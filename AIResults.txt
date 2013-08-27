@@ -1,0 +1,99 @@
+=============== (depth 1)
+Random (100) vs. SimpleMinMax (100) - 2197 ms.: RESULT_TURN_LIMIT_REACHED
+Time pr move (max.): 11 vs. 67
+Time pr move (avg.): 0.12 vs. 19.06
+Time pr move (mean): 0 vs. 16
+Positions pr move (max.): 0 vs. 170
+Positions pr move (avg.): 0.0 vs. 95.76
+Positions pr move (mean): 0 vs. 90
+==============m ==
+
+===============
+SimpleMinMax (200) vs. SimpleMinMax (0) - 266255 ms.: RESULT_TURN_LIMIT_REACHED
+Time pr move (max.): 5937 vs. 9677
+Time pr move (avg.): 218.57 vs. 2437.79
+Time pr move (mean): 1 vs. 2455
+Positions pr move (max.): 9624 vs. 11163
+Positions pr move (avg.): 351.91 vs. 2618.99
+Positions pr move (mean): 1 vs. 2320
+================
+
+================
+Depth 3
+RandomA (10) vs. SimpleMinMax (10) - 870168 ms.: RESULT_TURN_LIMIT_REACHED
+Time pr move (max.): 25 vs. 372426
+Time pr move (avg.): 2.6 vs. 87000.2
+Time pr move (mean): 0 vs. 8816
+Positions pr move (max.): 0 vs. 372992
+Positions pr move (avg.): 0.0 vs. 130642.3
+Positions pr move (mean): 0 vs. 62654
+------------------
+RandomA time pr. move: [25, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+RandomA game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+RandomA game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+SimpleMinMax time pr. move: [6237, 8816, 6718, 6023, 116654, 128374, 219632, 372426, 5057, 65]
+SimpleMinMax game states pr. sec.: [9581, 7106, 4426, 2973, 2248, 1589, 1332, 1001, 819, 876]
+SimpleMinMax game states pr. move: [59760, 62654, 29735, 17907, 262333, 204107, 292734, 372992, 4144, 57]
+------------------
+================
+
+================
+Depth 2 for both
+SimpleMinMax (10) vs. AlphaBeta (10) - 68039 ms.: RESULT_TURN_LIMIT_REACHED
+Time pr move (max.): 11850 vs. 8368
+Time pr move (avg.): 3833.4 vs. 2956.4
+Time pr move (mean): 3329 vs. 2862
+Positions pr move (max.): 8866 vs. 7943
+Positions pr move (avg.): 4653.1 vs. 3845.5
+Positions pr move (mean): 6167 vs. 5950
+------------------
+SimpleMinMax time pr. move: [554, 219, 373, 11, 2086, 3329, 4911, 7125, 7876, 11850]
+SimpleMinMax game states pr. sec.: [1310, 4109, 5428, 3272, 2249, 1852, 1535, 1164, 924, 748]
+SimpleMinMax game states pr. move: [726, 900, 2025, 36, 4693, 6167, 7541, 8299, 7278, 8866]
+AlphaBeta time pr. move: [445, 231, 66, 166, 2862, 3438, 6189, 7648, 8368, 151]
+AlphaBeta game states pr. sec.: [4449, 5844, 4090, 2427, 2078, 1746, 1219, 1038, 825, 668]
+AlphaBeta game states pr. move: [1980, 1350, 270, 403, 5950, 6005, 7547, 7943, 6906, 101]
+------------------
+================
+
+================
+Depth 3 for both
+SimpleMinMax (10) vs. AlphaBeta (10) - 980129 ms.: RESULT_TURN_LIMIT_REACHED
+Time pr move (max.): 330676 vs. 22664
+Time pr move (avg.): 90077.0 vs. 7922.1
+Time pr move (mean): 4383 vs. 4899
+Positions pr move (max.): 432857 vs. 22978
+Positions pr move (avg.): 154970.2 vs. 9854.0
+Positions pr move (mean): 40680 vs. 5345
+------------------
+SimpleMinMax time pr. move: [2403, 4136, 4383, 933, 127567, 144482, 280135, 330676, 2120, 3935]
+SimpleMinMax game states pr. sec.: [9118, 9835, 5694, 3712, 2593, 1901, 1545, 1251, 1237, 994]
+SimpleMinMax game states pr. move: [21912, 40680, 24957, 3464, 330811, 274686, 432857, 413798, 2623, 3914]
+AlphaBeta time pr. move: [1185, 921, 367, 1763, 13265, 17836, 22664, 16286, 4899, 35]
+AlphaBeta game states pr. sec.: [3296, 3643, 4024, 2246, 1668, 1288, 994, 786, 1091, 1028]
+AlphaBeta game states pr. move: [3906, 3356, 1477, 3961, 22130, 22978, 22549, 12802, 5345, 36]
+------------------
+================
+
+----
+30 sek. limit
+RandomA (30) vs. MCTS-UCT (30) - 900672 ms.: RESULT_TURN_LIMIT_REACHED
+RandomA (27) vs. MCTS-UCT (27) - 810324 ms.: RESULT_BLACK_WINS
+RandomA (20) vs. MCTS-UCT (20) - 600296 ms.: RESULT_BLACK_WINS
+RandomA (17) vs. MCTS-UCT (17) - 510203 ms.: RESULT_BLACK_WINS
+RandomA (22) vs. MCTS-UCT (22) - 660353 ms.: RESULT_BLACK_WINS
+RandomA (13) vs. MCTS-UCT (13) - 390156 ms.: RESULT_BLACK_WINS
+RandomA (30) vs. MCTS-UCT (30) - 900402 ms.: RESULT_TURN_LIMIT_REACHED
+RandomA (17) vs. MCTS-UCT (17) - 510248 ms.: RESULT_BLACK_WINS
+RandomA (18) vs. MCTS-UCT (18) - 540246 ms.: RESULT_BLACK_WINS
+RandomA (16) vs. MCTS-UCT (16) - 480279 ms.: RESULT_BLACK_WINS
+MCTS-UCT (11) vs. RandomA (11) - 330184 ms.: RESULT_WHITE_WINS
+MCTS-UCT (12) vs. RandomA (11) - 360188 ms.: RESULT_WHITE_WINS
+MCTS-UCT (13) vs. RandomA (12) - 390168 ms.: RESULT_WHITE_WINS
+MCTS-UCT (25) vs. RandomA (24) - 750323 ms.: RESULT_WHITE_WINS
+MCTS-UCT (30) vs. RandomA (30) - 900344 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (17) vs. RandomA (16) - 510210 ms.: RESULT_WHITE_WINS
+MCTS-UCT (26) vs. RandomA (25) - 780893 ms.: RESULT_WHITE_WINS
+MCTS-UCT (30) vs. RandomA (30) - 901597 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. RandomA (30) - 901873 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (11) vs. RandomA (10) - 330157 ms.: RESULT_WHITE_WINS

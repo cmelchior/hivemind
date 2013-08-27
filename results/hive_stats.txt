@@ -1,0 +1,178 @@
+Boardspace.net Hive statistics
+
+
+For those that don't know Boardspace.net, it is a website for playing a lot of abstract board games and Hive as been
+especially popular there. This means that the website has a large amount of replays available, and fortunately they are
+also available for download and analysis.
+
+This was exactly what I needed for a small Hive AI project I am currently working on, so I have spend some time
+analyzing the game data and thought others might find them interesting too.
+
+Enjoy!
+
+All datafiles/images can be downloaded here: <<Link>>
+
+
+1) Games analyzed
+
+Currently Boardspace.net have 140.000+ worth of game data.
+I have ignored all games against Dumbot (the standard AI player) and only looked at player vs. player games. This amount
+to 22404 games analyzed of which 886 games where tournament games. Tournament games are prefixed with "t-*" while other
+games are prefixed with "p-*"
+
+This is spread over a lot of variants as seen below, with standard Hive (without any expansion), being played the most.
+
+<<Image of games analyzed>>
+
+
+2) Game results
+
+I have seen it stated elsewhere that the beginning player (always white on boardspace.net) has a small advantage.
+So I looked at the result of all games. Across all games there doesn't seem to be support for that notation with
+black and white winners being incredible equal at 45.5% wins to White and 45.9% wins to Black. Draws happen in 4.3% of
+all games. Boardspace.net made a rule change some years ago which disallowed Queen-Queen openings (which should reduce
+draws). I have not been able to find the exact date for that change, so games before that date is also included in the stats.
+
+Generally tournament games (which in teori should have better players than general play) gives the starting player a
+5% advantage with 44.4% White wins and 39.1% Black wins.
+
+This seems to indicate that White does have a slight advantage, but only for experienced players.
+
+<<Image of game results pr. type>>
+<<Image of game results for all>>
+
+
+Note: The real number of "Other" games was originally a bit higher, but looking at the replays it seemed a lot of games
+was abonded when a "sure winner" was known even though the game wasn't over. In order to get
+more Win/Loose games I had an AI play two more turns to correctly sort all games that was 1 turn from ending. This
+moved 4% from Others to white/black win results.
+
+
+3) Game turns pr. player
+
+Most hive games ends after 15 or 16 turns with tournament games usually taking a few turns more. Very few games take
+more than 40 turns, although the longest game recorded lastet a whooping 123 turns. The shortest game lastet 5 turns -
+somebody must really have made a mistake there.
+
+<<Image of game turns>>
+<<Image of game turns
+
+Only games which ended with a result (win/draw) was included in this metric.
+
+
+4) Game duration pr. player
+
+The average time pr. player across all games was 21 seconds. Tournament games take a bit longer with 27
+seconds pr. move on average. Worth noting is that apparently tournament players have a lot to think about with the
+Mosquito/LadyBug expansions as their games take 42 seconds on average (although the sample size is small with only 33 games).
+
+If a games takes 16 pr. player, a game last on average 11-12 minutes.
+
+<<Game duration>>
+
+Only games which ended with a result (win/draw) was included in this metric.
+
+5) Opening token
+
+The Spider and Grasshopper seems to be the starting pieces used by most by a large margin, with 39.96% and 39.97%
+respectively. Probably because they are seen as the "weaker" tokens and the starting tokens usually get locked in.
+
+
+<<Image of opening tokens>>
+
+Fun fact, in 22404 games, the spider was used 8505 times as the starting piece while the grasshopper was
+used 8506 times.
+
+Bugs have been weighted by how many games they could be chosen, so the comparison should be fair even though the Pillbug
+was only recently introduced.
+
+
+6) Closing token
+
+Closing tokens are the token last used to end the game. Apparently having the Beetle on top of the hive is a very
+popular strategy as 47.54% of all games was ended by moving the Beetle. So stop those beetles :).
+Not surprisingly the Ant was the 2nd most used piece with 24.16%. Somewhat surprising is it that the LadyBug as a fairly
+aggressive piece was only used 2.10% of time.
+
+<<Image of closing tokens>>
+
+Bugs have been weighted by how many games they could be chosen, so the comparison should be fair even though the Pillbug
+was only recently introduced. The Pillbug also gets counted if it was used to move the last piece.
+
+
+7) Opening moves
+
+Opening moves are defined as the first 4 moves by each player. I have not analyzed starting positions yet, simply moves.
+When a bug is placed on the board it gets a new number so if two spiders are placed they are called S1 and S2, but if
+Spider 1 just moved S1 will be there twice.
+
+The opening moves have been grouped into 4 graphs: All white openings, All black openings, White winner openings (when white won)
+and Black winner openings (when black won).
+
+<<Image All white>>
+<<Image white winner>>
+<<Image All black>>
+<<Image black winner>>
+
+A total of 738 openings was registered, but only the 10 most used was included.
+
+---
+black openings
+G1-Q-A1-A1	1396	6.246644
+G1-Q-S1-S1	1180	5.2801147
+G1-Q-S1-A1	948	4.2419906
+G1-Q-A1-A2	762	3.409701
+S1-Q-A1-A1	734	3.2844102
+S1-A1-Q-A1	415	1.8569894
+G1-G2-Q-A1	400	1.7898693
+S1-Q-S2-S2	374	1.6735278
+G1-Q-A1-S1	341	1.5258636
+G1-Q-G2-A1	340	1.5213889
+
+black winner
+G1-Q-A1-A1	972	9.458013
+G1-Q-S1-S1	718	6.9864745
+G1-Q-S1-A1	582	5.663131
+G1-Q-A1-A2	433	4.2132916
+S1-Q-A1-A1	364	3.5418897
+S1-A1-Q-A1	218	2.1212416
+B1-Q-A1-A1	212	2.0628588
+G1-G2-Q-A1	206	2.004476
+G1-Q-G2-A1	188	1.8293276
+G1-Q-A1-S1	169	1.6444488
+
+white opening
+G1-A1-Q-A1	1853	8.290828
+G1-Q-A1-A1	1521	6.805369
+S1-Q-A1-A1	1402	6.2729306
+S1-A1-Q-A1	1058	4.733781
+G1-Q-S1-S1	930	4.1610737
+S1-Q-S2-S2	638	2.8545861
+G1-Q-A1-A2	464	2.0760627
+B1-Q-A1-A1	325	1.4541388
+S1-Q-A1-A2	321	1.4362416
+G1-A1-Q-A2	302	1.3512304
+
+white winner openings
+G1-A1-Q-A1	1003	9.848783
+G1-Q-A1-A1	715	7.020817
+S1-Q-A1-A1	653	6.412019
+S1-A1-Q-A1	518	5.08641
+G1-Q-S1-S1	517	5.0765905
+S1-Q-S2-S2	312	3.0636292
+G1-Q-A1-A2	272	2.6708562
+S1-Q-A1-A2	190	1.8656716
+G1-A1-Q-A2	187	1.8362137
+G1-A1-Q-S1	155	1.5219953
+
+The most popular opening across all variants seems to be agressive openings with either ants or spiders attack on turn 3 or 4.
+Especially black usually opt for a Turn 2 queen to be able to move as soon as White is able, and apparently Grashopper is a very
+popular first token as black player.
+
+What is interesting is that no starting strategy for White seems to win more than anticipated, but black starting with G1-Q-A1-A1 in 6.2% of the games
+actually win 50% more games at 9.4%. Getting those ants out early is apparently quite a big deal for black.
+
+
+
+
+
