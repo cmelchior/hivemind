@@ -29,19 +29,22 @@ public class Game {
     private boolean replayMode = false;     // If true, the game cannot progress any futher, but forward(), backwards() can be called to navigate the game. When set to to false, game is forwarded to last position again.
     private int replayIndex = 0;            // Pointer to current move (that has not been played).
 
-    private boolean printGameStateAfterEachMove = false;
-
     private int turnLimit = -1;             // If above 0, the game ends in a draw after so many moves.
-    private GameStatus status = GameStatus.RESULT_NOT_STARTED;
 
+    private GameStatus status = GameStatus.RESULT_NOT_STARTED;
     private Player activePlayer;
     private List<GameCommand> moves = new ArrayList<GameCommand>();
 
+    private boolean printGameStateAfterEachMove = false;
     private GameStatistics statistics = new GameStatistics();
     private HiveAsciiPrettyPrinter mapPrinter = new HiveAsciiPrettyPrinter();
 
-    public Game() {
-    }
+    // Keeping track of draws
+    private boolean forcedDraw;             // If true, game is declared a draw after a set number of repeat moves by each player.
+    private int repeatMovesBeforeForcedDraw = 3; // Number of moves each player must make that are "the same" before forcing a draw.
+    private int whiteDuplicateMoves = 0;
+    private int blackDuplicateMoves = 0;
+
 
     public void addPlayers(Player white, Player black) {
         this.whitePlayer = white;
@@ -149,6 +152,7 @@ public class Game {
      */
     private void printBoardState(GameCommand command) {
         System.out.println(getOtherPlayer().getName() + ": Turn " + getOtherPlayer().getTurns());
+        System.out.println("DuplicateMoves: " + whiteDuplicateMoves + " vs. " + blackDuplicateMoves);
         System.out.println(command.toString());
         mapPrinter.print(board);
     }
@@ -156,14 +160,36 @@ public class Game {
     private void executeCommand(GameCommand command) {
         if (command.equals(GameCommand.PASS)) {
             statistics.playerPasses(activePlayer);
-        } else if (command.getFromQ() != Hex.SUPPLY) {
-            statistics.playerMoves(activePlayer);
         } else {
             statistics.playerMoves(activePlayer);
         }
 
+        keepTrackOfDuplicateMoves(command);
         command.execute(this);
         moves.add(command);
+    }
+
+    /**
+     * Keeps track of players executing duplicate moves.
+     * Should be called before the move is actually executed.
+     */
+    private void keepTrackOfDuplicateMoves(GameCommand command) {
+        if (moves.size() >= 4) {
+            String lastMove = moves.get(moves.size() - 4).getTargetSquareDesc();
+            if (command.getTargetSquareDesc().equals(lastMove)) {
+                if (activePlayer.isWhitePlayer()) {
+                    whiteDuplicateMoves++;
+                } else {
+                    blackDuplicateMoves++;
+                }
+            } else {
+                if (activePlayer.isWhitePlayer()) {
+                    whiteDuplicateMoves = 0;
+                } else {
+                    blackDuplicateMoves = 0;
+                }
+            }
+        }
     }
 
     private boolean isLegalCommand(GameCommand command) {
@@ -197,9 +223,10 @@ public class Game {
     public boolean isEndOfGame() {
         boolean whiteQueenSurronded = Rules.getInstance().isQueenSurrounded(whitePlayer, board);
         boolean blackQueenSurronded = Rules.getInstance().isQueenSurrounded(blackPlayer, board);
+        boolean forcedDraw = isForcedDraw();
 
         // End game conditions
-        if (whitePlayer.getTurns() + blackPlayer.getTurns() == 2*turnLimit && turnLimit > 0) {
+        if (whitePlayer.getTurns() + blackPlayer.getTurns() == 2 * turnLimit && turnLimit > 0) {
             setStatus(GameStatus.RESULT_TURN_LIMIT_REACHED);
             if (DEBUG) System.out.println("Move limit reached: " + turnLimit);
             return true;
@@ -214,6 +241,10 @@ public class Game {
         } else if (blackQueenSurronded) {
             setStatus(GameStatus.RESULT_WHITE_WINS);
             if (DEBUG) System.out.println("White wins");
+            return true;
+        } else if (forcedDraw) {
+            setStatus(GameStatus.RESULT_DRAW);
+            if (DEBUG) System.out.println("Game ended in a draw!");
             return true;
         }
 
@@ -303,5 +334,10 @@ public class Game {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isForcedDraw() {
+        int maxTurns = repeatMovesBeforeForcedDraw;
+        return whiteDuplicateMoves >= maxTurns && blackDuplicateMoves >= maxTurns;
     }
 }

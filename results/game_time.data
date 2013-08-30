@@ -1,9 +1,18 @@
 Variant	Time (s.)
-all	806
+all	576
+all-d	534
 all-p	793
 all-t	1144
+d-hive	496
+d-hive-l	571
+d-hive-lm	764
+d-hive-m	406
+d-hive-p	991
+d-hive-pl	1097
+d-hive-plm	1099
+d-hive-pm	1225
 p-hive	787
-p-hive-l	914
+p-hive-l	915
 p-hive-lm	806
 p-hive-m	719
 p-hive-p	939

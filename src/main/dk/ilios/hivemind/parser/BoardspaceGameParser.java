@@ -35,10 +35,12 @@ public class BoardspaceGameParser {
     private String player1;
     private int player1Turns = 0;
     private long player1GameTime = -1;
+    private int player1Ranking = -1;
 
     private String player2;
     private int player2Turns = 0;
     private long player2GameTime = -1;
+    private int player2Ranking = -1;
 
     private HiveAsciiPrettyPrinter printer = new HiveAsciiPrettyPrinter();
 
@@ -91,6 +93,18 @@ public class BoardspaceGameParser {
                 player2GameTime = parseTime(line.substring(8, line.length() - 2));
                 continue;
             }
+
+            // Player 1 ranking
+            if (line.startsWith("P0[ranking")) {
+                player1Ranking = Integer.parseInt(line.substring(11, line.length() - 2));
+                continue;
+            }
+
+            // Player 2 ranking
+            if (line.startsWith("P1[ranking")) {
+                player2Ranking = Integer.parseInt(line.substring(11, line.length() - 2));
+                continue;
+            }
         }
         br.close();
 
@@ -108,7 +122,9 @@ public class BoardspaceGameParser {
         Player white = new Player(player1, Player.PlayerType.WHITE);
         Player black = new Player(player2, Player.PlayerType.BLACK);
         white.addPlayTime(player1GameTime);
+        white.setRanking(player1Ranking);
         black.addPlayTime(player2GameTime);
+        black.setRanking(player2Ranking);
 
         white.fillBaseSupply();
         black.fillBaseSupply();

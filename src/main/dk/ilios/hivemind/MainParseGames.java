@@ -25,26 +25,33 @@ public class MainParseGames {
 
     public void start(File f) {
         // Setup metrics to report on
-        metrics.add(new GamesAnalyzedMetric());
+//        metrics.add(new GamesAnalyzedMetric());
         metrics.add(new GameResultPrColorMetric(true));
-        metrics.add(new GameDurationTurnsMetric());
-        metrics.add(new GameDurationTimeMetric());
-        metrics.add(new OpeningTokenMetric());
-        metrics.add(new LastTokenMetric());
-        metrics.add(new BugsInSupplyAtGameEndMetric());
-        metrics.add(new BugsOnBoardAtGameEndMetric());
-        metrics.add(new OpeningsMetric());
-        metrics.add(new WinnerOpeningMetric());
-        metrics.add(new FreeTokensPrTurnMetric(15));
-        metrics.add(new FreeTokensPrTurnMetric(25));
-        metrics.add(new TokensAroundQueenMetric(15));
-        metrics.add(new TokensAroundQueenMetric(25));
+//        metrics.add(new GameDurationTurnsMetric());
+//        metrics.add(new GameDurationTimeMetric());
+//        metrics.add(new OpeningTokenMetric());
+//        metrics.add(new LastTokenMetric());
+//        metrics.add(new BugsInSupplyAtGameEndMetric());
+//        metrics.add(new BugsOnBoardAtGameEndMetric());
+//        metrics.add(new OpeningsMetric());
+//        metrics.add(new WinnerOpeningMetric());
+//        metrics.add(new FreeTokensPrTurnMetric(15));
+//        metrics.add(new FreeTokensPrTurnMetric(25));
+//        metrics.add(new TokensAroundQueenMetric(15));
+//        metrics.add(new TokensAroundQueenMetric(25));
+//        metrics.add(new HighRankedGamesMetric());
 
         // Setup directories to parse
         Stack<File> dirs = new Stack<File>();
         dirs.add(new File(TOURNAMENT_DIR));
 
         Map<BoardspaceGameType, List<File>>  files = new HashMap<BoardspaceGameType, List<File>>();
+
+        // Test
+//        List<File> testFiles = new ArrayList<File>();
+//        testFiles.add(new File("./plays/test.sgf"));
+//        files.put(BoardspaceGameType.PLAYER, testFiles);
+
 
         Stack<File> tournamentFiles = new Stack<File>();
         tournamentFiles.add(new File(TOURNAMENT_DIR));
@@ -57,8 +64,8 @@ public class MainParseGames {
 //        Stack<File> dumbotFiles = new Stack<File>();
 //        dumbotFiles.add(new File(DUMBOT_DIR));
 //        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
-
-        // Start parsing
+//
+//        // Start parsing
         // If a game breaks, quit parsing and report progress so far
         for (BoardspaceGameType type : files.keySet()) {
             List<File> fileList = files.get(type);

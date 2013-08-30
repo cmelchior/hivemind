@@ -114,4 +114,12 @@ public class GameCommand {
         sb.append("(" + toQ + ", " + toR + ")");
         return sb.toString();
     }
+
+    public String getTargetSquareDesc() {
+        if (toQ == Hex.SUPPLY || toR == Hex.SUPPLY) {
+            return "SUPPLY";
+        } else {
+            return "(" + toQ + ", " + toR + ")";
+        }
+    }
 }

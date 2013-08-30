@@ -18,6 +18,7 @@ public class Player {
     private CommandProvider commandProvider;
 
     private final String name;
+    private int ranking;
 
     private final PlayerType type;
     private int moves = 0; // Number of moves made in the game
@@ -227,5 +228,13 @@ public class Player {
 
     public void addPlayTime(long timeInMs) {
         playTime += timeInMs;
+    }
+
+    public int getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(int ranking) {
+        this.ranking = ranking;
     }
 }

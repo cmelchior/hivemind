@@ -35,11 +35,10 @@ public class HiveAsciiPrettyPrinter {
 
         AsciiBoard asciiBoard = new AsciiBoard(adjustQ, maxQ, adjustR, maxR, hexPrinter);
         for (Hex hex : board.getFilledHexes()) {
-            BugType type = hex.getTopToken().getType();
             Player player = hex.getTopToken().getPlayer();
 
             char fill = (player.getType() == Player.PlayerType.WHITE) ? '#' : '+';
-            asciiBoard.printHex(getTokenTitle(type), getPlayerTitle(player), fill, hex.getQ() - adjustQ, hex.getR() - adjustR);
+            asciiBoard.printHex(hex.getTopToken().getId(), getPlayerTitle(player), fill, hex.getQ() - adjustQ, hex.getR() - adjustR);
         }
         return asciiBoard;
     }
