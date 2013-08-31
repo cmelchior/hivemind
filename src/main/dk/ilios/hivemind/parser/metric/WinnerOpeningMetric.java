@@ -23,7 +23,7 @@ public class WinnerOpeningMetric extends Metric {
 
     @Override
     public void analyzeGame(BoardspaceGameType type, String variant, Game game) {
-        if (game.getWhitePlayer().getMoves() < 4) return;
+        if (game.getWhitePlayer().getMoves() < 4 || game.getBlackPlayer().getMoves() < 4) return;
         if (game.getStatus() != GameStatus.RESULT_WHITE_WINS && game.getStatus() != GameStatus.RESULT_BLACK_WINS) return;
         StringBuilder sb = new StringBuilder();
 

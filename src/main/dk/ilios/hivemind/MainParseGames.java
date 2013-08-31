@@ -4,6 +4,8 @@ import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.parser.BoardspaceGameParser;
 import dk.ilios.hivemind.parser.BoardspaceGameType;
 import dk.ilios.hivemind.parser.metric.*;
+import dk.ilios.hivemind.parser.predicates.BoardspaceNetMasterPlayers;
+import dk.ilios.hivemind.parser.predicates.Predicate;
 
 import java.io.File;
 import java.util.*;
@@ -19,27 +21,33 @@ public class MainParseGames {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        new MainParseGames().start(new File(args[0]));
+        new MainParseGames().start();
         System.out.println("Done: " + (System.currentTimeMillis() - start)/1000 + " s.");
     }
 
-    public void start(File f) {
+    public void start() {
         // Setup metrics to report on
-//        metrics.add(new GamesAnalyzedMetric());
+        metrics.add(new GamesAnalyzedMetric());
         metrics.add(new GameResultPrColorMetric(true));
-//        metrics.add(new GameDurationTurnsMetric());
-//        metrics.add(new GameDurationTimeMetric());
-//        metrics.add(new OpeningTokenMetric());
-//        metrics.add(new LastTokenMetric());
-//        metrics.add(new BugsInSupplyAtGameEndMetric());
-//        metrics.add(new BugsOnBoardAtGameEndMetric());
-//        metrics.add(new OpeningsMetric());
-//        metrics.add(new WinnerOpeningMetric());
-//        metrics.add(new FreeTokensPrTurnMetric(15));
-//        metrics.add(new FreeTokensPrTurnMetric(25));
-//        metrics.add(new TokensAroundQueenMetric(15));
-//        metrics.add(new TokensAroundQueenMetric(25));
-//        metrics.add(new HighRankedGamesMetric());
+        metrics.add(new GameDurationTurnsMetric());
+        metrics.add(new GameDurationTimeMetric());
+        metrics.add(new OpeningTokenMetric());
+        metrics.add(new LastTokenMetric());
+        metrics.add(new BugsInSupplyAtGameEndMetric());
+        metrics.add(new BugsOnBoardAtGameEndMetric());
+        metrics.add(new OpeningsMetric());
+        metrics.add(new WinnerOpeningMetric());
+        metrics.add(new FreeTokensPrTurnMetric(15));
+        metrics.add(new FreeTokensPrTurnMetric(25));
+        metrics.add(new TokensAroundQueenMetric(15));
+        metrics.add(new TokensAroundQueenMetric(25));
+        metrics.add(new HighRankedGamesMetric());
+        metrics.add(new CompareOpeningsMetric());
+
+        // Filters
+        List<Predicate> filters = new ArrayList<Predicate>();
+//        filters.add(new BoardspaceNetMasterPlayers());
+
 
         // Setup directories to parse
         Stack<File> dirs = new Stack<File>();
@@ -53,19 +61,19 @@ public class MainParseGames {
 //        files.put(BoardspaceGameType.PLAYER, testFiles);
 
 
-        Stack<File> tournamentFiles = new Stack<File>();
-        tournamentFiles.add(new File(TOURNAMENT_DIR));
-        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
+//        Stack<File> tournamentFiles = new Stack<File>();
+//        tournamentFiles.add(new File(TOURNAMENT_DIR));
+//        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
+//
+//        Stack<File> playerFiles = new Stack<File>();
+//        playerFiles.add(new File(PLAYER_DIR));
+//        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
 
-        Stack<File> playerFiles = new Stack<File>();
-        playerFiles.add(new File(PLAYER_DIR));
-        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
-//
-//        Stack<File> dumbotFiles = new Stack<File>();
-//        dumbotFiles.add(new File(DUMBOT_DIR));
-//        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
-//
-//        // Start parsing
+        Stack<File> dumbotFiles = new Stack<File>();
+        dumbotFiles.add(new File(DUMBOT_DIR));
+        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
+
+        // Start parsing
         // If a game breaks, quit parsing and report progress so far
         for (BoardspaceGameType type : files.keySet()) {
             List<File> fileList = files.get(type);
@@ -81,9 +89,19 @@ public class MainParseGames {
                     continue;
                 }
 
-                for (Metric metric : metrics) {
-                    game.setReplayMode(false);
-                    metric.analyzeGame(type, parser.getGameType(), game);
+                boolean analyseGame = true;
+                for (Predicate filter : filters) {
+                    if (!filter.analyseGame(game)) {
+                        analyseGame = false;
+                        break;
+                    }
+                }
+
+                if (analyseGame) {
+                    for (Metric metric : metrics) {
+                        game.setReplayMode(false);
+                        metric.analyzeGame(type, parser.getGameType(), game);
+                    }
                 }
             }
         }

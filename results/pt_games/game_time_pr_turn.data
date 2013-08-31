@@ -1,7 +1,7 @@
 Variant	Time (s.)
 all	21
 all-p	20
-all-t	27
+all-t	26
 p-hive	20
 p-hive-l	23
 p-hive-lm	21
@@ -10,11 +10,11 @@ p-hive-p	21
 p-hive-pl	25
 p-hive-plm	20
 p-hive-pm	25
-t-hive	27
-t-hive-l	30
-t-hive-lm	42
-t-hive-m	21
-t-hive-p	28
+t-hive	26
+t-hive-l	29
+t-hive-lm	38
+t-hive-m	22
+t-hive-p	27
 t-hive-pl	24
-t-hive-plm	29
-t-hive-pm	27
+t-hive-plm	28
+t-hive-pm	26
