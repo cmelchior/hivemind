@@ -1,9 +1,9 @@
-HIVEMIND
+HIVEMIND v.0.1
 =================
 
 Document is Work-in-Progres!
 
-HiveMind is a Java based stand-alone AI implementation for the boardgame Hive by John Yianni.
+HiveMind is a Java based stand-alone AI implementation for the board game Hive by John Yianni.
 
 HiveMind currently consists of 3 seperate modules:
 
@@ -18,9 +18,10 @@ HiveMind currently consists of 3 seperate modules:
 Current status
 -----------------
 Alpha:
-    - All board game rules are implemented except Pillbug.
-    - AI Game controller working. Statistics still need work.
-    - Some basic AI implementations working: Standard Minimax variants, Standard Monte Carlo tree search + UTC.
+
+- All board game rules are implemented except Pillbug.
+- AI Game controller working. Statistics still need work.
+- Some basic AI implementations working: Standard Minimax variants, Standard Monte Carlo tree search + UTC.
 
 
 AI's
