@@ -1,4 +1,4 @@
-package dk.ilios.hivemind.parser.predicates;
+package dk.ilios.hivemind.parser.filters;
 
 import dk.ilios.hivemind.game.Game;
 
@@ -25,7 +25,7 @@ import java.util.HashSet;
  * BlackMagic
  * Ampexian
  */
-public class BoardspaceNetMasterPlayers implements Predicate {
+public class BoardspaceNetMasterPlayersFilter implements Filter {
 
     private HashSet<String> players = new HashSet<String>() {
         {
@@ -50,7 +50,7 @@ public class BoardspaceNetMasterPlayers implements Predicate {
     };
 
     @Override
-    public boolean analyseGame(Game game) {
+    public boolean analyseGame(String type, Game game) {
         return players.contains(game.getWhitePlayer().getName().toLowerCase()) && players.contains(game.getBlackPlayer().getName().toLowerCase());
     }
 }
