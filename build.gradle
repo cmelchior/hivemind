@@ -1,13 +1,16 @@
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.6
 group = 'dk.ilios.hivemind'
-version = '1.0'
+version = '1.0-SNAPSHOT'
+mainClassName = 'dk.ilios.hivemind.MainParseGames'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

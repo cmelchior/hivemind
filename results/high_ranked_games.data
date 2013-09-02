@@ -1,4 +1,11 @@
 Type	Count
-1	all	0
-2	all-p	0
-3	p-hive-m	0
+1	all	26
+2	all-t	26
+3	t-hive	9
+4	t-hive-l	2
+5	t-hive-lm	3
+6	t-hive-m	4
+7	t-hive-p	7
+8	t-hive-pl	0
+9	t-hive-plm	1
+10	t-hive-pm	0
