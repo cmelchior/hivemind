@@ -111,13 +111,13 @@ TODO
 -----------------
 - (✓) Make plots of metrics.
 - (✓) Make write-up of stats for Boardspace.net / Boardgamegeek
+- Add threading to AI battles.
+- Better comparison of AI battles
 
 - Good Minimax heuristic function
 - Good Monte Carlo heuristic function
 - Consider how transposition tables should work
 - Method profilling (can game model be improved?)
-- Better comparison of AI battles
-- Add threading to AI battles.
 - Find possible improvements to Minimax
 - Find possible improvements to Monte Carlo Tree Search
 

@@ -21,6 +21,11 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
     }
 
     @Override
+    public HiveAI copy() {
+        return new AlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis);
+    }
+
+    @Override
     public GameCommand nextMove(Game state, Board board) {
         maximizingPlayer = state.getActivePlayer();
         start = System.currentTimeMillis();

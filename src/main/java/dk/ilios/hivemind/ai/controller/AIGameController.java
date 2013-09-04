@@ -8,10 +8,8 @@ import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
 import dk.ilios.hivemind.model.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Controller class for executing AI battles.
@@ -20,11 +18,16 @@ import java.util.Set;
  */
 public class AIGameController {
 
+    // How many games can run simultaneously. Max should be #CPUs - 1 to avoid CPU contention.
+    // Look into if it is possible to force Java to use different CPU's. Right now we just cross fingers and hope.
+    private static final int THREAD = 3;
+
     private int turnLimit;
     private int numberOfMatches;
 
+    private long duration;
     private Set<HiveAI> opponents = new HashSet<HiveAI>();
-    private List<GameStatistics> gameResults = new ArrayList<GameStatistics>();
+    private List<GameStatistics> gameResults = Collections.synchronizedList(new ArrayList<GameStatistics>());
 
     public void addOpponent(HiveAI opponent) {
         opponents.add(opponent);
@@ -42,14 +45,33 @@ public class AIGameController {
     }
 
     public void start() {
+        long start = System.currentTimeMillis();
+        ExecutorService executor = Executors.newFixedThreadPool(THREAD);
         for (HiveAI oppA : opponents) {
             for (HiveAI oppB : opponents) {
                 if (oppA.equals(oppB)) continue;
                 for (int i = 0; i < numberOfMatches; i++) {
-                    runGame(oppA, oppB, false);
+                    final HiveAI a = oppA.copy();
+                    final HiveAI b = oppB.copy();
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            runGame(a, b, false);
+                        }
+                    });
                 }
             }
         }
+
+        // Wait for tasks to finish
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            /* Ignore */
+        }
+
+        duration = System.currentTimeMillis() - start;
     }
 
     public void startSingleGame(HiveAI whitePlayer, HiveAI blackPlayer, boolean printGameState) {
@@ -101,7 +123,7 @@ public class AIGameController {
     }
 
     public void printLog() {
-        StringBuilder sb = new StringBuilder("Games done: \n");
+        StringBuilder sb = new StringBuilder("Games done: " + (duration/1000f) + "s.\n");
         sb.append("================\n");
         for (GameStatistics stats : gameResults) {
             sb.append(stats.shortSummary());

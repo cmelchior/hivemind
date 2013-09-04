@@ -204,7 +204,7 @@ public class BoardspaceGameParser {
         // Old pattern:  ; P0[32 dropb B1 N 12 bG1]     // Both Dumbot / Player moves
         // New Patterns: ; P1[19 pdropb bq L 14 -bL1]   // Player move token / pillbug moves
         //               ; P0[11 move W L1 N 12 wG1\\]  // Dumbot move token
-        //               ; P0[86 pmove B M1 O 10 bM1-]  // Dumbot - Pillbug moves
+        //               ; P0[86 pmove B M1 O 10 bM1-]  // Pillbug moves
         //               ; P0[31 move W P O 11 wQ-]     // Apparently pillbug doesn't have a number?!?
 
         Pattern p = Pattern.compile("P(.)\\[\\d+ (p?(dropb|move)) (. )?(.{1,3}) [A-Z] \\d+ ([^\\]]*)\\]; P.\\[.{1,3} done\\]");
@@ -236,7 +236,7 @@ public class BoardspaceGameParser {
      *
      * @param player   Either "0" (starting player/White) or "1"
      * @param command Command used by Boardspace.net, "dropb, pdrob, move, pmove". Not currently used.
-     * @param color Either "w","b" or null. If null, token being moved is players own, otherwise it might the the opponents.
+     * @param color Either "w","b" or null. If null, token being moved is players own.
      * @param tokenId  "Q", "B1, ", "A3" etc. Represents a unique token for the given player
      * @param moveTo Uses the boardspace notation defined here: http://www.boardspace.net/english/about_hive_notation.html
      *
@@ -316,7 +316,6 @@ public class BoardspaceGameParser {
             tokenId = moveTo.substring(1, moveTo.length() - 2);
             neighborAdjustment = new int[] {1, 0};
 
-
         } else if (moveTo.startsWith("/")) {
             player = moveTo.substring(1,2);
             tokenId = moveTo.substring(2);
@@ -351,7 +350,6 @@ public class BoardspaceGameParser {
 
         return new int[] { hex.getQ() + neighborAdjustment[0], hex.getR() + neighborAdjustment[1] };
     }
-
 
     /**
      * Returns a game summary nicely formatted.

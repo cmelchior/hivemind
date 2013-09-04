@@ -31,6 +31,12 @@ public class IDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
     }
 
     @Override
+    public HiveAI copy() {
+        return new IDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis);
+    }
+
+
+    @Override
     public GameCommand nextMove(Game state, Board board) {
         start = System.currentTimeMillis();
         maximizingPlayer = state.getActivePlayer();

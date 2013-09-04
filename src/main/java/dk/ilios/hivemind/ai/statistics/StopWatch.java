@@ -13,7 +13,7 @@ public class StopWatch {
 	static private StopWatch instance;
 	private Map<String, Watch> watches = new HashMap<String, Watch>();
 
-	public static StopWatch getInstance() {
+	public static synchronized StopWatch getInstance() {
 		if (instance == null) {
 			instance = new StopWatch();
 		}

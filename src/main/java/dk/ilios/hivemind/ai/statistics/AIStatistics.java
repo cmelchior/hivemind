@@ -3,6 +3,7 @@ package dk.ilios.hivemind.ai.statistics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Utility class for keeping track of AI performance
@@ -16,9 +17,8 @@ public class AIStatistics {
     int branches = 0;
     int nodes = 0;
 
-
-
     // Temporary data
+    String currentKey;
     int aiDepth = 3;
     int positionsEvaluated = 0;    // How many moves has been considered when getting the next move.
 
@@ -26,7 +26,8 @@ public class AIStatistics {
      * A new move request has been made.
      */
     public void startCalculatingNextMove() {
-        StopWatch.getInstance().start(getKey());
+        currentKey = UUID.randomUUID().toString();
+        StopWatch.getInstance().start(currentKey);
         positionsEvaluated = 0;
     }
 
@@ -34,16 +35,12 @@ public class AIStatistics {
      * The AI has returned a move
      */
     public void moveCalculated() {
-        long time = StopWatch.getInstance().stop(getKey()).getElapsedTimeInMillis();
+        long time = StopWatch.getInstance().stop(currentKey).getElapsedTimeInMillis();
         int movesPrSecond = (int) (positionsEvaluated / (time / 1000d));
 
         millisecondsPrMove.add(time);
         gameStatesEvaluatedPrSecond.add(movesPrSecond);
         positionsEvaluatedPrMove.add(positionsEvaluated);
-    }
-
-    private String getKey() {
-        return this.toString() + ": " + (millisecondsPrMove.size() + 1);
     }
 
     /**

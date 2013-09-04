@@ -39,6 +39,11 @@ public class UCTMonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAi {
     }
 
     @Override
+    public HiveAI copy() {
+        return new UCTMonteCarloTreeSearchAI(name, maxDepth, timeLimit);
+    }
+
+    @Override
     public GameCommand nextMove(Game state, Board board) {
         this.state = state;
         startPlayer = state.getActivePlayer();

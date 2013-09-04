@@ -23,6 +23,11 @@ public class SimpleMinMaxAI extends AbstractMinMaxAI {
     }
 
     @Override
+    public HiveAI copy() {
+        return new SimpleMinMaxAI(name, heuristic, searchDepth, maxTimeInMillis);
+    }
+
+    @Override
     public GameCommand nextMove(Game state, Board board) {
         maximizingPlayer = state.getActivePlayer();
         start = System.currentTimeMillis();

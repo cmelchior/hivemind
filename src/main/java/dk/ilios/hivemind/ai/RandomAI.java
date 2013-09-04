@@ -27,7 +27,12 @@ public class RandomAI implements HiveAI {
     }
 
     @Override
-    public GameCommand nextMove(Game state, Board board) {
+    public HiveAI copy() {
+        return new RandomAI(name);
+    }
+
+    @Override
+    public synchronized GameCommand nextMove(Game state, Board board) {
         this.state = state;
         Player activePlayer = state.getActivePlayer();
 

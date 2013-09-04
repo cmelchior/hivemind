@@ -22,6 +22,11 @@ public class NegamaxAI extends AbstractMinMaxAI {
     }
 
     @Override
+    public HiveAI copy() {
+        return new NegamaxAI(name, heuristic, searchDepth, maxTimeInMillis);
+    }
+
+    @Override
     public GameCommand nextMove(Game state, Board board) {
         maximizingPlayer = state.getActivePlayer();
         start = System.currentTimeMillis();

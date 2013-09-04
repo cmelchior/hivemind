@@ -34,6 +34,11 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
     }
 
     @Override
+    public HiveAI copy() {
+        return new TranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis);
+    }
+
+    @Override
     public GameCommand nextMove(Game state, Board board) {
         start = System.currentTimeMillis();
         maximizingPlayer = state.getActivePlayer();
