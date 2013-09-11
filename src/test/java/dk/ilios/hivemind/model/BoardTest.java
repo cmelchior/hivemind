@@ -6,9 +6,7 @@ import dk.ilios.hivemind.game.Game;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BoardTest {
 
@@ -65,60 +63,110 @@ public class BoardTest {
     }
 
     @Test
-    public void testZobristKey_empty() {
-        long time = System.currentTimeMillis();
-        Board board = new Board();
-        System.out.println("" + (System.currentTimeMillis() - time));
+    public void testStandardPosition_rotate2ndToken() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
 
-        assertEquals(0, board.getZobristKey());
+        Board board = game.getBoard();
+        board.setStandardPositionMode(true);
+
+        Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
+        Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
+
+        board.addToken(grasshopper, 1, 1);
+        board.addToken(bee, 1, 2);
+
+        int[] grasshopperCoords = board.getSPCoordinatesFor(grasshopper.getHex());
+        int[] beeCoords = board.getSPCoordinatesFor(bee.getHex());
+
+        assertArrayEquals(new int[] {0, 0}, grasshopperCoords);
+        assertArrayEquals(new int[] {1, 0}, beeCoords);
     }
+
 
     @Test
-    public void testZobristKey_playerState() {
-        Board board = new Board();
-        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
+    public void testStandardPosition_flip3rdToken() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(true);
+
+        Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
         Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
+        Token spider = p1.getFromSupply(BugType.SPIDER);
 
-        board.addToken(whiteBee, 0, 0);
-        board.addToken(blackBee, 0, 1);
-        long firstKey = board.getZobristKey();
+        board.addToken(grasshopper, 1, 1);
+        board.addToken(blackBee, 1, 2);
+        board.addToken(spider, 0, 1);
+        printer.print(board);
 
-        board.removeToken(0, 1);
-        board.removeToken(0, 0);
-        board.addToken(blackBee, 0, 1);
-        board.addToken(whiteBee, 0, 0);
+        int[] spiderCoords = board.getSPCoordinatesFor(spider.getHex());
+        assertArrayEquals(new int[] {0, -1}, spiderCoords);
 
-        // Last player move is encoded into the key. Similar
-        // board layouts are not the same if next player differs.
-        assertNotEquals(firstKey, board.getZobristKey());
     }
 
-    @Test
-    public void testZobristKey_boardState() {
-        Board board = new Board();
-        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
-        Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
-        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
-        Token blackSoldier = p2.getFromSupply(BugType.SOLDIER_ANT);
 
-        board.addToken(whiteBee, 0, 0);
-        board.addToken(blackBee, 0, 1);
-        board.addToken(whiteSoldier, 1, 0);
-        board.addToken(blackSoldier, 1, 1);
 
-        long firstKey = board.getZobristKey();
+//    @Test
+//    public void testZobristKey_empty() {
+//        long time = System.currentTimeMillis();
+//        Board board = new Board();
+//        System.out.println("" + (System.currentTimeMillis() - time));
+//
+//        assertEquals(0, board.getZobristKey());
+//    }
+//
+//    @Test
+//    public void testZobristKey_playerState() {
+//        Board board = new Board();
+//        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
+//        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
+//
+//        board.addToken(whiteBee, 0, 0);
+//        board.addToken(blackBee, 0, 1);
+//        long firstKey = board.getZobristKey();
+//
+//        board.removeToken(0, 1);
+//        board.removeToken(0, 0);
+//        board.addToken(blackBee, 0, 1);
+//        board.addToken(whiteBee, 0, 0);
+//
+//        // Last player move is encoded into the key. Similar
+//        // board layouts are not the same if next player differs.
+//        assertNotEquals(firstKey, board.getZobristKey());
+//    }
+//
+//    @Test
+//    public void testZobristKey_boardState() {
+//        Board board = new Board();
+//        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
+//        Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
+//        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
+//        Token blackSoldier = p2.getFromSupply(BugType.SOLDIER_ANT);
+//
+//        board.addToken(whiteBee, 0, 0);
+//        board.addToken(blackBee, 0, 1);
+//        board.addToken(whiteSoldier, 1, 0);
+//        board.addToken(blackSoldier, 1, 1);
+//
+//        long firstKey = board.getZobristKey();
+//
+//        board.removeToken(1, 1);
+//        board.removeToken(1, 0);
+//        board.removeToken(0, 1);
+//        board.removeToken(0, 0);
+//
+//        board.addToken(whiteBee, 0, 0);
+//        board.addToken(blackSoldier, 1, 1);
+//        board.addToken(whiteSoldier, 1, 0);
+//        board.addToken(blackBee, 0, 1);
+//
+//        // If board state is the same and next player also. It doesn't matter how that state was reached.
+//        assertEquals(firstKey, board.getZobristKey());
+//    }
 
-        board.removeToken(1, 1);
-        board.removeToken(1, 0);
-        board.removeToken(0, 1);
-        board.removeToken(0, 0);
 
-        board.addToken(whiteBee, 0, 0);
-        board.addToken(blackSoldier, 1, 1);
-        board.addToken(whiteSoldier, 1, 0);
-        board.addToken(blackBee, 0, 1);
 
-        // If board state is the same and next player also. It doesn't matter how that state was reached.
-        assertEquals(firstKey, board.getZobristKey());
-    }
+
 }

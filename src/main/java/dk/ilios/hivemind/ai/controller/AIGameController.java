@@ -20,7 +20,7 @@ public class AIGameController {
 
     // How many games can run simultaneously. Max should be #CPUs - 1 to avoid CPU contention.
     // Look into if it is possible to force Java to use different CPU's. Right now we just cross fingers and hope.
-    private static final int THREAD = 3;
+    private static final int THREADS = 3;
 
     private int turnLimit;
     private int numberOfMatches;
@@ -46,7 +46,7 @@ public class AIGameController {
 
     public void start() {
         long start = System.currentTimeMillis();
-        ExecutorService executor = Executors.newFixedThreadPool(THREAD);
+        ExecutorService executor = Executors.newFixedThreadPool(THREADS);
         for (HiveAI oppA : opponents) {
             for (HiveAI oppB : opponents) {
                 if (oppA.equals(oppB)) continue;
@@ -122,11 +122,11 @@ public class AIGameController {
         gameResults.add(game.getStatistics());
     }
 
-    public void printLog() {
+    public void printLog(boolean longSummary) {
         StringBuilder sb = new StringBuilder("Games done: " + (duration/1000f) + "s.\n");
         sb.append("================\n");
         for (GameStatistics stats : gameResults) {
-            sb.append(stats.shortSummary());
+            sb.append((longSummary ? stats.longSummary() : stats.shortSummary()));
             sb.append('\n');
         }
         sb.append("================");

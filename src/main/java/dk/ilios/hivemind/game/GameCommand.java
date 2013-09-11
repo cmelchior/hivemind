@@ -94,7 +94,7 @@ public class GameCommand {
         }
 
         // Make sure that the old active players gets it turn correctly modified
-        // by toggling player first.
+            // by toggling player first.
         game.togglePlayer();
         game.getActivePlayer().undoTokenMoved();
     }

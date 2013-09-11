@@ -1,85 +1,131 @@
 package dk.ilios.hivemind.model;
 
+import dk.ilios.hivemind.game.GameCommand;
+
 import java.util.*;
 
 /**
  * Class representing a Hive hexagonal Board.
+ *
  * As Hive doesn't have any "real" board, the board is defined from the starting piece with gets position (0,0).
  * The rest of the board is described by a 2 dimensional grid system.
  *
- * The hex grid uses a trapezoidal or axial coordinate system, like so:
+ * The hex grid uses a trapezoidal or axial coordinate system [2], like so:
  *
  *           _ _
  *         /     \
  *    _ _ /(0,-1) \ _ _
- *  /     \  -y   /     \
+ *  /     \  -r   /     \
  * /(-1,0) \ _ _ /(1,-1) \
- * \  -x   /     \       /
+ * \  -q   /     \       /
  *  \ _ _ / (0,0) \ _ _ /
  *  /     \       /     \
  * /(-1,1) \ _ _ / (1,0) \
- * \       /     \  +x   /
+ * \       /     \  +q   /
  *  \ _ _ / (0,1) \ _ _ /
- *        \  +y   /
+ *        \  +r   /
  *         \ _ _ /
  *
+ *
+ * If enabled, the board is maintained in "Standard Position" (SP), which is defined by the following properties:
+ *  - White Queen Bee is always (0,0)
+ *  - Black Queen coordinates must be R = 0 and 0 < Q < MAX_Q. Rotate the board clockwise until this is true.
+ *
+ * Before queens are placed, SP is defined the same way like in Randell Ringersolls book [1], expect we look at the 3rd/
+ * 4th token instead of the queen (although it usually will be the queen anyway).
+ *
+ *  - 1st token (white) is placed at (0,0) -> Start
+ *  - 2nd token (black) is placed at (1,0).
+ *  - 3rd token (white) if R > 0, flip board around Q, so R < 0.
+ *  - 4th token (black) if 3rd token has R = 0 and 4th has R > 0. Flip around Q so R < 0.
+ *
+ * Standard position uses the queens as "center points" as they are the most likely to be locked in place and they cannot
+ * move very far. This minimizes the chance of origin changes or rotations. Analysis of Boardspace.net games has shown that
+ * Queen Bee moves are only 4.8% of all moves.
+ *
+ * Note SP doesn't guarantee that all similar board positions have the same Zobrist Key [3]. Mirror or reflected boards
+ * around the Q axis do not have the same Zobrist key. For now this is in acceptable inaccuracy.
+ *
+ * << Insert example here >>
+ *
+ * A Zobrist key is maintained for the board state. It will be recalculated for rotations/flips/center changes, so
+ * the Zobrist key is always calculated on the SP board.
+ *
+ * Note the backing hashes for the Zobrist key have a pretty high memory requirement, due to the potential board size.
+ * Currently about 800 kB.
+ *
+ * INVARIANT:
+ *
+ *
+ * @see [1] Randy Ingersoll: Play Hive like a champion
+ * @see [2] http://www.redblobgames.com/grids/hexagons/
+ * @see [3] http://en.wikipedia.org/wiki/Zobrist_hashing
  */
 public class Board {
 
-    Map<String, Hex> hexes = new HashMap<String, Hex>(); // Key := (q,r), Value: hex. List of hexes visited in the game
-    int[][] neighbors =  new int[][] {{0,-1},{+1,-1},{1,0},{0,1},{-1, +1},{-1,0}}; // From top and clockwise round.
+    private Map<String, Hex> hexes = new HashMap<String, Hex>(); // Key := (q,r), Value: hex. List of hexes visited in the game
+    private Set<Token> tokens = new HashSet<Token>();
+    private int[][] neighbors =  new int[][] {{0,-1},{+1,-1},{1,0},{0,1},{-1, +1},{-1,0}}; // From top and clockwise round.
+
+    private Token turn3Token = null;
+    private Token blackQueen = null;
+    private Token whiteQueen = null;
+
+    private boolean standardPosition = false; // If true, board is maintained in Standard Position
+    private boolean spQFlip = false;          // Flip around the Q axis
+    private int spRotation = 0;               // How many clockwise rotations are needed to achieve Standard Position
+    private int[] spOrigin = new int[2];      // Displacement of origin
+
+    private boolean replayMode = false; //
 
     // The board state is hashed as a Zobrist key.
     // Instead of using coordinates, which are in principal unlimited, we use token edges instead.
     private int tokenId = 0;
-    private static final int COLORS = 2;
-    private static final int TOKEN_TYPES = 9; // Including all expansions + "empty" token
-    private static final int EDGES = 8; // 6 sides + up + down
+//    private static final int COLORS = 2;
+//    private static final int TOKEN_TYPES = 9; // Including all expansions + "empty" token
+//    private static final int EDGES = 8; // 6 sides + up + down
 
-    Player zobristPlayer = null;
-    long[] nodeHash = new long[2*13];
-    long[][][][][] edgeHash = new long[COLORS][TOKEN_TYPES][EDGES][COLORS][TOKEN_TYPES];
-    long whiteMoved = 0;
-    long blackMoved = 0;
+//    Player zobristPlayer = null;
+//    long[] nodeHash = new long[2*13];
+//    long[][][][][] edgeHash = new long[COLORS][TOKEN_TYPES][EDGES][COLORS][TOKEN_TYPES];
+//    long whiteMoved = 0;
+//    long blackMoved = 0;
     long zobristKey = 0;
 
-    private static int EMPTY_HEX = 0;
-    private static int BOTTOM_EDGE = 6;
-    private static int TOP_EDGE = 7;
-
-    public Board() {
-        loadZobristHashes();
-    }
+//
+//    private static int EMPTY_HEX = 0;
+//    private static int BOTTOM_EDGE = 6;
+//    private static int TOP_EDGE = 7;
 
     private void loadZobristHashes() {
-        Random random = new Random();
-
-        // Create the zobrist hashes needed for all edges
-        // Is it possible to convert this to a recursive call?
-        for (int i = 0; i < edgeHash.length; i++) {
-            long[][][][] d1 = edgeHash[0];
-            for (int j = 0; j < d1.length; j++) {
-                long[][][] d2 = d1[j];
-                for (int k = 0; k < d2.length; k++) {
-                    long[][] d3 = d2[k];
-                    for (int l = 0; l < d3.length; l++) {
-                        long[] d4 = d3[l];
-                        for(int m = 0; m < d4.length; m++) {
-                            edgeHash[i][j][k][l][m] = random.nextLong();
-                        }
-                    }
-                }
-            }
-        }
-
-        // Create the zobrist hashes for nodes
-        // Only used for the 1st node, after this, everything is described by edges
-        for (int i = 0; i < nodeHash.length; i++) {
-            nodeHash[i] = random.nextLong();
-        }
-
-        whiteMoved = random.nextLong();
-        blackMoved = random.nextLong();
+//        Random random = new Random();
+//
+//        // Create the zobrist hashes needed for all edges
+//        // Is it possible to convert this to a recursive call?
+//        for (int i = 0; i < edgeHash.length; i++) {
+//            long[][][][] d1 = edgeHash[0];
+//            for (int j = 0; j < d1.length; j++) {
+//                long[][][] d2 = d1[j];
+//                for (int k = 0; k < d2.length; k++) {
+//                    long[][] d3 = d2[k];
+//                    for (int l = 0; l < d3.length; l++) {
+//                        long[] d4 = d3[l];
+//                        for(int m = 0; m < d4.length; m++) {
+//                            edgeHash[i][j][k][l][m] = random.nextLong();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Create the zobrist hashes for nodes
+//        // Only used for the 1st node, after this, everything is described by edges
+//        for (int i = 0; i < nodeHash.length; i++) {
+//            nodeHash[i] = random.nextLong();
+//        }
+//
+//        whiteMoved = random.nextLong();
+//        blackMoved = random.nextLong();
     }
 
     /**
@@ -91,23 +137,177 @@ public class Board {
         hex.addToken(token);
         token.setHex(hex);
         token.getPlayer().removeFromSupply(token);
-        updateZobristKey(token);
-        updateZobristKeyForPlayer(token.getPlayer());
+        tokens.add(token);
+
+
+        if (token.getOriginalType() == BugType.QUEEN_BEE) {
+            if (token.getPlayer().isWhitePlayer()) {
+                whiteQueen = token;
+            } else {
+                blackQueen = token;
+            }
+
+        }
+//        updateZobristKey(token);
+//        updateZobristKeyForPlayer(token.getPlayer());
+        maintainStandardPosition(token);
+    }
+
+    private void maintainStandardPosition(Token token) {
+        if (!standardPosition || replayMode) return;
+        if (bothQueensPlaced()) {
+            maintainSPForMidGame(token);
+        } else {
+            maintainSPForOpenings(token);
+        }
+    }
+
+    // INVARIANT: All tokens are placed in a legal position
+    private void maintainSPForOpenings(Token token) {
+        int turn = tokens.size();
+
+        if (turn == 1) {
+            // First token must be (0,0)
+            moveOrigin(token);
+
+        } else if (turn == 2) {
+            // Rotate 1st black token to (1,0)
+            int[] spCoords = getSPCoordinatesFor(token.getHex());
+            while(spCoords[0] != 1 || spCoords[1] != 0) {
+                rotateClockwise();
+                spCoords = getSPCoordinatesFor(token.getHex());
+            }
+
+        } else if (turn == 3) {
+            // Swap around q axis if R is positive (we want token in upper left corner)
+            turn3Token = token;
+            int[] spCoords = getSPCoordinatesFor(token.getHex());
+            if (spCoords[0] < 0 && spCoords[1] > 0) {
+                spQFlip = true;
+            }
+
+        } else if (turn == 4) {
+            // Swap around q axis if R is positive (we want token in upper left corner)
+            Token previousToken = turn3Token;
+            Token currentToken = token;
+            int[] previousSPCoords = getSPCoordinatesFor(previousToken.getHex());
+            int[] currentSPCoords = getSPCoordinatesFor(currentToken.getHex());
+            if (previousSPCoords[0] == -1 && previousSPCoords[1] == 0 && currentSPCoords[0] >= 0 && currentSPCoords[1] >= 0) {
+                spQFlip = true;
+            }
+        } else {
+            // Just maintain current flip / rotation
+        }
+    }
+
+    private void maintainSPForMidGame(Token token) {
+        if (token.getPlayer().isWhitePlayer() && token.getPlayer().getQueen() == token) {
+            moveOrigin(token); // White queen added or moved. Move center to new position
+            spQFlip = false;
+        } else if (token.getPlayer().isBlackPlayer() && token.getPlayer().getQueen() == token) {
+            rotateToStandardPosition(); // Black queen moved. Rotate board appropriately
+        }
+    }
+
+    private boolean bothQueensPlaced() {
+        return whiteQueen != null && blackQueen != null;
+    }
+
+    private void moveOrigin(Token token) {
+        if (token.inSupply()) throw new IllegalStateException("Cannot recenter around token in supply: " + token);
+        spOrigin[0] = token.getHex().getQ();
+        spOrigin[1] = token.getHex().getR();
+    }
+
+    private void rotateToStandardPosition() {
+        int[] sp = getSPCoordinatesFor(blackQueen.getHex());
+
+        while(!(sp[0] >= 0 && sp[1] >= 0)) {
+            rotateClockwise();
+            sp = getSPCoordinatesFor(blackQueen.getHex());
+        }
+    }
+
+    private void rotateClockwise() {
+        spRotation = (spRotation + 1) % 6;
+    }
+
+    /**
+     * Rotates the basis vectors clockwise.
+     * [x, y, z] -> [-z, -x, -y]
+     */
+    private int[] rotateRight(int[] rotation) {
+        int newX = -rotation[2];
+        int newY = -rotation[0];
+        int newZ = -rotation[1];
+        rotation[0] = newX;
+        rotation[1] = newY;
+        rotation[2] = newZ;
+        return rotation;
+    }
+
+    public int[] getSPCoordinatesFor(Hex hex) {
+        return getSPCoordinatesFor(hex.getQ(), hex.getR());
+    }
+
+    public int[] getSPCoordinatesFor(int q, int r) {
+        int[] cubeCoords = convertToCubeCoordinates(q - spOrigin[0], r - spOrigin[1]);
+
+        for (int i = 0; i < spRotation; i++) {
+            cubeCoords = rotateRight(cubeCoords);
+        }
+
+        if (spQFlip) {
+            int newX = -cubeCoords[1];
+            int newY = -cubeCoords[0];
+            int newZ = -cubeCoords[2];
+            cubeCoords[0] = newX;
+            cubeCoords[1] = newY;
+            cubeCoords[2] = newZ;
+        }
+
+        return convertToAxialCoordinates(cubeCoords[0], cubeCoords[1], cubeCoords[2]);
+    }
+
+    private int[] convertToAxialCoordinates(int x, int y, int z) {
+        return new int[] { x, z};
+    }
+
+    // Cube coordinates fulfill x + y + z = 0
+    private int[] convertToCubeCoordinates(int q, int r) {
+        int x = q;
+        int z = r;
+        int y = -x - z;
+        return new int[] { x, y, z };
+    }
+
+    /**
+     * Enable standard position for the board. Can only be enabled when the board is empty.
+     * @param enabled
+     */
+    public void setStandardPositionMode(boolean enabled) {
+        if (hexes.size() > 0 && enabled) throw new IllegalStateException("Cannot enable Standard Position for non-empty board");
+        this.standardPosition = enabled;
+        if (enabled) {
+            spOrigin = new int[2];
+            spRotation = 0;
+            spQFlip = false;
+        }
     }
 
     // Encode the player who just moved into the key
     private void updateZobristKeyForPlayer(Player player) {
-        if (zobristPlayer == null) {
-            // Starting player
-            zobristKey = zobristKey ^ (player.isWhitePlayer() ? whiteMoved : blackMoved);
-            zobristPlayer = player;
-        } else {
-            // Toggle player if needed
-            if (player == zobristPlayer) return;
-            zobristKey = zobristKey ^ blackMoved;
-            zobristKey = zobristKey ^ whiteMoved;
-            zobristPlayer = player;
-        }
+//        if (zobristPlayer == null) {
+//            // Starting player
+//            zobristKey = zobristKey ^ (player.isWhitePlayer() ? whiteMoved : blackMoved);
+//            zobristPlayer = player;
+//        } else {
+//            // Toggle player if needed
+//            if (player == zobristPlayer) return;
+//            zobristKey = zobristKey ^ blackMoved;
+//            zobristKey = zobristKey ^ whiteMoved;
+//            zobristPlayer = player;
+//        }
     }
 
     /**
@@ -173,6 +373,15 @@ public class Board {
         Token token = hex.removeToken();
         token.setHex(null);
         token.getPlayer().addToSupply(token);
+        tokens.remove(token);
+
+        if (token.getOriginalType() == BugType.QUEEN_BEE) {
+            if (token.getPlayer().isWhitePlayer()) {
+                whiteQueen = null;
+            } else {
+                blackQueen = null;
+            }
+        }
     }
 
 
@@ -212,8 +421,9 @@ public class Board {
         Hex toHex = findOrCreateHex(toQ, toR);
         toHex.addToken(token);
         token.setHex(toHex);
-        updateZobristKey(token); // Insert new position
-        updateZobristKeyForPlayer(token.getPlayer());
+//        updateZobristKey(token); // Insert new position
+//        updateZobristKeyForPlayer(token.getPlayer());
+        maintainStandardPosition(token);
     }
 
     /**
@@ -340,7 +550,7 @@ public class Board {
         int result = Integer.MAX_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int q = hex.getQ();
+            int q = standardPosition ? getSPCoordinatesFor(hex)[0] : hex.getQ();
             if (q < result) {
                 result = q;
             }
@@ -356,7 +566,7 @@ public class Board {
         int result = Integer.MAX_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int r = hex.getR();
+            int r = standardPosition ? getSPCoordinatesFor(hex)[1] : hex.getR();
             if (r < result) {
                 result = r;
             }
@@ -369,7 +579,7 @@ public class Board {
         int result = Integer.MIN_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int q = hex.getQ();
+            int q = standardPosition ? getSPCoordinatesFor(hex)[0] : hex.getQ();
             if (q > result) {
                 result = q;
             }
@@ -382,7 +592,7 @@ public class Board {
         int result = Integer.MIN_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int r = hex.getR();
+            int r = standardPosition ? getSPCoordinatesFor(hex)[1] : hex.getR();
             if (r > result) {
                 result = r;
             }
@@ -510,5 +720,13 @@ public class Board {
     public int getTokenId() {
         tokenId++;
         return tokenId;
+    }
+
+    public void setReplayMode(boolean enabled) {
+        this.replayMode = enabled;
+    }
+
+    public boolean isUsingStandardPosition() {
+        return standardPosition;
     }
 }

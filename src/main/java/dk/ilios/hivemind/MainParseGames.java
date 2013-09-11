@@ -81,10 +81,10 @@ public class MainParseGames {
         Stack<File> tournamentFiles = new Stack<File>();
         tournamentFiles.add(new File(TOURNAMENT_DIR));
         files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
-//
-//        Stack<File> playerFiles = new Stack<File>();
-//        playerFiles.add(new File(PLAYER_DIR));
-//        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
+
+        Stack<File> playerFiles = new Stack<File>();
+        playerFiles.add(new File(PLAYER_DIR));
+        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
 
 //        Stack<File> dumbotFiles = new Stack<File>();
 //        dumbotFiles.add(new File(DUMBOT_DIR));
@@ -95,22 +95,23 @@ public class MainParseGames {
 
     // Setup metrics to report on
     private void setupMetrics() {
-        metrics.add(new GamesAnalyzedMetric());
-        metrics.add(new GameResultPrColorMetric(true));
-        metrics.add(new GameDurationTurnsMetric());
-        metrics.add(new GameDurationTimeMetric());
-        metrics.add(new OpeningTokenMetric());
-        metrics.add(new LastTokenMetric());
-        metrics.add(new BugsInSupplyAtGameEndMetric());
-        metrics.add(new BugsOnBoardAtGameEndMetric());
-        metrics.add(new OpeningsMetric());
-        metrics.add(new WinnerOpeningMetric());
-        metrics.add(new FreeTokensPrTurnMetric(15));
-        metrics.add(new FreeTokensPrTurnMetric(25));
-        metrics.add(new TokensAroundQueenMetric(15));
-        metrics.add(new TokensAroundQueenMetric(25));
-        metrics.add(new HighRankedGamesMetric());
-        metrics.add(new CompareOpeningsMetric());
+//        metrics.add(new GamesAnalyzedMetric());
+//        metrics.add(new GameResultPrColorMetric(true));
+//        metrics.add(new GameDurationTurnsMetric());
+//        metrics.add(new GameDurationTimeMetric());
+//        metrics.add(new OpeningTokenMetric());
+//        metrics.add(new LastTokenMetric());
+//        metrics.add(new BugsInSupplyAtGameEndMetric());
+//        metrics.add(new BugsOnBoardAtGameEndMetric());
+//        metrics.add(new OpeningsMetric());
+//        metrics.add(new WinnerOpeningMetric());
+//        metrics.add(new FreeTokensPrTurnMetric(15));
+//        metrics.add(new FreeTokensPrTurnMetric(25));
+//        metrics.add(new TokensAroundQueenMetric(15));
+//        metrics.add(new TokensAroundQueenMetric(25));
+//        metrics.add(new HighRankedGamesMetric());
+//        metrics.add(new CompareOpeningsMetric());
+        metrics.add(new LeastMovedTokenMetric());
     }
 
     private void setupFilters() {

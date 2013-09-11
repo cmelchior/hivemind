@@ -55,6 +55,10 @@ public class Token {
         }
     }
 
+    public boolean inSupply() {
+        return (hex == null || hex.getQ() == Hex.SUPPLY);
+    }
+
     public String getId() {
         return id;
     }

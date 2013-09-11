@@ -1,18 +1,49 @@
 package dk.ilios.hivemind.game;
 
-import dk.ilios.hivemind.Constants;
 import dk.ilios.hivemind.ai.statistics.GameStatistics;
 import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 import dk.ilios.hivemind.model.Board;
 import dk.ilios.hivemind.model.Hex;
 import dk.ilios.hivemind.model.Player;
+import dk.ilios.hivemind.model.Token;
 import dk.ilios.hivemind.model.rules.Rules;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Holds the game state for a game of Hive
+ * General game state class for a game of Hive.
+ *
+ *
+ * If enabled, the board is maintained in "Standard Position" (SP), which is defined by the following properties:
+ *  - White Queen Bee is always (0,0)
+ *  - Black Queen coordinates must be R = {0,1} and 0 < Q < MAX_Q. Rotate the board clockwise until this is true.
+ *
+ * Before queens are placed, SP is defined the same way like in Randell Ringersolls book [1], expect we always use the
+ * 3rd token to determine wether to look at the 3rd/
+ * 4th token instead of the queen (although it usually will be the queen anyway).
+ *
+ *  - 1st token (white) is placed at (0,0) -> Start
+ *  - 2nd token (black) is placed at (1,0).
+ *  - 3rd token (white) if R > 0, flip board around Q, so R < 0.
+ *
+ * Standard position uses the queens as "center points" as they are the most likely to be locked in place and they cannot
+ * move very far. This minimizes the chance of origin changes or rotations. Analysis of Boardspace.net games has shown
+ * that Queen Bee moves are only 4.8% of all moves.
+ *
+ * Note SP doesn't guarantee that all similar board positions have the same Zobrist Key [2]. Mirror or reflected boards
+ * around the Q axis do not have the same Zobrist key. For now this is in acceptable inaccuracy.
+ *
+ * << Insert example here >>
+ *
+ * A Zobrist key is maintained for the board state. It will be recalculated for rotations/flips/center changes, so
+ * the Zobrist key is always calculated on the SP board.
+ *
+ * Note the backing hashes for the Zobrist key have a pretty high memory requirement, due to the potential board size.
+ * Currently about 800 kB.
+ *
+ * @see [1] Randy Ingersoll: Play Hive like a champion
+ * @see [2] http://en.wikipedia.org/wiki/Zobrist_hashing
  */
 public class Game {
 
@@ -20,30 +51,34 @@ public class Game {
 
     private String name = "HiveX";
 
+    // Players
     private Player whitePlayer;
     private Player blackPlayer;
-    private Board board = new Board();
+
+    // Board properties
+    private Board board = new Board();        // Reference to game board
+    private boolean zobristKey = false;       // If true, a Zobrist key is maintained for the board position. Only works if in Standard Position
 
     private boolean isRunning = false;      // Game is started and progressing
     private boolean manualStepping = false; // If true, continue() must be called after every move to progress the game (for debugging/testing)
     private boolean replayMode = false;     // If true, the game cannot progress any futher, but forward(), backwards() can be called to navigate the game. When set to to false, game is forwarded to last position again.
     private int replayIndex = 0;            // Pointer to current move (that has not been played).
-
     private int turnLimit = -1;             // If above 0, the game ends in a draw after so many moves.
 
     private GameStatus status = GameStatus.RESULT_NOT_STARTED;
     private Player activePlayer;
     private List<GameCommand> moves = new ArrayList<GameCommand>();
 
+    // Keeping track of draws
+    private boolean enforceForcedDraw = true;       // If true, game is declared a draw after a set number of repeat moves by each player.
+    private int repeatMovesBeforeForcedDraw = 3;    // Number of moves each player must make that are "the same" before forcing a draw.
+    private int whiteDuplicateMoves = 0;
+    private int blackDuplicateMoves = 0;
+
+    // Debug properties
     private boolean printGameStateAfterEachMove = false;
     private GameStatistics statistics = new GameStatistics();
     private HiveAsciiPrettyPrinter mapPrinter = new HiveAsciiPrettyPrinter();
-
-    // Keeping track of draws
-    private boolean forcedDraw;             // If true, game is declared a draw after a set number of repeat moves by each player.
-    private int repeatMovesBeforeForcedDraw = 3; // Number of moves each player must make that are "the same" before forcing a draw.
-    private int whiteDuplicateMoves = 0;
-    private int blackDuplicateMoves = 0;
 
 
     public void addPlayers(Player white, Player black) {
@@ -75,6 +110,7 @@ public class Game {
     public void setReplayMode(boolean enabled) {
         if (replayMode == enabled) return;
 
+        board.setReplayMode(enabled);
         if (enabled) {
             // Enable replay mode and put replay index at the start of the game
             isRunning = false;
@@ -94,18 +130,29 @@ public class Game {
         }
     }
 
-    public void forward() {
+    /**
+     * Forward game state and return command that caused the state change
+     * @return
+     */
+    public GameCommand forward() {
         if (!replayMode) throw new IllegalStateException("Replay mode not enabled");
-        if (replayIndex == moves.size()) return;
-        moves.get(replayIndex).execute(this);
+        if (replayIndex == moves.size()) return null;
+        GameCommand command = moves.get(replayIndex);
+        command.execute(this);
         replayIndex++;
+        return command;
     }
 
-    public void backwards() {
+    /**
+     * Rollback game state and return command that caused the state change
+     */
+    public GameCommand backwards() {
         if (!replayMode) throw new IllegalStateException("Replay mode not enabled");
-        if (replayIndex == 0) return;
+        if (replayIndex == 0) return null;
         replayIndex--;
-        moves.get(replayIndex).undo(this);
+        GameCommand command = moves.get(replayIndex);
+        command.undo(this);
+        return command;
     }
 
     /**
@@ -336,8 +383,17 @@ public class Game {
         return name;
     }
 
-    public boolean isForcedDraw() {
+    private boolean isForcedDraw() {
+        if (!enforceForcedDraw) return false;
         int maxTurns = repeatMovesBeforeForcedDraw;
         return whiteDuplicateMoves >= maxTurns && blackDuplicateMoves >= maxTurns;
+    }
+
+    /**
+     * Enable the calculation of Zobrist keys for the board. Enabling Zobrist key also enabled Standard Position.
+     */
+    public void setZobristKeyMode(boolean enabled) {
+        if (enabled) board.setStandardPositionMode(enabled);
+        zobristKey = enabled;
     }
 }

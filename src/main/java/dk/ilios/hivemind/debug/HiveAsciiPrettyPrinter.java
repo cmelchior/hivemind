@@ -26,7 +26,14 @@ public class HiveAsciiPrettyPrinter {
 
 
     private AsciiBoard prettyPrintBoard(Board board) {
+        if (board.isUsingStandardPosition()) {
+            return standardPositionBoard(board);
+        }  else {
+            return normalBoard(board);
+        }
+    }
 
+    private AsciiBoard normalBoard(Board board) {
         // Find bound so we can adjust (top,left) to (0,0)
         int adjustQ = board.getMinQ();
         int adjustR = board.getMinR();
@@ -39,6 +46,24 @@ public class HiveAsciiPrettyPrinter {
 
             char fill = (player.getType() == Player.PlayerType.WHITE) ? '#' : '+';
             asciiBoard.printHex(hex.getTopToken().getId(), getPlayerTitle(player), fill, hex.getQ() - adjustQ, hex.getR() - adjustR);
+        }
+        return asciiBoard;
+    }
+
+    private AsciiBoard standardPositionBoard(Board board) {
+        // Find bound so we can adjust (top,left) to (0,0)
+        int adjustQ = board.getMinQ();
+        int adjustR = board.getMinR();
+        int maxQ = board.getMaxQ();
+        int maxR = board.getMaxR();
+
+        AsciiBoard asciiBoard = new AsciiBoard(adjustQ, maxQ, adjustR, maxR, hexPrinter);
+        for (Hex hex : board.getFilledHexes()) {
+            int[] hexCoords = board.getSPCoordinatesFor(hex);
+            Player player = hex.getTopToken().getPlayer();
+
+            char fill = (player.getType() == Player.PlayerType.WHITE) ? '#' : '+';
+            asciiBoard.printHex(hex.getTopToken().getId(), getPlayerTitle(player), fill, hexCoords[0] - adjustQ, hexCoords[1] - adjustR);
         }
         return asciiBoard;
     }
