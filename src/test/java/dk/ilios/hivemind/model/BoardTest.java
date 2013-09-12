@@ -106,6 +106,31 @@ public class BoardTest {
 
     }
 
+    @Test
+    public void testStandardPosition_flip4thToken() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(true);
+
+        Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
+        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
+        Token spider = p1.getFromSupply(BugType.SPIDER);
+        Token beetle = p2.getFromSupply(BugType.BEETLE);
+
+        board.addToken(grasshopper, 0, 0);
+        board.addToken(blackBee, 1, 0);
+        board.addToken(spider, -1, 0);
+        board.addToken(beetle,1,1);
+
+        printer.print(board);
+
+        int[] beetleCoords = board.getSPCoordinatesFor(beetle.getHex());
+        assertArrayEquals(new int[] {2, -1}, beetleCoords);
+
+    }
+
 
 
 //    @Test
