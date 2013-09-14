@@ -30,7 +30,7 @@ public class SpiderTest {
 
     @Test
     public void testTargetSquares_aroundHive() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.SPIDER);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
         board.addToken(ant, 0, 0);
@@ -65,7 +65,7 @@ public class SpiderTest {
      */
     @Test
     public void testTargetSquares_cannotEnterGate() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.SPIDER);
         board.addToken(ant, 0, 3);
         board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 1, 0);

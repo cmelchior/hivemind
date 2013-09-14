@@ -34,7 +34,7 @@ public class MosquitoTest {
      */
     @Test
     public void testTargetSquares_noMove() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token mos1 = p1.getFromSupply(BugType.MOSQUITO);
         Token mos2 = p2.getFromSupply(BugType.MOSQUITO);
         mos1.mimic(mos2);
@@ -51,7 +51,7 @@ public class MosquitoTest {
      */
     @Test
     public void testTargetSquares_copyMovement() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token mos1 = p1.getFromSupply(BugType.MOSQUITO);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
         mos1.mimic(bee);

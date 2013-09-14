@@ -145,6 +145,7 @@ public class BoardspaceGameParser {
         }
 
         game.addPlayers(white, black);
+        game.getBoard().setStandardPositionMode(true);
         game.setManualStepping(true);
         game.setPrintGameStateAfterEachMove(DEBUG);
         game.start();

@@ -29,7 +29,7 @@ public class BeetleTest {
 
     @Test
     public void testTargetSquares_startingPosition() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token bee = p1.getFromSupply(BugType.BEETLE);
         Token ant = p2.getFromSupply(BugType.SOLDIER_ANT);
         board.addToken(bee, 0, 0);
@@ -48,7 +48,7 @@ public class BeetleTest {
      */
     @Test
     public void testTargetSquares_freedom_to_move_between_gates_blocked() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token beetle = p1.getFromSupply(BugType.BEETLE);
         board.addToken(beetle, 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
@@ -68,7 +68,7 @@ public class BeetleTest {
      */
     @Test
     public void testTargetSquares_freedom_to_move_between_gates() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token bee = p1.getFromSupply(BugType.BEETLE);
         board.addToken(bee, 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);

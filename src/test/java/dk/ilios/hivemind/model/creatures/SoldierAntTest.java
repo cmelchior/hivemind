@@ -29,7 +29,7 @@ public class SoldierAntTest {
 
     @Test
     public void testTargetSquares_aroundHive() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.SOLDIER_ANT);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
         board.addToken(ant, 0, 0);
@@ -63,7 +63,7 @@ public class SoldierAntTest {
      */
     @Test
     public void testTargetSquares_cannotEnterGate() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.SOLDIER_ANT);
         board.addToken(ant, 0, 0);
         board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 1, 0);
@@ -79,7 +79,7 @@ public class SoldierAntTest {
 
     @Test
     public void freeToMove_surrounded() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.SOLDIER_ANT);
         board.addToken(ant, 0, 0);
 

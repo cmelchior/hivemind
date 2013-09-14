@@ -56,8 +56,8 @@ public class Game {
     private Player blackPlayer;
 
     // Board properties
-    private Board board = new Board();        // Reference to game board
-    private boolean zobristKey = false;       // If true, a Zobrist key is maintained for the board position. Only works if in Standard Position
+    private Board board;                    // Reference to game board
+    private boolean zobristKey = false;     // If true, a Zobrist key is maintained for the board position. Only works if in Standard Position
 
     private boolean isRunning = false;      // Game is started and progressing
     private boolean manualStepping = false; // If true, continue() must be called after every move to progress the game (for debugging/testing)
@@ -86,6 +86,7 @@ public class Game {
         this.blackPlayer = black;
         statistics.setWhiteName(whitePlayer.getName());
         statistics.setBlackName(blackPlayer.getName());
+        board = new Board(white, black);
     }
 
     /**
@@ -110,7 +111,6 @@ public class Game {
     public void setReplayMode(boolean enabled) {
         if (replayMode == enabled) return;
 
-        board.setReplayMode(enabled);
         if (enabled) {
             // Enable replay mode and put replay index at the start of the game
             isRunning = false;
@@ -312,6 +312,9 @@ public class Game {
     }
 
     public Board getBoard() {
+        if (board == null) {
+            throw new IllegalStateException("Add players before board is available");
+        }
         return board;
     }
 

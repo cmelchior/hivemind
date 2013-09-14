@@ -1,6 +1,6 @@
 package dk.ilios.hivemind.model;
 
-import dk.ilios.hivemind.game.GameCommand;
+import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 
 import java.util.*;
 
@@ -63,24 +63,25 @@ import java.util.*;
  */
 public class Board {
 
+    private HiveAsciiPrettyPrinter printer = new HiveAsciiPrettyPrinter();
+
     private Map<String, Hex> hexes = new HashMap<String, Hex>(); // Key := (q,r), Value: hex. List of hexes visited in the game
     private Set<Token> tokens = new HashSet<Token>();
     private int[][] neighbors =  new int[][] {{0,-1},{+1,-1},{1,0},{0,1},{-1, +1},{-1,0}}; // From top and clockwise round.
 
-    private Token turn3Token = null;
-    private Token blackQueen = null;
-    private Token whiteQueen = null;
+    // Standard position variabels
+    private Player whitePlayer;
+    private Player blackPlayer;
 
     private boolean standardPosition = false; // If true, board is maintained in Standard Position
     private boolean spQFlip = false;          // Flip around the Q axis
     private int spRotation = 0;               // How many clockwise rotations are needed to achieve Standard Position
     private int[] spOrigin = new int[2];      // Displacement of origin
-
-    private boolean replayMode = false; //
+    private Token[] firstTokens = new Token[4]; // Keep track of the first 4 tokens placed on the board. 2 white and 2 black
 
     // The board state is hashed as a Zobrist key.
     // Instead of using coordinates, which are in principal unlimited, we use token edges instead.
-    private int tokenId = 0;
+//    private int tokenId = 0;
 //    private static final int COLORS = 2;
 //    private static final int TOKEN_TYPES = 9; // Including all expansions + "empty" token
 //    private static final int EDGES = 8; // 6 sides + up + down
@@ -90,9 +91,14 @@ public class Board {
 //    long[][][][][] edgeHash = new long[COLORS][TOKEN_TYPES][EDGES][COLORS][TOKEN_TYPES];
 //    long whiteMoved = 0;
 //    long blackMoved = 0;
-    long zobristKey = 0;
+//    long zobristKey = 0;
 
 //
+    public Board(Player white, Player black) {
+        this.whitePlayer = white;
+        this.blackPlayer = black;
+    }
+
 //    private static int EMPTY_HEX = 0;
 //    private static int BOTTOM_EDGE = 6;
 //    private static int TOP_EDGE = 7;
@@ -139,22 +145,18 @@ public class Board {
         token.getPlayer().removeFromSupply(token);
         tokens.add(token);
 
-
-        if (token.getOriginalType() == BugType.QUEEN_BEE) {
-            if (token.getPlayer().isWhitePlayer()) {
-                whiteQueen = token;
-            } else {
-                blackQueen = token;
-            }
-
-        }
 //        updateZobristKey(token);
 //        updateZobristKeyForPlayer(token.getPlayer());
+
+        // Keep track of first 4 tokens
+        if (tokens.size() < 5) {
+            firstTokens[tokens.size() - 1] = token;
+        }
         maintainStandardPosition(token);
     }
 
     private void maintainStandardPosition(Token token) {
-        if (!standardPosition || replayMode) return;
+        if (!standardPosition) return;
         if (bothQueensPlaced()) {
             maintainSPForMidGame(token);
         } else {
@@ -162,55 +164,128 @@ public class Board {
         }
     }
 
+    private boolean bothQueensPlaced() {
+        return !whitePlayer.getQueen().inSupply() && !blackPlayer.getQueen().inSupply();
+    }
+
     // INVARIANT: All tokens are placed in a legal position
     private void maintainSPForOpenings(Token token) {
-        int turn = tokens.size();
+        int turn = whitePlayer.getMoves() + blackPlayer.getMoves();
 
-        if (turn == 1) {
-            // First token must be (0,0)
+        if (firstTokens[3] != null) {
+            // TURN 4
+            moveOrigin(firstTokens[0]);
+            rotateSecondTokenToStandardPosition();
+            swapAxisIfNeededForThirdToken();
+            swapAxisIfNeededForFourthToken();
+
+        } else if (firstTokens[2] != null) {
+            // TURN 3
+            moveOrigin(firstTokens[0]);
+            rotateSecondTokenToStandardPosition();
+            swapAxisIfNeededForThirdToken();
+
+        } else if (firstTokens[1] != null) {
+            // TURN 2
+            moveOrigin(firstTokens[0]);
+            rotateSecondTokenToStandardPosition();
+
+        } else if (firstTokens[0] != null) {
+            // TURN 1
             moveOrigin(token);
 
-        } else if (turn == 2) {
-            // Rotate 1st black token to (1,0)
-            int[] spCoords = getSPCoordinatesFor(token.getHex());
-            while(spCoords[0] != 1 || spCoords[1] != 0) {
-                rotateClockwise();
-                spCoords = getSPCoordinatesFor(token.getHex());
-            }
-
-        } else if (turn == 3) {
-            // Swap around q axis if R is positive (we want token in upper left corner)
-            turn3Token = token;
-            int[] spCoords = getSPCoordinatesFor(token.getHex());
-            if (spCoords[0] < 0 && spCoords[1] > 0) {
-                spQFlip = true;
-            }
-
-        } else if (turn == 4) {
-            // Swap around q axis if R is positive (we want token in upper left corner)
-            Token previousToken = turn3Token;
-            Token currentToken = token;
-            int[] previousSPCoords = getSPCoordinatesFor(previousToken.getHex());
-            int[] currentSPCoords = getSPCoordinatesFor(currentToken.getHex());
-            if (previousSPCoords[0] == -1 && previousSPCoords[1] == 0 && currentSPCoords[0] >= 0 && currentSPCoords[1] >= 0) {
-                spQFlip = true;
-            }
         } else {
-            // Just maintain current flip / rotation
+            throw new IllegalStateException("Board is empty");
+        }
+
+//            if (turn == 1) {
+//            // First token must be (0,0)
+//            moveOrigin(token);
+//
+//        } else if (turn == 2) {
+//            // Rotate 1st black token to (1,0)
+//            int[] spCoords = getSPCoordinatesFor(token.getHex());
+//            int i = 6;
+//            while(!(spCoords[0] == 1 && spCoords[1] == 0)) {
+//                if (i == 0) {
+//                    printer.print(this);
+//                    throw new IllegalStateException("Keep rotating: " + Arrays.toString(spCoords));
+//                }
+//                rotateClockwise();
+//                spCoords = getSPCoordinatesFor(token.getHex());
+//                i--;
+//            }
+//
+//        } else if (turn == 3) {
+//            turn3Token = token;
+//            if (token.getType() == BugType.QUEEN_BEE) {
+//                moveOrigin(token);
+//            }
+//
+//            // Swap around q axis if R is positive (we want token in upper left corner)
+//            int[] spCoords = getSPCoordinatesFor(token.getHex());
+//            if (spCoords[0] < 0 && spCoords[1] > 0) {
+//                spQFlip = true;
+//            } else {
+//                spQFlip = false;
+//            }
+//
+//        } else if (turn == 4) {
+//            // Swap around q axis if R is positive (we want token in upper left corner)
+//            Token previousToken = turn3Token;
+//            Token currentToken = token;
+//            int[] previousSPCoords = getSPCoordinatesFor(previousToken.getHex());
+//            int[] currentSPCoords = getSPCoordinatesFor(currentToken.getHex());
+//            if (previousSPCoords[1] == 0 && currentSPCoords[0] >= 0 && currentSPCoords[1] >= 0) {
+//                spQFlip = true;
+//            } else {
+//                spQFlip = false;
+//            }
+//        } else {
+//            // Just maintain current flip / rotation
+//        }
+    }
+
+    private void swapAxisIfNeededForThirdToken() {
+        int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+        if (coords[1] > 0) {
+            spQFlip = true;
+        } else {
+            spQFlip = false;
+        }
+    }
+
+    private void swapAxisIfNeededForFourthToken() {
+        int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+        if (coords[1] == 0) {
+            // Only check rotation if 3rd is inline with the rest
+            coords = getSPCoordinatesFor(firstTokens[3].getHex());
+            if (coords[1] > 0) {
+                spQFlip = true;
+            } else {
+                spQFlip = false;
+            }
+        }
+    }
+
+    private void rotateSecondTokenToStandardPosition() {
+        int i = 6;
+        int[] spCoords = getSPCoordinatesFor(firstTokens[1].getHex());
+        while(!(spCoords[0] == 1 && spCoords[1] == 0)) {
+            if (i == 0) {
+                printer.print(this);
+                throw new IllegalStateException("Keep rotating: " + Arrays.toString(spCoords));
+            }
+            rotateClockwise();
+            spCoords = getSPCoordinatesFor(firstTokens[1].getHex());
+            i--;
         }
     }
 
     private void maintainSPForMidGame(Token token) {
-        if (token.getPlayer().isWhitePlayer() && token.getPlayer().getQueen() == token) {
-            moveOrigin(token); // White queen added or moved. Move center to new position
-            spQFlip = false;
-        } else if (token.getPlayer().isBlackPlayer() && token.getPlayer().getQueen() == token) {
-            rotateToStandardPosition(); // Black queen moved. Rotate board appropriately
-        }
-    }
-
-    private boolean bothQueensPlaced() {
-        return whiteQueen != null && blackQueen != null;
+        spQFlip = false;
+        moveOrigin(whitePlayer.getQueen());
+        rotateToStandardPosition(token);
     }
 
     private void moveOrigin(Token token) {
@@ -219,17 +294,32 @@ public class Board {
         spOrigin[1] = token.getHex().getR();
     }
 
-    private void rotateToStandardPosition() {
-        int[] sp = getSPCoordinatesFor(blackQueen.getHex());
+    // Rotate to last available space before crossing the positive Q axis.
+    private void rotateToStandardPosition(Token token) {
+        int[] sp = getSPCoordinatesFor(token.getHex());
 
+        int maxRotations = 6;
         while(!(sp[0] >= 0 && sp[1] >= 0)) {
+            if (maxRotations == 0) {
+                throw new IllegalStateException("Keep rotating");
+            }
             rotateClockwise();
-            sp = getSPCoordinatesFor(blackQueen.getHex());
+            sp = getSPCoordinatesFor(token.getHex());
+            maxRotations--;
         }
+
+        rotateCounterClockwise();
     }
 
     private void rotateClockwise() {
         spRotation = (spRotation + 1) % 6;
+    }
+
+    private void rotateCounterClockwise() {
+        spRotation--;
+        if (spRotation < 0) {
+            spRotation = 5;
+        }
     }
 
     /**
@@ -270,7 +360,7 @@ public class Board {
     }
 
     private int[] convertToAxialCoordinates(int x, int y, int z) {
-        return new int[] { x, z};
+        return new int[] { x, z };
     }
 
     // Cube coordinates fulfill x + y + z = 0
@@ -365,6 +455,8 @@ public class Board {
 
     /**
      * Removes a token from the board and puts in back into the players supply.
+     *
+     * INVARIANT: Can only be removed in the order they where added.
      */
     public void removeToken(int q, int r) {
         Hex hex = findOrCreateHex(q, r);
@@ -375,12 +467,9 @@ public class Board {
         token.getPlayer().addToSupply(token);
         tokens.remove(token);
 
-        if (token.getOriginalType() == BugType.QUEEN_BEE) {
-            if (token.getPlayer().isWhitePlayer()) {
-                whiteQueen = null;
-            } else {
-                blackQueen = null;
-            }
+        // Maintain tracking of first 4 tokens.
+        if (tokens.size() < 4) {
+            firstTokens[tokens.size()] = null;
         }
     }
 
@@ -710,21 +799,21 @@ public class Board {
      * Having zobrist keys that z(b) = z(rotate(b)) or z(b) = z(shift(b)) would however be an interesting optimization.
      *
      */
-    public long getZobristKey() {
-        return zobristKey;
-    }
-
-    /**
-     * Returns the next token id.
-     */
-    public int getTokenId() {
-        tokenId++;
-        return tokenId;
-    }
-
-    public void setReplayMode(boolean enabled) {
-        this.replayMode = enabled;
-    }
+//    public long getZobristKey() {
+//        return zobristKey;
+//    }
+//
+//    /**
+//     * Returns the next token id.
+//     */
+//    public int getTokenId() {
+//        tokenId++;
+//        return tokenId;
+//    }
+//
+//    public void setReplayMode(boolean enabled) {
+//        this.replayMode = enabled;
+//    }
 
     public boolean isUsingStandardPosition() {
         return standardPosition;

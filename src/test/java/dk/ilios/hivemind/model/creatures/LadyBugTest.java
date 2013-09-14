@@ -31,7 +31,7 @@ public class LadyBugTest {
 
     @Test
     public void testTargetSquares_noMoves() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.LADY_BUG);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
         board.addToken(ant, 0, 0);
@@ -68,7 +68,7 @@ public class LadyBugTest {
      */
     @Test
     public void testTargetSquares_largeHive() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.LADY_BUG);
         board.addToken(ant, 1, 0);
         board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 0, 3);
@@ -108,7 +108,7 @@ public class LadyBugTest {
      */
     @Test
     public void testTargetSquares_movingOnTop() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.LADY_BUG);
         board.addToken(ant, 1, 0);
         board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 0, 3);

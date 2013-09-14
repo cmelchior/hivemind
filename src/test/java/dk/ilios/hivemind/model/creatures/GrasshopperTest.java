@@ -28,7 +28,7 @@ public class GrasshopperTest {
 
     @Test
     public void testTargetSquares_overToken() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
         board.addToken(grasshopper, 0, 0);
@@ -59,7 +59,7 @@ public class GrasshopperTest {
      */
     @Test
     public void testTargetSquares_cannotJumpOverEmptySpaces() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token ant = p1.getFromSupply(BugType.GRASSHOPPER);
         board.addToken(ant, 0, 2);
         board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 1, 0);

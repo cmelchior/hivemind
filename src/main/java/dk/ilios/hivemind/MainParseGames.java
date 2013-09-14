@@ -42,9 +42,9 @@ public class MainParseGames {
 
                 try {
                     parser = new BoardspaceGameParser(file);
-                    game = parser.parse(); // Roughly 150 ms. to parse a game = 7 games pr. sec = 420 games pr. minute, YMMV.
+                    game = parser.parse();
                 } catch (RuntimeException e) {
-                    System.out.println("Game could not be parsed: " + file.getName() + " -> " + e.getMessage());
+                    System.out.println("Game could not be parsed: " + file.getName() + " -> " + e);
                     continue;
                 }
 
@@ -70,8 +70,8 @@ public class MainParseGames {
 
     private void setupGameFiles() {
         // Setup directories to parse
-        Stack<File> dirs = new Stack<File>();
-        dirs.add(new File(TOURNAMENT_DIR));
+//        Stack<File> dirs = new Stack<File>();
+//        dirs.add(new File(TOURNAMENT_DIR));
 
         // Test
 //        List<File> testFiles = new ArrayList<File>();
@@ -111,7 +111,8 @@ public class MainParseGames {
 //        metrics.add(new TokensAroundQueenMetric(25));
 //        metrics.add(new HighRankedGamesMetric());
 //        metrics.add(new CompareOpeningsMetric());
-        metrics.add(new LeastMovedTokenMetric());
+//        metrics.add(new LeastMovedTokenMetric());
+        metrics.add(new IngersollOpeningsMetric());
     }
 
     private void setupFilters() {

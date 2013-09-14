@@ -30,7 +30,7 @@ public class RulesTest {
 
     @Test
     public void canSlideTo_noSpace() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, -1);
 
@@ -39,7 +39,7 @@ public class RulesTest {
 
     @Test
     public void canSlideTo_success() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 1);
@@ -49,7 +49,7 @@ public class RulesTest {
 
     @Test
     public void canSlideTo_blocked() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
@@ -59,7 +59,7 @@ public class RulesTest {
 
     @Test
     public void canCrawlDown_success() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, -1);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
 
@@ -89,7 +89,7 @@ public class RulesTest {
      */
     @Test
     public void canSlideTo_oneHiveBrokenDuringMove() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, -1);
         board.addToken(p2.getFromSupply(BugType.BEETLE), 2, -1);
@@ -104,7 +104,7 @@ public class RulesTest {
      */
     @Test
     public void canSlideTo_illegalArguments() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
 
         assertFalse(Rules.getInstance().canSlideTo(board.getHex(0, 1), board.getHex(0, 0), board));
@@ -112,7 +112,7 @@ public class RulesTest {
 
     @Test
     public void canSlideOnTopOfHive() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p1.getFromSupply(BugType.LADY_BUG), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
@@ -125,7 +125,7 @@ public class RulesTest {
      */
     @Test
     public void canSlideOnTopOfHive_blockedSinglePiece() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p1.getFromSupply(BugType.LADY_BUG), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
@@ -136,7 +136,7 @@ public class RulesTest {
 
     @Test
     public void canSlideOnTopOfHive_blockedGuards() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
 
         board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
         board.addToken(p1.getFromSupply(BugType.LADY_BUG), 0, 0);
@@ -151,7 +151,7 @@ public class RulesTest {
 
     @Test
     public void canCrawlDown_blocked() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, -1);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, -1);
         board.addToken(p1.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
@@ -167,7 +167,7 @@ public class RulesTest {
      */
     @Test
     public void canCrawlTo_success() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.BEETLE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, -1);
 
@@ -179,7 +179,7 @@ public class RulesTest {
      */
     @Test
     public void canCrawlTo_blockedHigh() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
         board.addToken(p2.getFromSupply(BugType.BEETLE), 0, -1);
         board.addToken(p1.getFromSupply(BugType.BEETLE), 0, 0);
@@ -195,7 +195,7 @@ public class RulesTest {
      */
     @Test
     public void canCrawlTo_blockedLow() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p1.getFromSupply(BugType.BEETLE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
@@ -205,7 +205,7 @@ public class RulesTest {
 
     @Test
     public void getMimicList_onGround() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token mos1 = p1.getFromSupply(BugType.MOSQUITO);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
         mos1.mimic(bee);
@@ -220,7 +220,7 @@ public class RulesTest {
 
     @Test
     public void getMimicList_onHive() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
         board.addToken(p1.getFromSupply(BugType.BEETLE), 0, 0);
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);

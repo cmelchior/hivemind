@@ -28,7 +28,7 @@ public class QueenBeeTest {
 
     @Test
     public void testTargetSquares_startingPosition() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token bee = p1.getFromSupply(BugType.QUEEN_BEE);
         Token ant = p2.getFromSupply(BugType.SOLDIER_ANT);
         board.addToken(bee, 0, 0);

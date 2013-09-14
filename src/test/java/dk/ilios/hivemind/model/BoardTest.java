@@ -26,7 +26,7 @@ public class BoardTest {
 
     @Test
     public void testClockwiseNeighbor() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Hex hex = board.getClockwiseHex(new Hex(0,0), new Hex(1, -1), board);
 
         assertEquals(1, hex.getQ());
@@ -35,7 +35,7 @@ public class BoardTest {
 
     @Test
     public void testCounterClockwiseNeighbor() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Hex hex = board.getCounterClockwiseHex(new Hex(0,0), new Hex(1, -1), board);
 
         assertEquals(0, hex.getQ());
@@ -44,7 +44,7 @@ public class BoardTest {
 
     @Test
     public void testHexEquals() {
-        Board board = new Board();
+        Board board = new Board(p1, p2);
         Token bee = p1.getFromSupply(BugType.QUEEN_BEE);
         board.addToken(bee, 1, -1);
         assertEquals(bee.getHex(), board.getHex(1, -1));
@@ -99,7 +99,6 @@ public class BoardTest {
         board.addToken(grasshopper, 1, 1);
         board.addToken(blackBee, 1, 2);
         board.addToken(spider, 0, 1);
-        printer.print(board);
 
         int[] spiderCoords = board.getSPCoordinatesFor(spider.getHex());
         assertArrayEquals(new int[] {0, -1}, spiderCoords);
@@ -115,20 +114,46 @@ public class BoardTest {
         board.setStandardPositionMode(true);
 
         Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
-        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
-        Token spider = p1.getFromSupply(BugType.SPIDER);
         Token beetle = p2.getFromSupply(BugType.BEETLE);
+        Token whiteQueen = p1.getFromSupply(BugType.QUEEN_BEE);
+        Token blackQueen = p2.getFromSupply(BugType.QUEEN_BEE);
 
         board.addToken(grasshopper, 0, 0);
-        board.addToken(blackBee, 1, 0);
-        board.addToken(spider, -1, 0);
-        board.addToken(beetle,1,1);
+        p1.movedToken();
+        board.addToken(beetle, 1, 0);
+        p2.movedToken();
+        board.addToken(whiteQueen, -1, 0);
+        p1.movedToken();
+        board.addToken(blackQueen,1,1);
+        p2.movedToken();
+
+        int[] blackQueenCoords = board.getSPCoordinatesFor(blackQueen.getHex());
+        assertArrayEquals(new int[] {3, -2}, blackQueenCoords);
+    }
+
+
+    @Test
+    public void testStandardPosition_zOpening() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(true);
+
+        Token gh1 = p1.getFromSupply(BugType.GRASSHOPPER);
+        Token gh2 = p2.getFromSupply(BugType.GRASSHOPPER);
+        Token whiteQueen = p1.getFromSupply(BugType.QUEEN_BEE);
+        Token blackQueen = p2.getFromSupply(BugType.QUEEN_BEE);
+
+        board.addToken(gh1, 0, 0);
+        board.addToken(gh2, 1, 0);
+        board.addToken(whiteQueen, -1, 1);
+        board.addToken(blackQueen,2,-1);
 
         printer.print(board);
 
-        int[] beetleCoords = board.getSPCoordinatesFor(beetle.getHex());
-        assertArrayEquals(new int[] {2, -1}, beetleCoords);
-
+        int[] blackQueenCoords = board.getSPCoordinatesFor(blackQueen.getHex());
+        assertArrayEquals(new int[] {3, -2}, blackQueenCoords);
     }
 
 
