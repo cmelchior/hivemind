@@ -3,7 +3,7 @@ package dk.ilios.hivemind.parser.metric;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.game.GameStatus;
-import dk.ilios.hivemind.model.BugType;
+import dk.ilios.hivemind.model.*;
 import dk.ilios.hivemind.parser.BoardspaceGameType;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class IngersollOpeningsMetric extends Metric {
 
     public static final String COUNT_FILE_NAME = "game_openings_vs_results_count.data";
-    public static final String PERCENTAGE_FILE_NAME = "game_openings_vs_results_type.data";
+    public static final String PERCENTAGE_FILE_NAME = "game_openings_vs_results_percentage.data";
 
     private Map<String, Result> results = new HashMap<String, Result>();
 
@@ -32,12 +32,12 @@ public class IngersollOpeningsMetric extends Metric {
         results.put("F", new Result());
         results.put("X", new Result());
         results.put("?", new Result());
+        results.put("%", new Result());
     }
 
     @Override
     public void analyzeGame(BoardspaceGameType type, String variant, Game game) {
         game.setReplayMode(true);
-
         String openingType = getOpeningType(game);
         GameStatus status = game.getStatus();
         switch (status) {
@@ -60,39 +60,96 @@ public class IngersollOpeningsMetric extends Metric {
     }
 
     private String getOpeningType(Game game) {
-        game.forward();
-        game.forward();
-        GameCommand whiteTurn2 = game.forward();
-        GameCommand blackTurn2 = game.forward();
 
-        if (whiteTurn2 == null || blackTurn2 == null) {
-            return "?";
-
-        } else if (whiteTurn2.getToken().getOriginalType() == BugType.QUEEN_BEE && blackTurn2.getToken().getOriginalType() == BugType.QUEEN_BEE) {
-            int[] wqCoords = game.getBoard().getSPCoordinatesFor(whiteTurn2.getToken().getHex());
-            int[] bqCoords = game.getBoard().getSPCoordinatesFor(blackTurn2.getToken().getHex());
-
-            if (bqCoords[0] == 2 && bqCoords[1] == 0) {
-                return "C";
-            } else if ((bqCoords[0] == 1 && bqCoords[1] == 2) || (bqCoords[0] == 3 && bqCoords[1] == -2)) {
-                return "Z";
-            } else if (bqCoords[0] == 3 && bqCoords[1] == 0) {
-                return "I";
-            } else if (bqCoords[0] == 3 && bqCoords[1] == -1) {
-                return "J";
-            } else if (bqCoords[0] == 2 && bqCoords[1] == 1) {
-                return "F";
-            } else {
-                System.out.println("Could not determine opening: " + Arrays.toString(wqCoords) + "/" + Arrays.toString(bqCoords) + "\n" + printer.toString(game.getBoard()));
-                return "?";
-            }
-        } else {
-            return "X";
+        // Forward game until both queens are placed.
+        int i = 10;
+        while ((game.getWhitePlayer().getQueen().inSupply() || game.getBlackPlayer().getQueen().inSupply()) && i > 0) {
+            game.forward();
+            i--;
         }
+
+        if ((game.getWhitePlayer().getQueen().inSupply() || game.getBlackPlayer().getQueen().inSupply())) {
+            return "%";
+        }
+
+        if (isC(game)) {
+            return "C";
+        } else if (isZ(game)) {
+            return "Z";
+        } else if (isI(game)) {
+            return "I";
+        } else if (isJ(game)) {
+            return "J";
+        } else if (isF(game)) {
+            return "F";
+        } else if (isX(game)) {
+            return "X";
+        } else {
+           return "?";
+        }
+    }
+
+    private boolean isX(Game game) {
+        Hex startingWhiteHex = game.getMove(game.getWhitePlayer(), 1).getToken().getHex();
+        Hex whiteQueenHex = game.getWhitePlayer().getQueen().getHex();
+        Hex startingBlackHex = game.getMove(game.getBlackPlayer(), 1).getToken().getHex();
+        Hex blackQueenHex = game.getBlackPlayer().getQueen().getHex();
+
+        if (HexagonUtils.distance(startingWhiteHex.getQ(), startingWhiteHex.getR(), whiteQueenHex.getQ(), whiteQueenHex.getR()) > 1
+                || HexagonUtils.distance(startingBlackHex.getQ(), startingBlackHex.getR(), blackQueenHex.getQ(), blackQueenHex.getR()) > 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isF(Game game) {
+        return checkTokens(1,0, 2,-1, 3,-2, game.getBoard()) || checkTokens(1,-1, 2,-1, 3,-1, game.getBoard());
+    }
+
+    private boolean isJ(Game game) {
+        return checkTokens(1,0, 2,0, 3,-1, game.getBoard()) || checkTokens(1,-1, 2,-2, 3,-2, game.getBoard());
+    }
+
+    private boolean isI(Game game) {
+        return checkTokens(1,0, 2,0, 3,0, game.getBoard());
+    }
+
+    private boolean isZ(Game game) {
+        return checkTokens(1,0, 2,-1, 3,-1, game.getBoard()) || checkTokens(1,-1, 2,-1, 3,-2, game.getBoard());
+    }
+
+    private boolean isC(Game game) {
+        return checkTokens(1,-1, 2,-1, 2,0, game.getBoard()) || checkTokens(0,1, 1,1, 2,0, game.getBoard());
+   }
+
+    private boolean checkTokens(int q1, int r1, int q2, int r2, int q3, int r3, Board b) {
+        Token t1 = b.getHexForStandardPosition(q1, r1).getTopToken();
+        Token t2 = b.getHexForStandardPosition(q2, r2).getTopToken();
+        Token t3 = b.getHexForStandardPosition(q3, r3).getTopToken();
+
+        if (t1 == null || t2 == null || t3 == null) {
+            return false;
+        }
+
+        if (!t1.getPlayer().isWhitePlayer()) {
+            return false;
+        }
+
+        if (!t2.getPlayer().isBlackPlayer()) {
+            return false;
+        }
+
+        if (!t3.getPlayer().isBlackPlayer() || t3.getOriginalType() != BugType.QUEEN_BEE) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public void save() {
+        results.remove("%");
         savePercentage();
         saveCount();
     }
@@ -165,6 +222,4 @@ public class IngersollOpeningsMetric extends Metric {
             return (float) whiteWin + blackWin + draw + other;
         }
     }
-
-
 }

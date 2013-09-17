@@ -156,6 +156,36 @@ public class BoardTest {
         assertArrayEquals(new int[] {3, -2}, blackQueenCoords);
     }
 
+    @Test
+    public void testStandardPosition_reverse() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(true);
+
+        Token gh1 = p1.getFromSupply(BugType.GRASSHOPPER);
+        Token gh2 = p2.getFromSupply(BugType.GRASSHOPPER);
+        Token s1 = p1.getFromSupply(BugType.SPIDER);
+        Token s2 = p2.getFromSupply(BugType.SPIDER);
+        Token whiteQueen = p1.getFromSupply(BugType.QUEEN_BEE);
+        Token blackQueen = p2.getFromSupply(BugType.QUEEN_BEE);
+
+        board.addToken(gh1, 0, 0);
+        board.addToken(gh2, 1, 0);
+        board.addToken(s1, -1, 0);
+        board.addToken(s2, 2, 0);
+        board.addToken(whiteQueen, 0, -1);
+        board.addToken(blackQueen,1,1);
+
+        printer.print(board);
+
+        int[] blackQueenCoords = board.getSPCoordinatesFor(blackQueen.getHex());
+        Hex originalHex = board.getHexForStandardPosition(blackQueenCoords[0], blackQueenCoords[1]);
+        assertEquals(blackQueen, originalHex.getTopToken());
+    }
+
+
 
 
 //    @Test

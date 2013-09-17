@@ -66,6 +66,7 @@ public class Board {
     private HiveAsciiPrettyPrinter printer = new HiveAsciiPrettyPrinter();
 
     private Map<String, Hex> hexes = new HashMap<String, Hex>(); // Key := (q,r), Value: hex. List of hexes visited in the game
+
     private Set<Token> tokens = new HashSet<Token>();
     private int[][] neighbors =  new int[][] {{0,-1},{+1,-1},{1,0},{0,1},{-1, +1},{-1,0}}; // From top and clockwise round.
 
@@ -173,22 +174,22 @@ public class Board {
         int turn = whitePlayer.getMoves() + blackPlayer.getMoves();
 
         if (firstTokens[3] != null) {
-            // TURN 4
+            // TURN 4+, after turn 4 pieces can move
             moveOrigin(firstTokens[0]);
-            rotateSecondTokenToStandardPosition();
+            rotateToStandardPosition(firstTokens[1]);
             swapAxisIfNeededForThirdToken();
             swapAxisIfNeededForFourthToken();
 
         } else if (firstTokens[2] != null) {
             // TURN 3
             moveOrigin(firstTokens[0]);
-            rotateSecondTokenToStandardPosition();
+            rotateToStandardPosition(firstTokens[1]);
             swapAxisIfNeededForThirdToken();
 
         } else if (firstTokens[1] != null) {
             // TURN 2
             moveOrigin(firstTokens[0]);
-            rotateSecondTokenToStandardPosition();
+            rotateToStandardPosition(firstTokens[1]);
 
         } else if (firstTokens[0] != null) {
             // TURN 1
@@ -197,57 +198,11 @@ public class Board {
         } else {
             throw new IllegalStateException("Board is empty");
         }
-
-//            if (turn == 1) {
-//            // First token must be (0,0)
-//            moveOrigin(token);
-//
-//        } else if (turn == 2) {
-//            // Rotate 1st black token to (1,0)
-//            int[] spCoords = getSPCoordinatesFor(token.getHex());
-//            int i = 6;
-//            while(!(spCoords[0] == 1 && spCoords[1] == 0)) {
-//                if (i == 0) {
-//                    printer.print(this);
-//                    throw new IllegalStateException("Keep rotating: " + Arrays.toString(spCoords));
-//                }
-//                rotateClockwise();
-//                spCoords = getSPCoordinatesFor(token.getHex());
-//                i--;
-//            }
-//
-//        } else if (turn == 3) {
-//            turn3Token = token;
-//            if (token.getType() == BugType.QUEEN_BEE) {
-//                moveOrigin(token);
-//            }
-//
-//            // Swap around q axis if R is positive (we want token in upper left corner)
-//            int[] spCoords = getSPCoordinatesFor(token.getHex());
-//            if (spCoords[0] < 0 && spCoords[1] > 0) {
-//                spQFlip = true;
-//            } else {
-//                spQFlip = false;
-//            }
-//
-//        } else if (turn == 4) {
-//            // Swap around q axis if R is positive (we want token in upper left corner)
-//            Token previousToken = turn3Token;
-//            Token currentToken = token;
-//            int[] previousSPCoords = getSPCoordinatesFor(previousToken.getHex());
-//            int[] currentSPCoords = getSPCoordinatesFor(currentToken.getHex());
-//            if (previousSPCoords[1] == 0 && currentSPCoords[0] >= 0 && currentSPCoords[1] >= 0) {
-//                spQFlip = true;
-//            } else {
-//                spQFlip = false;
-//            }
-//        } else {
-//            // Just maintain current flip / rotation
-//        }
     }
 
     private void swapAxisIfNeededForThirdToken() {
         int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+        // R must be negative for 3rd token to be in SP
         if (coords[1] > 0) {
             spQFlip = true;
         } else {
@@ -257,6 +212,8 @@ public class Board {
 
     private void swapAxisIfNeededForFourthToken() {
         int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+
+        // If R == 0 for 3rd piece, R must be negative for 4th piece to be in SP
         if (coords[1] == 0) {
             // Only check rotation if 3rd is inline with the rest
             coords = getSPCoordinatesFor(firstTokens[3].getHex());
@@ -268,24 +225,10 @@ public class Board {
         }
     }
 
-    private void rotateSecondTokenToStandardPosition() {
-        int i = 6;
-        int[] spCoords = getSPCoordinatesFor(firstTokens[1].getHex());
-        while(!(spCoords[0] == 1 && spCoords[1] == 0)) {
-            if (i == 0) {
-                printer.print(this);
-                throw new IllegalStateException("Keep rotating: " + Arrays.toString(spCoords));
-            }
-            rotateClockwise();
-            spCoords = getSPCoordinatesFor(firstTokens[1].getHex());
-            i--;
-        }
-    }
-
     private void maintainSPForMidGame(Token token) {
         spQFlip = false;
         moveOrigin(whitePlayer.getQueen());
-        rotateToStandardPosition(token);
+        rotateToStandardPosition(blackPlayer.getQueen());
     }
 
     private void moveOrigin(Token token) {
@@ -296,12 +239,18 @@ public class Board {
 
     // Rotate to last available space before crossing the positive Q axis.
     private void rotateToStandardPosition(Token token) {
-        int[] sp = getSPCoordinatesFor(token.getHex());
+        if (token.getHex().getQ() == spOrigin[0] && token.getHex().getR() == spOrigin[1]) {
+            // Very special case, can happen if a Beetle working as Blacks anchor point, move on top of White's origin.
+            // Just keep current SP in that case.
+            return;
+        }
 
+        int[] sp = getSPCoordinatesFor(token.getHex());
         int maxRotations = 6;
-        while(!(sp[0] >= 0 && sp[1] >= 0)) {
+        while(!(sp[0] >= 0 && sp[1] >= 1)) {
             if (maxRotations == 0) {
-                throw new IllegalStateException("Keep rotating");
+                printer.print(this);
+                throw new IllegalStateException("Keep rotating: Cannot find Standard Position");
             }
             rotateClockwise();
             sp = getSPCoordinatesFor(token.getHex());
@@ -322,29 +271,15 @@ public class Board {
         }
     }
 
-    /**
-     * Rotates the basis vectors clockwise.
-     * [x, y, z] -> [-z, -x, -y]
-     */
-    private int[] rotateRight(int[] rotation) {
-        int newX = -rotation[2];
-        int newY = -rotation[0];
-        int newZ = -rotation[1];
-        rotation[0] = newX;
-        rotation[1] = newY;
-        rotation[2] = newZ;
-        return rotation;
-    }
-
     public int[] getSPCoordinatesFor(Hex hex) {
         return getSPCoordinatesFor(hex.getQ(), hex.getR());
     }
 
     public int[] getSPCoordinatesFor(int q, int r) {
-        int[] cubeCoords = convertToCubeCoordinates(q - spOrigin[0], r - spOrigin[1]);
+        int[] cubeCoords = HexagonUtils.convertToCubeCoordinates(q - spOrigin[0], r - spOrigin[1]);
 
         for (int i = 0; i < spRotation; i++) {
-            cubeCoords = rotateRight(cubeCoords);
+            cubeCoords = HexagonUtils.rotateRight(cubeCoords);
         }
 
         if (spQFlip) {
@@ -356,19 +291,33 @@ public class Board {
             cubeCoords[2] = newZ;
         }
 
-        return convertToAxialCoordinates(cubeCoords[0], cubeCoords[1], cubeCoords[2]);
+        return HexagonUtils.convertToAxialCoordinates(cubeCoords[0], cubeCoords[1], cubeCoords[2]);
     }
 
-    private int[] convertToAxialCoordinates(int x, int y, int z) {
-        return new int[] { x, z };
-    }
+    /**
+     * Returns the hex for the given Standard Position
+     *
+     * @param q Q coordinate in Standard Position
+     * @param r R coordinate in Standard Position
+     */
+    public Hex getHexForStandardPosition(int q, int r) {
+        int[] cubeCoords = HexagonUtils.convertToCubeCoordinates(q, r);
 
-    // Cube coordinates fulfill x + y + z = 0
-    private int[] convertToCubeCoordinates(int q, int r) {
-        int x = q;
-        int z = r;
-        int y = -x - z;
-        return new int[] { x, y, z };
+        if (spQFlip) {
+            int newX = -cubeCoords[1];
+            int newY = -cubeCoords[0];
+            int newZ = -cubeCoords[2];
+            cubeCoords[0] = newX;
+            cubeCoords[1] = newY;
+            cubeCoords[2] = newZ;
+        }
+
+        for (int i = 0; i < (6 - spRotation); i++) {
+            cubeCoords = HexagonUtils.rotateRight(cubeCoords);
+        }
+
+        int[] originalCoords = HexagonUtils.convertToAxialCoordinates(cubeCoords[0], cubeCoords[1], cubeCoords[2]);
+        return findOrCreateHex(originalCoords[0] + spOrigin[0], originalCoords[1] + spOrigin[1]);
     }
 
     /**

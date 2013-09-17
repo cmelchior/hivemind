@@ -3,8 +3,10 @@ package dk.ilios.hivemind;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.parser.BoardspaceGameParser;
 import dk.ilios.hivemind.parser.BoardspaceGameType;
+import dk.ilios.hivemind.parser.filters.BoardspaceNetMasterPlayersFilter;
 import dk.ilios.hivemind.parser.filters.Filter;
 import dk.ilios.hivemind.parser.filters.HivePLGamesOnlyFilter;
+import dk.ilios.hivemind.parser.filters.QueenAsStartingPieceFilter;
 import dk.ilios.hivemind.parser.metric.*;
 
 import java.io.File;
@@ -78,17 +80,17 @@ public class MainParseGames {
 //        testFiles.add(new File("./plays/test.sgf"));
 //        files.put(BoardspaceGameType.PLAYER, testFiles);
 
-        Stack<File> tournamentFiles = new Stack<File>();
-        tournamentFiles.add(new File(TOURNAMENT_DIR));
-        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
+//        Stack<File> tournamentFiles = new Stack<File>();
+//        tournamentFiles.add(new File(TOURNAMENT_DIR));
+//        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
 
-        Stack<File> playerFiles = new Stack<File>();
-        playerFiles.add(new File(PLAYER_DIR));
-        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
+//        Stack<File> playerFiles = new Stack<File>();
+//        playerFiles.add(new File(PLAYER_DIR));
+//        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
 
-//        Stack<File> dumbotFiles = new Stack<File>();
-//        dumbotFiles.add(new File(DUMBOT_DIR));
-//        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
+        Stack<File> dumbotFiles = new Stack<File>();
+        dumbotFiles.add(new File(DUMBOT_DIR));
+        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
 
     }
 
@@ -118,6 +120,7 @@ public class MainParseGames {
     private void setupFilters() {
 //        filters.add(new BoardspaceNetMasterPlayersFilter());
 //        filters.add(new HivePLGamesOnlyFilter());
+        filters.add(new QueenAsStartingPieceFilter());
     }
 
 

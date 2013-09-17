@@ -51,3 +51,7 @@ eval "gnuplot -e \"output='../results/black_winner_openings.png'\" ./gnuplot/bla
 
 # White winner openings
 eval "gnuplot -e \"output='../results/white_winner_openings.png'\" ./gnuplot/white_winner_openings.plot"
+
+# Game openings vs. results - All
+COLUMNS=$(($(head -1 ../results/game_openings_vs_results_percentage.data | tr -d "\n" | tr "\t" "\n" | wc -l) + 1))
+eval "gnuplot -e \"columns=$COLUMNS;output='../results/game_openings_vs_results.png'\" ./gnuplot/game_openings_vs_results.plot"
