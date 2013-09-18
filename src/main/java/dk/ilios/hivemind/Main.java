@@ -16,7 +16,7 @@ public class Main {
         HiveAI opponentB = new SimpleMinMaxAI("SimpleMinMax", new SimpleHeuristicV2(), 2, 30000);
         HiveAI opponentC = new AlphaBetaMiniMaxAI("AlphaBeta", new SimpleHeuristicV2(), 3, 30000);
         HiveAI opponentCMark = new IDDFSAlphaBetaMiniMaxAI("Negamax", new SimpleHeuristicV2(), 3, 30000);
-        HiveAI opponentD = new IDDFSAlphaBetaMiniMaxAI("IDDFS", new SimpleHeuristicV3(), 1, 30000);
+        HiveAI opponentD = new IDDFSAlphaBetaMiniMaxAI("IDDFS", new SimpleHeuristicV3(), 2, 20000);
         HiveAI opponentE = new MonteCarloTreeSearchAI("MCTS", 100, 30000);
         HiveAI opponentF = new UCTMonteCarloTreeSearchAI("MCTS-UCT", 100, 30000);
 

@@ -29,7 +29,7 @@ import java.util.*;
  *
  * If enabled, the board is maintained in "Standard Position" (SP), which is defined by the following properties:
  *  - White Queen Bee is always (0,0)
- *  - Black Queen coordinates must be R = 0 and 0 < Q < MAX_Q. Rotate the board clockwise until this is true.
+ *  - Black Queen coordinates must be min(R) <= 0 and 0 < Q < MAX_Q. Rotate the board clockwise until this is true.
  *
  * Before queens are placed, SP is defined the same way like in Randell Ringersolls book [1], expect we look at the 3rd/
  * 4th token instead of the queen (although it usually will be the queen anyway).
@@ -44,7 +44,8 @@ import java.util.*;
  * Queen Bee moves are only 4.8% of all moves.
  *
  * Note SP doesn't guarantee that all similar board positions have the same Zobrist Key [3]. Mirror or reflected boards
- * around the Q axis do not have the same Zobrist key. For now this is in acceptable inaccuracy.
+ * around the Q axis do not have the same Zobrist key. For now this is in acceptable inaccuracy as we still reduce
+ * a board position from 12 different positions to 2.
  *
  * << Insert example here >>
  *
@@ -52,10 +53,7 @@ import java.util.*;
  * the Zobrist key is always calculated on the SP board.
  *
  * Note the backing hashes for the Zobrist key have a pretty high memory requirement, due to the potential board size.
- * Currently about 800 kB.
- *
- * INVARIANT:
- *
+ * Currently about 51*51*7*2*8 ~ 2.2 MB.
  *
  * @see [1] Randy Ingersoll: Play Hive like a champion
  * @see [2] http://www.redblobgames.com/grids/hexagons/
@@ -92,9 +90,14 @@ public class Board {
 //    long[][][][][] edgeHash = new long[COLORS][TOKEN_TYPES][EDGES][COLORS][TOKEN_TYPES];
 //    long whiteMoved = 0;
 //    long blackMoved = 0;
-//    long zobristKey = 0;
+    long zobristKey = 0;
 
-//
+    // See [2] for details about storing hexagon maps.
+    // Maximum size is 26 tokens in each directions that can be stacked 7 high.
+    // This is not entirely true, but for simplicity we just use that as a first implementation
+    // hashes := [q][r][height][color][bug_types];
+    private long[][][][][] zobristHashes = new long[51][51][7][2][8];
+
     public Board(Player white, Player black) {
         this.whitePlayer = white;
         this.blackPlayer = black;
@@ -105,34 +108,25 @@ public class Board {
 //    private static int TOP_EDGE = 7;
 
     private void loadZobristHashes() {
-//        Random random = new Random();
-//
-//        // Create the zobrist hashes needed for all edges
-//        // Is it possible to convert this to a recursive call?
-//        for (int i = 0; i < edgeHash.length; i++) {
-//            long[][][][] d1 = edgeHash[0];
-//            for (int j = 0; j < d1.length; j++) {
-//                long[][][] d2 = d1[j];
-//                for (int k = 0; k < d2.length; k++) {
-//                    long[][] d3 = d2[k];
-//                    for (int l = 0; l < d3.length; l++) {
-//                        long[] d4 = d3[l];
-//                        for(int m = 0; m < d4.length; m++) {
-//                            edgeHash[i][j][k][l][m] = random.nextLong();
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Create the zobrist hashes for nodes
-//        // Only used for the 1st node, after this, everything is described by edges
-//        for (int i = 0; i < nodeHash.length; i++) {
-//            nodeHash[i] = random.nextLong();
-//        }
-//
-//        whiteMoved = random.nextLong();
-//        blackMoved = random.nextLong();
+        Random random = new Random();
+
+        // Create the zobrist hashes needed for all edges
+        // Is it possible to convert this to a recursive call?
+        for (int i = 0; i < zobristHashes.length; i++) {
+            long[][][][] d1 = zobristHashes[0];
+            for (int j = 0; j < d1.length; j++) {
+                long[][][] d2 = d1[j];
+                for (int k = 0; k < d2.length; k++) {
+                    long[][] d3 = d2[k];
+                    for (int l = 0; l < d3.length; l++) {
+                        long[] d4 = d3[l];
+                        for(int m = 0; m < d4.length; m++) {
+                            zobristHashes[i][j][k][l][m] = random.nextLong();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -146,7 +140,7 @@ public class Board {
         token.getPlayer().removeFromSupply(token);
         tokens.add(token);
 
-//        updateZobristKey(token);
+        updateZobristKey(token);
 //        updateZobristKeyForPlayer(token.getPlayer());
 
         // Keep track of first 4 tokens
@@ -158,10 +152,15 @@ public class Board {
 
     private void maintainStandardPosition(Token token) {
         if (!standardPosition) return;
+        boolean rebuildZobristKey;
         if (bothQueensPlaced()) {
-            maintainSPForMidGame(token);
+            rebuildZobristKey = maintainSPForMidGame(token);
         } else {
-            maintainSPForOpenings(token);
+            rebuildZobristKey = maintainSPForOpenings(token);
+        }
+
+        if (rebuildZobristKey) {
+            rebuildZobristKey();
         }
     }
 
@@ -170,48 +169,54 @@ public class Board {
     }
 
     // INVARIANT: All tokens are placed in a legal position
-    private void maintainSPForOpenings(Token token) {
+    private boolean maintainSPForOpenings(Token token) {
         int turn = whitePlayer.getMoves() + blackPlayer.getMoves();
-
+        boolean rebuildZobristKey = false;
         if (firstTokens[3] != null) {
             // TURN 4+, after turn 4 pieces can move
-            moveOrigin(firstTokens[0]);
-            rotateToStandardPosition(firstTokens[1]);
-            swapAxisIfNeededForThirdToken();
-            swapAxisIfNeededForFourthToken();
+            rebuildZobristKey = moveOrigin(firstTokens[0]) || rebuildZobristKey;
+            rebuildZobristKey = rotateToStandardPosition(firstTokens[1]) || rebuildZobristKey;
+            rebuildZobristKey = swapAxisIfNeededForThirdToken() || rebuildZobristKey;
+            rebuildZobristKey = swapAxisIfNeededForFourthToken() || rebuildZobristKey;
 
         } else if (firstTokens[2] != null) {
             // TURN 3
-            moveOrigin(firstTokens[0]);
-            rotateToStandardPosition(firstTokens[1]);
-            swapAxisIfNeededForThirdToken();
+            rebuildZobristKey = moveOrigin(firstTokens[0]) || rebuildZobristKey;
+            rebuildZobristKey = rotateToStandardPosition(firstTokens[1]) || rebuildZobristKey;
+            rebuildZobristKey = swapAxisIfNeededForThirdToken() || rebuildZobristKey;
 
         } else if (firstTokens[1] != null) {
             // TURN 2
-            moveOrigin(firstTokens[0]);
-            rotateToStandardPosition(firstTokens[1]);
+            rebuildZobristKey = moveOrigin(firstTokens[0]) || rebuildZobristKey;
+            rebuildZobristKey = rotateToStandardPosition(firstTokens[1]) || rebuildZobristKey;
 
         } else if (firstTokens[0] != null) {
             // TURN 1
-            moveOrigin(token);
+            rebuildZobristKey = moveOrigin(token) || rebuildZobristKey;
 
         } else {
             throw new IllegalStateException("Board is empty");
         }
+
+        return rebuildZobristKey;
     }
 
-    private void swapAxisIfNeededForThirdToken() {
+    private boolean swapAxisIfNeededForThirdToken() {
         int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+        boolean oldFlip = spQFlip;
         // R must be negative for 3rd token to be in SP
         if (coords[1] > 0) {
             spQFlip = true;
         } else {
             spQFlip = false;
         }
+
+        return oldFlip != spQFlip;
     }
 
-    private void swapAxisIfNeededForFourthToken() {
+    private boolean swapAxisIfNeededForFourthToken() {
         int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+        boolean oldFlip = spQFlip;
 
         // If R == 0 for 3rd piece, R must be negative for 4th piece to be in SP
         if (coords[1] == 0) {
@@ -223,28 +228,48 @@ public class Board {
                 spQFlip = false;
             }
         }
+
+        return oldFlip != spQFlip;
     }
 
-    private void maintainSPForMidGame(Token token) {
+    private boolean maintainSPForMidGame(Token token) {
+        boolean oldFlip = spQFlip;
+        boolean rebuildZobristKey = false;
+
         spQFlip = false;
-        moveOrigin(whitePlayer.getQueen());
-        rotateToStandardPosition(blackPlayer.getQueen());
+        rebuildZobristKey = moveOrigin(whitePlayer.getQueen()) || rebuildZobristKey;
+        rebuildZobristKey = rotateToStandardPosition(blackPlayer.getQueen()) || rebuildZobristKey;
+
+        return rebuildZobristKey || oldFlip != spQFlip;
     }
 
-    private void moveOrigin(Token token) {
+    private boolean moveOrigin(Token token) {
         if (token.inSupply()) throw new IllegalStateException("Cannot recenter around token in supply: " + token);
+        Hex hex = token.getHex();
+        boolean rebuildZobristKey = spOrigin[0] != hex.getQ() || spOrigin[1] != hex.getR();
         spOrigin[0] = token.getHex().getQ();
         spOrigin[1] = token.getHex().getR();
+        return rebuildZobristKey;
+    }
+
+    // Rebuild Zobrist key when Standard Position changes
+    private void rebuildZobristKey() {
+        zobristKey = 0;
+        for (Token t: tokens) {
+            updateZobristKey(t);
+        }
     }
 
     // Rotate to last available space before crossing the positive Q axis.
-    private void rotateToStandardPosition(Token token) {
+    // Return true if rotation has changed so Zobrist key needs to be rebuild.
+    private boolean rotateToStandardPosition(Token token) {
         if (token.getHex().getQ() == spOrigin[0] && token.getHex().getR() == spOrigin[1]) {
             // Very special case, can happen if a Beetle working as Blacks anchor point, move on top of White's origin.
             // Just keep current SP in that case.
-            return;
+            return false;
         }
 
+        int oldRotation = spRotation;
         int[] sp = getSPCoordinatesFor(token.getHex());
         int maxRotations = 6;
         while(!(sp[0] >= 0 && sp[1] >= 1)) {
@@ -258,6 +283,7 @@ public class Board {
         }
 
         rotateCounterClockwise();
+        return spRotation != oldRotation;
     }
 
     private void rotateClockwise() {
@@ -328,74 +354,36 @@ public class Board {
         if (hexes.size() > 0 && enabled) throw new IllegalStateException("Cannot enable Standard Position for non-empty board");
         this.standardPosition = enabled;
         if (enabled) {
+            loadZobristHashes();
             spOrigin = new int[2];
             spRotation = 0;
             spQFlip = false;
         }
     }
 
-    // Encode the player who just moved into the key
-    private void updateZobristKeyForPlayer(Player player) {
-//        if (zobristPlayer == null) {
-//            // Starting player
-//            zobristKey = zobristKey ^ (player.isWhitePlayer() ? whiteMoved : blackMoved);
-//            zobristPlayer = player;
-//        } else {
-//            // Toggle player if needed
-//            if (player == zobristPlayer) return;
-//            zobristKey = zobristKey ^ blackMoved;
-//            zobristKey = zobristKey ^ whiteMoved;
-//            zobristPlayer = player;
-//        }
-    }
-
     /**
      * Updating the Zobrist key works by XOR, so calling it once, will insert a token, calling it twice will remove it.
      */
     private void updateZobristKey(Token token) {
-//        if (token == null || token.getHex() == null) return;
-//
-//        Hex tokenHex = token.getHex();
-//        int tokenId = token.getId();
-//        int color = getColorIndex(token.getPlayer());
-//
-//        // Update zobrist key
-//        List<Hex> border = getNeighborHexes(tokenHex);
-//        for (int i = 0; i < border.size(); i++) {
-//            int oppositeDir = (i + 3) % 6;
-//
-//            Hex neighborHex = border.get(i);
-//            if (neighborHex.isEmpty()) {
-//                zobristKey = zobristKey ^ edgeHash[color][tokenId][i][color][EMPTY_HEX]; // Create edge from node to empty
-//                zobristKey = zobristKey ^ edgeHash[color][EMPTY_HEX][oppositeDir][color][tokenId]; // Create edge in other direction from empty
-//            } else {
-//
-//                // Cancel empty edges
-//                int neighborColor = getColorIndex(neighborHex.getTopToken().getPlayer());
-//                zobristKey = zobristKey ^ edgeHash[color][EMPTY_HEX][i][neighborColor][neighborHex.getTopToken().getId()]; // remove old edge (this -> neighbor)
-//                zobristKey = zobristKey ^ edgeHash[neighborColor][neighborHex.getTopToken().getId()][oppositeDir][color][EMPTY_HEX]; // remove old edge (neighbor - > this)
-//                zobristKey = zobristKey ^ edgeHash[color][tokenId][i][neighborColor][neighborHex.getTopToken().getId()]; // add new edge (this -> neighbor)
-//                zobristKey = zobristKey ^ edgeHash[neighborColor][neighborHex.getTopToken().getId()][oppositeDir][color][tokenId]; // add new edge ( neighbor -> this)
-//            }
-//        }
-//
-//        // Update top/bottom
-//        // Token is always on top
-//        // Bottom might need to be updated
-//        zobristKey = zobristKey ^ edgeHash[color][tokenId][TOP_EDGE][color][EMPTY_HEX];
-//        zobristKey = zobristKey ^ edgeHash[color][EMPTY_HEX][BOTTOM_EDGE][color][tokenId];
-//
-//        if (token.getHex().getHeight() == 1) {
-//            zobristKey = zobristKey ^ edgeHash[color][tokenId][BOTTOM_EDGE][color][EMPTY_HEX];
-//        } else {
-//
-//            // Update lower token
-//            Token tokenBelow = tokenHex.getTokenAt(tokenHex.getHeight() - 1);
-//            zobristKey = zobristKey ^ edgeHash[color][tokenBelow.getId()][TOP_EDGE][color][tokenId];
-//
-//            // add bottom edge
-//            zobristKey = zobristKey ^ edgeHash[color][tokenId][BOTTOM_EDGE][color][tokenBelow.getId()];
-//        }
+        if (token == null || token.getHex() == null) return;
+
+        Hex tokenHex = token.getHex();
+        int typeIndex;
+        switch(token.getOriginalType()) {
+            case QUEEN_BEE: typeIndex = 0; break;
+            case BEETLE: typeIndex = 1; break;
+            case GRASSHOPPER: typeIndex = 2; break;
+            case SPIDER: typeIndex = 3; break;
+            case SOLDIER_ANT: typeIndex = 4; break;
+            case MOSQUITO: typeIndex = 5; break;
+            case LADY_BUG: typeIndex = 6; break;
+            case PILL_BUG: typeIndex = 7; break;
+            default:
+                throw new IllegalStateException("Unknown token: " + token);
+        }
+
+        int[] coords = getSPCoordinatesFor(tokenHex);
+        zobristKey = zobristKey ^ zobristHashes[coords[0] + 25][coords[1] + 25][tokenHex.getHeight() - 1][getColorIndex(token.getPlayer())][typeIndex];
     }
 
     private int getColorIndex(Player player) {
@@ -410,7 +398,6 @@ public class Board {
     public void removeToken(int q, int r) {
         Hex hex = findOrCreateHex(q, r);
         updateZobristKey(hex.getTopToken());
-        updateZobristKeyForPlayer(hex.getTopToken().getPlayer());
         Token token = hex.removeToken();
         token.setHex(null);
         token.getPlayer().addToSupply(token);
@@ -442,8 +429,7 @@ public class Board {
         Hex toHex = findOrCreateHex(toQ, toR);
         toHex.addToken(token);
         token.setHex(toHex);
-        updateZobristKey(token);
-        updateZobristKeyForPlayer(token.getPlayer());
+        updateZobristKey(token); // Add new position
     }
 
 
@@ -739,18 +725,10 @@ public class Board {
 
     /**
      * Returns the zobrist key for the given board layout.
-     * Due to the nature of Hive boards, which move freely and can be expanded in all directions, this makes it
-     * hard to make zobrist keys that also identify identical shifted or rotated positions.
-     *
-     * However as the search depth is never very big, it is not possible to shift or rotate a hive to another location
-     * within the given search time. At least not for any interesting sized hives.
-     *
-     * Having zobrist keys that z(b) = z(rotate(b)) or z(b) = z(shift(b)) would however be an interesting optimization.
-     *
      */
-//    public long getZobristKey() {
-//        return zobristKey;
-//    }
+    public long getZobristKey() {
+        return zobristKey;
+    }
 //
 //    /**
 //     * Returns the next token id.

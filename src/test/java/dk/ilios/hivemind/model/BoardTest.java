@@ -23,6 +23,13 @@ public class BoardTest {
         p2.fillBaseSupply();
     }
 
+    @Test
+    public void testCreateZobristMap() {
+        Board board = new Board(p1, p2);
+        long start = System.currentTimeMillis();
+        board.setStandardPositionMode(true);
+        System.out.println("Creating board in: " + (System.currentTimeMillis() - start));
+    }
 
     @Test
     public void testClockwiseNeighbor() {
@@ -150,8 +157,6 @@ public class BoardTest {
         board.addToken(whiteQueen, -1, 1);
         board.addToken(blackQueen,2,-1);
 
-        printer.print(board);
-
         int[] blackQueenCoords = board.getSPCoordinatesFor(blackQueen.getHex());
         assertArrayEquals(new int[] {3, -2}, blackQueenCoords);
     }
@@ -178,8 +183,6 @@ public class BoardTest {
         board.addToken(whiteQueen, 0, -1);
         board.addToken(blackQueen,1,1);
 
-        printer.print(board);
-
         int[] blackQueenCoords = board.getSPCoordinatesFor(blackQueen.getHex());
         Hex originalHex = board.getHexForStandardPosition(blackQueenCoords[0], blackQueenCoords[1]);
         assertEquals(blackQueen, originalHex.getTopToken());
@@ -188,14 +191,12 @@ public class BoardTest {
 
 
 
-//    @Test
-//    public void testZobristKey_empty() {
-//        long time = System.currentTimeMillis();
-//        Board board = new Board();
-//        System.out.println("" + (System.currentTimeMillis() - time));
-//
-//        assertEquals(0, board.getZobristKey());
-//    }
+    @Test
+    public void testZobristKey_empty() {
+        Board board = new Board(p1, p2);
+        board.setStandardPositionMode(true);
+        assertEquals(0, board.getZobristKey());
+    }
 //
 //    @Test
 //    public void testZobristKey_playerState() {
@@ -217,36 +218,65 @@ public class BoardTest {
 //        assertNotEquals(firstKey, board.getZobristKey());
 //    }
 //
-//    @Test
-//    public void testZobristKey_boardState() {
-//        Board board = new Board();
-//        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
-//        Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
-//        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
-//        Token blackSoldier = p2.getFromSupply(BugType.SOLDIER_ANT);
-//
-//        board.addToken(whiteBee, 0, 0);
-//        board.addToken(blackBee, 0, 1);
-//        board.addToken(whiteSoldier, 1, 0);
-//        board.addToken(blackSoldier, 1, 1);
-//
-//        long firstKey = board.getZobristKey();
-//
-//        board.removeToken(1, 1);
-//        board.removeToken(1, 0);
-//        board.removeToken(0, 1);
-//        board.removeToken(0, 0);
-//
-//        board.addToken(whiteBee, 0, 0);
-//        board.addToken(blackSoldier, 1, 1);
-//        board.addToken(whiteSoldier, 1, 0);
-//        board.addToken(blackBee, 0, 1);
-//
-//        // If board state is the same and next player also. It doesn't matter how that state was reached.
-//        assertEquals(firstKey, board.getZobristKey());
-//    }
+    @Test
+    public void testZobristKey_boardState() {
+        Board board = new Board(p1, p2);
+        board.setStandardPositionMode(true);
+        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
+        Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
+        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
+        Token blackSoldier = p2.getFromSupply(BugType.SOLDIER_ANT);
 
+        board.addToken(whiteBee, 0, 0);
+        board.addToken(blackBee, 0, 1);
+        board.addToken(whiteSoldier, 1, 0);
+        board.addToken(blackSoldier, 1, 1);
 
+        long firstKey = board.getZobristKey();
+
+        board.removeToken(1, 1);
+        board.removeToken(1, 0);
+        board.removeToken(0, 1);
+        board.removeToken(0, 0);
+
+        board.addToken(whiteBee, 0, 0);
+        board.addToken(blackSoldier, 1, 1);
+        board.addToken(whiteSoldier, 1, 0);
+        board.addToken(blackBee, 0, 1);
+
+        // If board state is the same and next player also. It doesn't matter how that state was reached.
+        assertEquals(firstKey, board.getZobristKey());
+    }
+
+    @Test
+    public void testZobristKey_sameForStandardPositionForMultiplePositions() {
+        Board board = new Board(p1, p2);
+        board.setStandardPositionMode(true);
+        Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
+        Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
+        Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
+        Token blackSoldier = p2.getFromSupply(BugType.SOLDIER_ANT);
+
+        board.addToken(whiteBee, 0, 0);
+        board.addToken(blackBee, 1, 0);
+        board.addToken(whiteSoldier, 2, 0);
+        board.addToken(blackSoldier, 3, -1);
+
+        long firstKey = board.getZobristKey();
+
+        board.removeToken(0, 0);
+        board.removeToken(1, 0);
+        board.removeToken(2, 0);
+        board.removeToken(3, -1);
+
+        board.addToken(whiteBee, 0, 0);
+        board.addToken(blackBee, -1, 0);
+        board.addToken(whiteSoldier, -2, 0);
+        board.addToken(blackSoldier, -3, 1);
+
+        // If the board maintain Standard Position the Zobrist keys should be equal.
+        assertEquals(firstKey, board.getZobristKey());
+    }
 
 
 }

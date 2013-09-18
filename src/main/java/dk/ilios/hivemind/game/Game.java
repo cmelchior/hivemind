@@ -13,34 +13,9 @@ import java.util.List;
 
 /**
  * General game state class for a game of Hive.
- *
- *
- * If enabled, the board is maintained in "Standard Position" (SP), which is defined by the following properties:
- *  - White Queen Bee is always (0,0)
- *  - Black Queen coordinates must be R = {0,1} and 0 < Q < MAX_Q. Rotate the board clockwise until this is true.
- *
- * Before queens are placed, SP is defined the same way like in Randell Ringersolls book [1], expect we always use the
- * 3rd token to determine wether to look at the 3rd/
- * 4th token instead of the queen (although it usually will be the queen anyway).
- *
- *  - 1st token (white) is placed at (0,0) -> Start
- *  - 2nd token (black) is placed at (1,0).
- *  - 3rd token (white) if R > 0, flip board around Q, so R < 0.
- *
- * Standard position uses the queens as "center points" as they are the most likely to be locked in place and they cannot
- * move very far. This minimizes the chance of origin changes or rotations. Analysis of Boardspace.net games has shown
- * that Queen Bee moves are only 4.8% of all moves.
- *
- * Note SP doesn't guarantee that all similar board positions have the same Zobrist Key [2]. Mirror or reflected boards
- * around the Q axis do not have the same Zobrist key. For now this is in acceptable inaccuracy.
- *
- * << Insert example here >>
- *
- * A Zobrist key is maintained for the board state. It will be recalculated for rotations/flips/center changes, so
- * the Zobrist key is always calculated on the SP board.
- *
- * Note the backing hashes for the Zobrist key have a pretty high memory requirement, due to the potential board size.
- * Currently about 800 kB.
+
+ * A Zobrist key is maintained for the game state. It consists of zobrist key for the board + game state information.
+ * See <code>Board</code> for further details.
  *
  * @see [1] Randy Ingersoll: Play Hive like a champion
  * @see [2] http://en.wikipedia.org/wiki/Zobrist_hashing
@@ -399,4 +374,20 @@ public class Game {
         if (enabled) board.setStandardPositionMode(enabled);
         zobristKey = enabled;
     }
+
+    // Encode the player who just moved into the key
+    private void updateZobristKeyForPlayer(Player player) {
+//        if (zobristPlayer == null) {
+//            // Starting player
+//            zobristKey = zobristKey ^ (player.isWhitePlayer() ? whiteMoved : blackMoved);
+//            zobristPlayer = player;
+//        } else {
+//            // Toggle player if needed
+//            if (player == zobristPlayer) return;
+//            zobristKey = zobristKey ^ blackMoved;
+//            zobristKey = zobristKey ^ whiteMoved;
+//            zobristPlayer = player;
+//        }
+    }
+
 }
