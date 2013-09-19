@@ -10,6 +10,7 @@ import dk.ilios.hivemind.model.rules.Rules;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * General game state class for a game of Hive.
@@ -32,24 +33,28 @@ public class Game {
 
     // Board properties
     private Board board;                    // Reference to game board
-    private boolean zobristKey = false;     // If true, a Zobrist key is maintained for the board position. Only works if in Standard Position
+
+    private boolean useZobristKey = false;      // If true, a Zobrist key is maintained for the board position and game state.
+    private Player zobristPlayer;
+    private long zobristKey = 0;                // Zobrist key for board + game state
+    private long[] playerHash = new long[2];
 
     private boolean isRunning = false;      // Game is started and progressing
     private boolean manualStepping = false; // If true, continue() must be called after every move to progress the game (for debugging/testing)
     private boolean replayMode = false;     // If true, the game cannot progress any futher, but forward(), backwards() can be called to navigate the game. When set to to false, game is forwarded to last position again.
     private int replayIndex = 0;            // Pointer to current move (that has not been played).
-    private int turnLimit = -1;             // If above 0, the game ends in a draw after so many moves.
 
+    private int turnLimit = -1;             // If above 0, the game ends in a draw after so many moves.
     private GameStatus status = GameStatus.RESULT_NOT_STARTED;
     private Player activePlayer;
-    private List<GameCommand> moves = new ArrayList<GameCommand>();
 
+    private List<GameCommand> moves = new ArrayList<GameCommand>();
     // Keeping track of draws
     private boolean enforceForcedDraw = true;       // If true, game is declared a draw after a set number of repeat moves by each player.
     private int repeatMovesBeforeForcedDraw = 3;    // Number of moves each player must make that are "the same" before forcing a draw.
     private int whiteDuplicateMoves = 0;
-    private int blackDuplicateMoves = 0;
 
+    private int blackDuplicateMoves = 0;
     // Debug properties
     private boolean printGameStateAfterEachMove = false;
     private GameStatistics statistics = new GameStatistics();
@@ -189,7 +194,16 @@ public class Game {
         keepTrackOfDuplicateMoves(command);
         command.execute(this);
         moves.add(command);
+
+        if (useZobristKey) {
+            zobristKey = board.getZobristKey() ^ playerHash[getColorIndex(getActivePlayer())];
+        }
     }
+
+    private int getColorIndex(Player player) {
+        return player.isWhitePlayer() ? 0 : 1;
+    }
+
 
     /**
      * Keeps track of players executing duplicate moves.
@@ -372,22 +386,15 @@ public class Game {
      */
     public void setZobristKeyMode(boolean enabled) {
         if (enabled) board.setStandardPositionMode(enabled);
-        zobristKey = enabled;
+        useZobristKey = enabled;
+
+        // Initialize Game state hashes
+        Random random = new Random();
+        playerHash[0] = random.nextLong();
+        playerHash[1] = random.nextLong();
     }
 
-    // Encode the player who just moved into the key
-    private void updateZobristKeyForPlayer(Player player) {
-//        if (zobristPlayer == null) {
-//            // Starting player
-//            zobristKey = zobristKey ^ (player.isWhitePlayer() ? whiteMoved : blackMoved);
-//            zobristPlayer = player;
-//        } else {
-//            // Toggle player if needed
-//            if (player == zobristPlayer) return;
-//            zobristKey = zobristKey ^ blackMoved;
-//            zobristKey = zobristKey ^ whiteMoved;
-//            zobristPlayer = player;
-//        }
+    public long getZobristKey() {
+        return zobristKey;
     }
-
 }

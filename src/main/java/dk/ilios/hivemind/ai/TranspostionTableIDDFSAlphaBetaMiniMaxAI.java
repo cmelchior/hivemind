@@ -1,10 +1,12 @@
 package dk.ilios.hivemind.ai;
 
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
+import dk.ilios.hivemind.ai.utils.TranspositionTable;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -28,6 +30,7 @@ import java.util.Random;
 public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private Random random = new Random();
+    private TranspositionTable table = new TranspositionTable();
 
     public TranspostionTableIDDFSAlphaBetaMiniMaxAI(String name, BoardValueHeuristic heuristicFunction, int depth, int maxTimeInMillis) {
         super(name, heuristicFunction, depth, maxTimeInMillis);
@@ -91,11 +94,21 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private int alphabeta(Game state, int depth, int alpha, int beta, boolean maximizingPlayer) {
 
+        // Check transposition table
+        long zobristKey = state.getZobristKey();
+        int stateValue = table.getResult(zobristKey);
+        if (stateValue != TranspositionTable.NO_MATCH) {
+            aiStats.cacheHit();
+            return stateValue;
+        }
+
+        // If NO_MATCH, run algorithm as usual
         if (isGameOver(state, depth) || depth <= 0 || System.currentTimeMillis() - start > maxTimeInMillis) {
-            return value(state);
+            int value = value(state);
+            table.addResult(zobristKey, value);
+            return value;
 
         } else {
-
             List<GameCommand> moves = generateMoves(state);
 
             if (maximizingPlayer) {
@@ -112,6 +125,8 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                         break;
                     }
                 }
+
+                table.addResult(zobristKey, alpha);
                 return alpha;
 
             } else {
@@ -129,6 +144,8 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                         break;
                     }
                 }
+
+                table.addResult(zobristKey, beta);
                 return beta;
             }
         }

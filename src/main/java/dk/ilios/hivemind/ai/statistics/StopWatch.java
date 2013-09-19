@@ -27,18 +27,20 @@ public class StopWatch {
 		return start(SINGLE_WATCH_ID);
 	}
 
-	public Watch start(String name) {
+	public synchronized Watch start(String name) {
 		Watch watch = new Watch();
 		watches.put(name, watch);
 		watch.start();
 		return watch;
 	}
 
-	public Watch stop(String name) {
+	public synchronized Watch stop(String name) {
 		Watch watch = watches.get(name);
 		if (watch != null) {
 			watch.stop();
-		}
+		} else {
+            throw new IllegalStateException("Watch not found for: " + name);
+        }
 
 		return watch;
 	}

@@ -14,8 +14,11 @@ public class AIStatistics {
     ArrayList<Long> millisecondsPrMove = new ArrayList<Long>(); // Time in milliseconds pr. move of the game
     ArrayList<Integer> gameStatesEvaluatedPrSecond = new ArrayList<Integer>(); // Normalized "performance" value
     ArrayList<Integer> positionsEvaluatedPrMove = new ArrayList<Integer>(); // Number of positions looked at when finding a move.
+    ArrayList<Integer> cacheHits = new ArrayList<Integer>(); // Number of cachehits
+
     int branches = 0;
     int nodes = 0;
+    int cacheHit = 0;
 
     // Temporary data
     String currentKey;
@@ -41,6 +44,7 @@ public class AIStatistics {
         millisecondsPrMove.add(time);
         gameStatesEvaluatedPrSecond.add(movesPrSecond);
         positionsEvaluatedPrMove.add(positionsEvaluated);
+        cacheHits.add(cacheHit);
     }
 
     /**
@@ -121,8 +125,16 @@ public class AIStatistics {
         return (nodes > 0) ? Math.round(branches/nodes) : 0;
     }
 
+    public List<Integer> getCacheHits() {
+        return cacheHits;
+    }
+
     public void nodeBranched(int size) {
         nodes++;
         branches += size;
+    }
+
+    public void cacheHit() {
+        cacheHit++;
     }
 }

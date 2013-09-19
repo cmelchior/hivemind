@@ -83,7 +83,6 @@ public class AIGameController {
         Player whitePlayer = new Player(whiteAI.getName(), Player.PlayerType.WHITE);
         whitePlayer.fillBaseSupply();
         whitePlayer.setCommandProvider(new CommandProvider() {
-
             @Override
             public GameCommand getCommand(Game currentState, Board board) {
                 whiteAI.getAiStats().startCalculatingNextMove();

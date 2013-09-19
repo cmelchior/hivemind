@@ -8,7 +8,7 @@ import dk.ilios.hivemind.model.Board;
 /**
  * Interface for Hive AI implementations
  */
-public interface HiveAI extends Cloneable {
+public interface HiveAI {
 
     /**
      * Return the next game move which the AI considers the best depending on the state of the game.
@@ -17,7 +17,6 @@ public interface HiveAI extends Cloneable {
 
     /**
      * Return metrics from this AI
-     * @return
      */
     public AIStatistics getAiStats();
 

@@ -67,11 +67,15 @@ public class GameStatistics {
         sb.append('\n');
         sb.append(whiteName + " game states pr. move: " + Arrays.toString(whiteAI.getPositionsEvaluatedPrMove().toArray()));
         sb.append('\n');
+        sb.append(whiteName + " cache hits pr. move: " + Arrays.toString(whiteAI.getCacheHits().toArray()));
+        sb.append('\n');
         sb.append(blackName + " time pr. move: " + Arrays.toString(blackAI.getMillisecondsPrMove().toArray()));
         sb.append('\n');
         sb.append(blackName + " game states pr. sec.: " + Arrays.toString(blackAI.getGameStatesEvaluatedPrSecond().toArray()));
         sb.append('\n');
         sb.append(blackName + " game states pr. move: " + Arrays.toString(blackAI.getPositionsEvaluatedPrMove().toArray()));
+        sb.append('\n');
+        sb.append(blackName + " cache hits pr. move: " + Arrays.toString(blackAI.getCacheHits().toArray()));
         sb.append('\n');
         sb.append("------------------");
 
