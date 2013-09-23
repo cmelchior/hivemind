@@ -10,7 +10,7 @@ import dk.ilios.hivemind.model.rules.Rules;
 
 import java.util.*;
 
-public abstract class AbstractMonteCarloTreeSearchAi implements HiveAI {
+public abstract class AbstractMonteCarloTreeSearchAI implements HiveAI {
 
     protected final int timeLimit; // Timelimit pr. move in millis
     protected final int maxDepth; // Max depth to run simulation
@@ -24,7 +24,7 @@ public abstract class AbstractMonteCarloTreeSearchAi implements HiveAI {
     protected long start; // Start time for requesting a new move.
 
 
-    public AbstractMonteCarloTreeSearchAi(String name, int maxDepth, int maxTimeMillis) {
+    public AbstractMonteCarloTreeSearchAI(String name, int maxDepth, int maxTimeMillis) {
         this.name = name;
         this.maxDepth = maxDepth;
         this.timeLimit = maxTimeMillis;
@@ -193,5 +193,8 @@ public abstract class AbstractMonteCarloTreeSearchAi implements HiveAI {
         }
     }
 
-
+    @Override
+    public boolean maintainsStandardPosition() {
+        return false;
+    }
 }

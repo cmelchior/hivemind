@@ -80,6 +80,7 @@ public class GameCommand {
 
         game.getActivePlayer().movedToken();
         game.togglePlayer();
+        game.updateZobristKey();
     }
 
     public void undo(Game game) {
@@ -97,6 +98,7 @@ public class GameCommand {
             // by toggling player first.
         game.togglePlayer();
         game.getActivePlayer().undoTokenMoved();
+        game.updateZobristKey();
     }
 
     @Override

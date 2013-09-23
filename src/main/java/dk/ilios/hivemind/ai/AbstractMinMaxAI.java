@@ -75,7 +75,6 @@ public abstract class AbstractMinMaxAI implements HiveAI {
     }
 
     protected Game undoMove(GameCommand command, Game state) {
-        // As
         command.undo(state);
         return state;
     }
@@ -98,5 +97,10 @@ public abstract class AbstractMinMaxAI implements HiveAI {
         List<GameCommand> result = moveGenerator.generateMoves(state);
         aiStats.nodeBranched(result.size());
         return result;
+    }
+
+    @Override
+    public boolean maintainsStandardPosition() {
+        return false;
     }
 }

@@ -2,7 +2,6 @@ package dk.ilios.hivemind.ai;
 
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
 import dk.ilios.hivemind.ai.heuristics.SimpleHeuristicV3;
-import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
@@ -20,7 +19,7 @@ import java.util.Random;
  * @see [2] Guillaume Maurice Jean-Bernard Chaslot: Monte Carlo Tree Search
  * @see [3] Magarana: Open Source Magic AI - https://code.google.com/p/magarena/source/browse/src/magic/ai/MCTSAI2.java
  */
-public class UCTMonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAi {
+public class UCTMonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAI {
 
     Random random = new Random();
     BoardValueHeuristic evaluationFunction = new SimpleHeuristicV3();

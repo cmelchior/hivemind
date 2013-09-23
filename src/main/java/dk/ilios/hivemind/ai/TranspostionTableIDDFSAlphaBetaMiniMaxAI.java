@@ -1,12 +1,13 @@
 package dk.ilios.hivemind.ai;
 
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
-import dk.ilios.hivemind.ai.utils.TranspositionTable;
+import dk.ilios.hivemind.ai.transpositiontable.TranspositionTable;
+import dk.ilios.hivemind.ai.transpositiontable.TranspositionTableEntry;
+import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +32,7 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private Random random = new Random();
     private TranspositionTable table = new TranspositionTable();
+    private HiveAsciiPrettyPrinter printer = new HiveAsciiPrettyPrinter();
 
     public TranspostionTableIDDFSAlphaBetaMiniMaxAI(String name, BoardValueHeuristic heuristicFunction, int depth, int maxTimeInMillis) {
         super(name, heuristicFunction, depth, maxTimeInMillis);
@@ -94,29 +96,40 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private int alphabeta(Game state, int depth, int alpha, int beta, boolean maximizingPlayer) {
 
-        // Check transposition table
+        int originalAlpha = alpha;
+        int originalBeta = beta;
+
+        // Check transposition tsable and adjust values if needed or return result if possible
         long zobristKey = state.getZobristKey();
-        int stateValue = table.getResult(zobristKey);
-        if (stateValue != TranspositionTable.NO_MATCH) {
+        TranspositionTableEntry entry = table.getResult(zobristKey);
+        if (entry != null && entry.depth >= depth) {
             aiStats.cacheHit();
-            return stateValue;
+            if (entry.type == TranspositionTableEntry.PV_NODE) {
+                return entry.value;
+            } else if (entry.type == TranspositionTableEntry.CUT_NODE && entry.value > alpha) {
+                alpha = entry.value;
+            } else if (entry.type == TranspositionTableEntry.ALL_NODE && entry.value < beta) {
+                beta = entry.value;
+            }
+
+            if (alpha >= beta) {
+                return entry.value; // Lowerbound is better than upper bound
+            }
         }
 
-        // If NO_MATCH, run algorithm as usual
+        // Run algorithm as usual
+        int value;
         if (isGameOver(state, depth) || depth <= 0 || System.currentTimeMillis() - start > maxTimeInMillis) {
-            int value = value(state);
-            table.addResult(zobristKey, value);
-            return value;
-
+            value = value(state);
         } else {
             List<GameCommand> moves = generateMoves(state);
 
             if (maximizingPlayer) {
                 for (GameCommand move : moves) {
                     applyMove(move, state);
-                    int value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
+                    value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value > alpha) {
-                        alpha  = value;
+                        alpha = value;
                     }
                     undoMove(move, state);
 
@@ -126,14 +139,13 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                     }
                 }
 
-                table.addResult(zobristKey, alpha);
-                return alpha;
+                value = alpha;
 
             } else {
 
                 for (GameCommand move : moves) {
                     applyMove(move, state);
-                    int value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
+                    value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value < beta) {
                         beta = value;
                     }
@@ -145,9 +157,25 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                     }
                 }
 
-                table.addResult(zobristKey, beta);
-                return beta;
+                value = beta;
             }
         }
+
+        // Update transposition table
+        if (value <= originalAlpha) {
+            table.addResult(zobristKey, value, depth, TranspositionTableEntry.CUT_NODE);
+        } else if (value >= originalBeta) {
+            table.addResult(zobristKey, value, depth, TranspositionTableEntry.ALL_NODE);
+        } else {
+            table.addResult(zobristKey, value, depth, TranspositionTableEntry.PV_NODE);
+        }
+
+        return value;
     }
+
+    @Override
+    public boolean maintainsStandardPosition() {
+        return true;
+    }
+
 }

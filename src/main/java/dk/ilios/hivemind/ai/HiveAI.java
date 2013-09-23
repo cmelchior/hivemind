@@ -29,4 +29,10 @@ public interface HiveAI {
      * Copy the AI parameters to create a new version with the same name.
      */
     public HiveAI copy();
+
+    /**
+     * Returns true if the HiveAI uses zobrist keys and Standard Position. If not, no need to use computational power to maintain Standard
+     * Position if it is not used.
+     */
+    public boolean maintainsStandardPosition();
 }

@@ -108,6 +108,7 @@ public class AIGameController {
         game.setTurnLimit(turnLimit);
         game.setPrintGameStateAfterEachMove(printGameState);
         game.addPlayers(whitePlayer, blackPlayer);
+        game.setStandardPositionMode(whiteAI.maintainsStandardPosition() || blackAI.maintainsStandardPosition());
         try {
             game.start();
         } catch (RuntimeException e) {

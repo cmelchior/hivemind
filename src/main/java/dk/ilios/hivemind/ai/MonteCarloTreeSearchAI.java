@@ -15,7 +15,7 @@ import java.util.Random;
  *
  * - Random playout
  */
-public class MonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAi {
+public class MonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAI {
 
     Random random = new Random();
     BoardValueHeuristic evaluationFunction = new SimpleHeuristicV3();

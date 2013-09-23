@@ -1,12 +1,13 @@
-package dk.ilios.hivemind.ai.utils;
+package dk.ilios.hivemind.ai.utils.transpositiontable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Implementation of a Transposition table for Minimax algorithms
+ * Implementation of a Transposition table for an AlphaBetaMinimax algorithm
  *
  * @see http://en.wikipedia.org/wiki/Transposition_table
+ * @see http://www.gamedev.net/topic/503234-transposition-table-question/
  */
 public class TranspositionTable {
 
@@ -14,7 +15,7 @@ public class TranspositionTable {
 
     private Map<Long, Integer> table = new HashMap<Long, Integer>();
 
-    public void addResult(long zobristKey, int result) {
+    public void addResult(long zobristKey, int result, int searchDepth) {
         if (result == NO_MATCH) return; // Ignore 0 results as we use them to indicate empty. Acceptable loss for now.
         table.put(zobristKey, result);
     }

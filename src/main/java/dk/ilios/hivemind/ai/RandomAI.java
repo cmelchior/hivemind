@@ -128,4 +128,9 @@ public class RandomAI implements HiveAI {
     public String getName() {
         return name;
     }
+
+    @Override
+    public boolean maintainsStandardPosition() {
+        return false;
+    }
 }

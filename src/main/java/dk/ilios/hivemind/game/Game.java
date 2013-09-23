@@ -35,7 +35,6 @@ public class Game {
     private Board board;                    // Reference to game board
 
     private boolean useZobristKey = false;      // If true, a Zobrist key is maintained for the board position and game state.
-    private Player zobristPlayer;
     private long zobristKey = 0;                // Zobrist key for board + game state
     private long[] playerHash = new long[2];
 
@@ -194,10 +193,6 @@ public class Game {
         keepTrackOfDuplicateMoves(command);
         command.execute(this);
         moves.add(command);
-
-        if (useZobristKey) {
-            zobristKey = board.getZobristKey() ^ playerHash[getColorIndex(getActivePlayer())];
-        }
     }
 
     private int getColorIndex(Player player) {
@@ -384,7 +379,7 @@ public class Game {
     /**
      * Enable the calculation of Zobrist keys for the board. Enabling Zobrist key also enabled Standard Position.
      */
-    public void setZobristKeyMode(boolean enabled) {
+    public void setStandardPositionMode(boolean enabled) {
         if (enabled) board.setStandardPositionMode(enabled);
         useZobristKey = enabled;
 
@@ -396,5 +391,11 @@ public class Game {
 
     public long getZobristKey() {
         return zobristKey;
+    }
+
+    public void updateZobristKey() {
+        if (useZobristKey) {
+            zobristKey = board.getZobristKey() ^ playerHash[getColorIndex(getActivePlayer())];
+        }
     }
 }
