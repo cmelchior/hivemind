@@ -1,5 +1,7 @@
 package dk.ilios.hivemind.ai.transpositiontable;
 
+import dk.ilios.hivemind.game.GameCommand;
+
 /**
  * Wrapper for transposition table entries.
  *
@@ -14,10 +16,12 @@ public class TranspositionTableEntry {
     public final int value; // Value for the node
     public final int depth; // Search depth
     public final int type;  // Type of value [PV_NODE, CUT_NODE, ALL_NODE]
+    public final GameCommand move;
 
-    public TranspositionTableEntry(int value, int depth, int type) {
+    public TranspositionTableEntry(int value, int depth, int type, GameCommand move) {
         this.value = value;
         this.depth = depth;
         this.type = type;
+        this.move = move;
     }
 }

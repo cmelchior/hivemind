@@ -5,6 +5,7 @@ import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Hex;
 import dk.ilios.hivemind.model.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public abstract class MoveGenerator {
 
-    public abstract List<GameCommand> generateMoves(Game state);
+    public abstract List<GameCommand> generateMoves(List<GameCommand> initialList, Game state);
 
     protected GameCommand createGameCommand(Token token, Hex hex) {
         if (token.getHex() == null) {

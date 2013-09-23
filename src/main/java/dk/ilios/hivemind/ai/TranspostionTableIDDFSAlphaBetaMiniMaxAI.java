@@ -32,7 +32,6 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private Random random = new Random();
     private TranspositionTable table = new TranspositionTable();
-    private HiveAsciiPrettyPrinter printer = new HiveAsciiPrettyPrinter();
 
     public TranspostionTableIDDFSAlphaBetaMiniMaxAI(String name, BoardValueHeuristic heuristicFunction, int depth, int maxTimeInMillis) {
         super(name, heuristicFunction, depth, maxTimeInMillis);
@@ -98,12 +97,14 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
         int originalAlpha = alpha;
         int originalBeta = beta;
+        GameCommand bestMove = null;
 
         // Check transposition tsable and adjust values if needed or return result if possible
         long zobristKey = state.getZobristKey();
         TranspositionTableEntry entry = table.getResult(zobristKey);
         if (entry != null && entry.depth >= depth) {
             aiStats.cacheHit();
+            bestMove = entry.move;
             if (entry.type == TranspositionTableEntry.PV_NODE) {
                 return entry.value;
             } else if (entry.type == TranspositionTableEntry.CUT_NODE && entry.value > alpha) {
@@ -122,10 +123,10 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
         if (isGameOver(state, depth) || depth <= 0 || System.currentTimeMillis() - start > maxTimeInMillis) {
             value = value(state);
         } else {
-            List<GameCommand> moves = generateMoves(state);
-
+            List<GameCommand> moves = generateMoves(state, bestMove);
             if (maximizingPlayer) {
                 for (GameCommand move : moves) {
+                    bestMove = move;
                     applyMove(move, state);
                     value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value > alpha) {
@@ -144,6 +145,7 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
             } else {
 
                 for (GameCommand move : moves) {
+                    bestMove = move;
                     applyMove(move, state);
                     value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value < beta) {
@@ -163,11 +165,11 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
         // Update transposition table
         if (value <= originalAlpha) {
-            table.addResult(zobristKey, value, depth, TranspositionTableEntry.CUT_NODE);
+            table.addResult(zobristKey, value, depth, TranspositionTableEntry.CUT_NODE, bestMove);
         } else if (value >= originalBeta) {
-            table.addResult(zobristKey, value, depth, TranspositionTableEntry.ALL_NODE);
+            table.addResult(zobristKey, value, depth, TranspositionTableEntry.ALL_NODE, bestMove);
         } else {
-            table.addResult(zobristKey, value, depth, TranspositionTableEntry.PV_NODE);
+            table.addResult(zobristKey, value, depth, TranspositionTableEntry.PV_NODE, bestMove);
         }
 
         return value;

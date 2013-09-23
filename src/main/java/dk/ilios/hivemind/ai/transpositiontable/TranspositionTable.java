@@ -1,5 +1,7 @@
 package dk.ilios.hivemind.ai.transpositiontable;
 
+import dk.ilios.hivemind.game.GameCommand;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,10 +17,10 @@ public class TranspositionTable {
 
     private Map<Long, TranspositionTableEntry> table = new HashMap<Long, TranspositionTableEntry>();
 
-    public void addResult(long zobristKey, int value, int depth, int valueType) {
+    public void addResult(long zobristKey, int value, int depth, int valueType, GameCommand bestMove) {
         TranspositionTableEntry existingEntry = table.get(zobristKey);
         if (existingEntry == null || depth >= existingEntry.depth) {
-            table.put(zobristKey, new TranspositionTableEntry(value, depth, valueType));
+            table.put(zobristKey, new TranspositionTableEntry(value, depth, valueType, bestMove));
         }
     }
 

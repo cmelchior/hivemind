@@ -14,8 +14,8 @@ import java.util.*;
 public class StandardMoveGenerator extends MoveGenerator {
 
     @Override
-    public List<GameCommand> generateMoves(Game state) {
-        List<GameCommand> result = new ArrayList<GameCommand>();
+    public List<GameCommand> generateMoves(List<GameCommand> initialList, Game state) {
+        List<GameCommand> result = initialList;
         Player player = state.getActivePlayer();
         Board board = state.getBoard();
 

@@ -9,10 +9,7 @@ import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.*;
 import dk.ilios.hivemind.model.rules.Rules;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractMinMaxAI implements HiveAI {
 
@@ -93,8 +90,17 @@ public abstract class AbstractMinMaxAI implements HiveAI {
     /**
      * Standard move generation
      */
-    protected List<GameCommand> generateMoves(Game state) {
-        List<GameCommand> result = moveGenerator.generateMoves(state);
+    protected List<GameCommand> generateMoves(Game state, GameCommand... priorityMoves) {
+        ArrayList<GameCommand> initialList = new ArrayList<GameCommand>();
+        List<GameCommand> result = moveGenerator.generateMoves(initialList, state);
+
+        for (GameCommand priorityMove : priorityMoves) {
+            if (priorityMove != null && result.contains(priorityMove)) {
+                result.remove(priorityMove);
+                result.add(0, priorityMove);
+            }
+        }
+
         aiStats.nodeBranched(result.size());
         return result;
     }
