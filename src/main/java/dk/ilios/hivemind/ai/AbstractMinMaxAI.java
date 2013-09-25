@@ -1,8 +1,8 @@
 package dk.ilios.hivemind.ai;
 
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
+import dk.ilios.hivemind.ai.moves.AggressiveMovesFirstGenerator;
 import dk.ilios.hivemind.ai.moves.MoveGenerator;
-import dk.ilios.hivemind.ai.moves.StandardMoveGenerator;
 import dk.ilios.hivemind.ai.statistics.AIStatistics;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
@@ -17,7 +17,7 @@ public abstract class AbstractMinMaxAI implements HiveAI {
     protected Game state;
     protected AIStatistics aiStats = new AIStatistics();
 
-    protected MoveGenerator moveGenerator = new StandardMoveGenerator();
+    protected MoveGenerator moveGenerator = new AggressiveMovesFirstGenerator();
     protected BoardValueHeuristic heuristic;
 
     protected int searchDepth;      // Search limit in depth

@@ -134,6 +134,6 @@ public class GameCommand {
         if (toQ != gc2.getToQ()) return false;
         if (toR != gc2.getToR()) return false;
         if (movedByPillbug != gc2.isMovedByPillbug()) return false;
-        return token.equals(gc2.getToken()) ;
+        return (token == null && gc2.getToken() == null) || token.equals(gc2.getToken());
     }
 }

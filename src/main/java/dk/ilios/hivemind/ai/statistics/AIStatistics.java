@@ -10,6 +10,8 @@ import java.util.UUID;
  */
 public class AIStatistics {
 
+    private boolean DEBUG = true;
+
     // Result arrays
     ArrayList<Long> millisecondsPrMove = new ArrayList<Long>(); // Time in milliseconds pr. move of the game
     ArrayList<Integer> gameStatesEvaluatedPrSecond = new ArrayList<Integer>(); // Normalized "performance" value
@@ -48,6 +50,10 @@ public class AIStatistics {
         gameStatesEvaluatedPrSecond.add(movesPrSecond);
         positionsEvaluatedPrMove.add(positionsEvaluated);
         cacheHits.add(cacheHit);
+
+        if (DEBUG) {
+            System.out.println("Turn length: " + (time/1000d) + " s.");
+        }
     }
 
     /**
