@@ -3,48 +3,46 @@ package dk.ilios.hivemind.ai;
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
 import dk.ilios.hivemind.ai.transpositiontable.TranspositionTable;
 import dk.ilios.hivemind.ai.transpositiontable.TranspositionTableEntry;
-import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
+import dk.ilios.hivemind.utils.LimitedBuffer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
  * AI that implements Minimax tree search algorithm with Alpha-Beta prunning and Iterative Deepening Depth-First Search.
- * Backed by a transposition table.
- *
- * @see http://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
- * @see http://en.wikipedia.org/wiki/Iterative_deepening
- * @see http://en.wikipedia.org/wiki/Transposition_table
- *
- * Other things to consider:
- * - Move reordering
- * - Killer heuristic
- * - http://chessprogramming.wikispaces.com/Quiescence+Search
- * - With move reordering in place, consider NegaScout: http://en.wikipedia.org/wiki/Negascout
- * - Consider http://en.wikipedia.org/wiki/MTD-f
- *
+ * Backed by a transposition table. Killer Heuristic applied to each ply as well.
  */
-public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
+public class KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private Random random = new Random();
     private TranspositionTable table = new TranspositionTable();
+    private ArrayList<LimitedBuffer<GameCommand>> killerMoves = new ArrayList<LimitedBuffer<GameCommand>>();
 
-    public TranspostionTableIDDFSAlphaBetaMiniMaxAI(String name, BoardValueHeuristic heuristicFunction, int depth, int maxTimeInMillis) {
+    public KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI(String name, BoardValueHeuristic heuristicFunction, int depth, int maxTimeInMillis) {
         super(name, heuristicFunction, depth, maxTimeInMillis);
+        for (int i = 0; i < depth; i++) {
+            killerMoves.add(new LimitedBuffer<GameCommand>(2));
+        }
     }
 
     @Override
     public HiveAI copy() {
-        return new TranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis);
+        return new KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis);
     }
 
     @Override
     public GameCommand nextMove(Game state, Board board) {
         start = System.currentTimeMillis();
         maximizingPlayer = state.getActivePlayer();
+
+        // Clear previous killer moves
+        for (LimitedBuffer<GameCommand> buffer : killerMoves) {
+            buffer.clear();
+        }
 
         // Iterate depths, effectively a breath-first search, where top nodes get visited multiple times
         int depth = 0;
@@ -98,7 +96,7 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
         int originalBeta = beta;
         GameCommand bestMove = null;
 
-        // Check transposition tsable and adjust values if needed or return result if possible
+        // Check transposition table and adjust values if needed or return result if possible
         long zobristKey = state.getZobristKey();
         TranspositionTableEntry entry = table.getResult(zobristKey);
         if (entry != null && entry.depth >= depth) {
@@ -117,17 +115,22 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
             }
         }
 
+
         // Run algorithm as usual
         int value;
         if (isGameOver(state, depth) || depth <= 0 || System.currentTimeMillis() - start > maxTimeInMillis) {
             value = value(state);
         } else {
-            List<GameCommand> moves = generateMoves(state, bestMove);
-            int moveAnalyzed = 0;
+
+            // Generate moves
+            GameCommand[] killMoves = new GameCommand[2];
+            killerMoves.get(depth).toArray(killMoves);
+            List<GameCommand> moves = generateMoves(state, bestMove, killMoves[0], killMoves[1]);
+            int moveEvaluated = 0;
 
             if (maximizingPlayer) {
                 for (GameCommand move : moves) {
-                    moveAnalyzed++;
+                    moveEvaluated++;
                     bestMove = move;
                     applyMove(move, state);
                     value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
@@ -138,7 +141,8 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
                     // Beta cut-off
                     if (beta <= alpha) {
-                        aiStats.cutOffAfter(moveAnalyzed);
+                        aiStats.cutOffAfter(moveEvaluated);
+                        killerMoves.get(depth).add(move);
                         break;
                     }
                 }
@@ -148,18 +152,19 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
             } else {
 
                 for (GameCommand move : moves) {
-                    moveAnalyzed++;
+                    moveEvaluated++;
                     bestMove = move;
                     applyMove(move, state);
                     value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value < beta) {
-                        aiStats.cutOffAfter(moveAnalyzed);
                         beta = value;
                     }
                     undoMove(move, state);
 
                     // Alpha cut-off
                     if (beta <= alpha) {
+                        aiStats.cutOffAfter(moveEvaluated);
+                        killerMoves.get(depth).add(move);
                         break;
                     }
                 }

@@ -124,4 +124,16 @@ public class GameCommand {
             return "(" + toQ + ", " + toR + ")";
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof GameCommand)) return false;
+        GameCommand gc2 = (GameCommand) o;
+        if (fromQ != gc2.getFromQ()) return false;
+        if (fromR != gc2.getFromR()) return false;
+        if (toQ != gc2.getToQ()) return false;
+        if (toR != gc2.getToR()) return false;
+        if (movedByPillbug != gc2.isMovedByPillbug()) return false;
+        return token.equals(gc2.getToken()) ;
+    }
 }

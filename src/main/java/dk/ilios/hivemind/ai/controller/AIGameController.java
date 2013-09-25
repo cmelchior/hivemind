@@ -120,6 +120,7 @@ public class AIGameController {
         statistics.addBlackAIStats(blackAI.getAiStats());
 
         gameResults.add(game.getStatistics());
+        System.out.println(game.getStatistics().shortSummary());
     }
 
     public void printLog(boolean longSummary) {

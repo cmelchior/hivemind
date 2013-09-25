@@ -94,7 +94,8 @@ public abstract class AbstractMinMaxAI implements HiveAI {
         ArrayList<GameCommand> initialList = new ArrayList<GameCommand>();
         List<GameCommand> result = moveGenerator.generateMoves(initialList, state);
 
-        for (GameCommand priorityMove : priorityMoves) {
+        for (int i = priorityMoves.length; i > 0; i--) {
+            GameCommand priorityMove = priorityMoves[i - 1];
             if (priorityMove != null && result.contains(priorityMove)) {
                 result.remove(priorityMove);
                 result.add(0, priorityMove);
@@ -107,6 +108,6 @@ public abstract class AbstractMinMaxAI implements HiveAI {
 
     @Override
     public boolean maintainsStandardPosition() {
-        return false;
+        return true;
     }
 }

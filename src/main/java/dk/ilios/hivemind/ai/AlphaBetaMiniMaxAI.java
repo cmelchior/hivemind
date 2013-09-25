@@ -57,10 +57,11 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
         } else {
 
             List<GameCommand> moves = generateMoves(state);
-
+            int moveEvaluated = 0;
             if (maximizingPlayer) {
                 for (GameCommand move : moves) {
                     applyMove(move, state);
+                    moveEvaluated++;
                     int value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value > alpha) {
                         alpha  = value;
@@ -69,6 +70,7 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
                     // Beta cut-off
                     if (beta <= alpha) {
+                        aiStats.cutOffAfter(moveEvaluated);
                         break;
                     }
                 }
@@ -86,6 +88,7 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
                     // Alpha cut-off
                     if (beta <= alpha) {
+                        aiStats.cutOffAfter(moveEvaluated);
                         break;
                     }
                 }

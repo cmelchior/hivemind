@@ -16,6 +16,9 @@ public class AIStatistics {
     ArrayList<Integer> positionsEvaluatedPrMove = new ArrayList<Integer>(); // Number of positions looked at when finding a move.
     ArrayList<Integer> cacheHits = new ArrayList<Integer>(); // Number of cachehits
 
+    int numberOfCutoffs = 0;
+    int totalCutoffTurns = 0; // Average number of moves before cutoffs is totalCutoffTurns/numberOfCutoffs
+
     int branches = 0;
     int nodes = 0;
     int cacheHit = 0;
@@ -137,4 +140,15 @@ public class AIStatistics {
     public void cacheHit() {
         cacheHit++;
     }
+
+    public void cutOffAfter(int moveEvaluated) {
+        numberOfCutoffs++;
+        totalCutoffTurns += moveEvaluated;
+    }
+
+    public double getAverageMovesEvaluatedBeforeCutoff() {
+        if (totalCutoffTurns == 0) return -1d;
+        return totalCutoffTurns/(double) numberOfCutoffs;
+    }
+
 }

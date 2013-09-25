@@ -1,0 +1,399 @@
+MCTS vs. TT-AB search. Max turn limit: 30 turns.
+TT-AB seems to blow MCTS out of the water. Needs further analysis.
+
+--------------------------------------------------
+java.lang.IllegalStateException: Illegal command: MCTS-UCT trying to execute null: (0, 0) -> (0, 0)
+	at dk.ilios.hivemind.game.Game.continueGame(Game.java:163)
+	at dk.ilios.hivemind.game.Game.continueGame(Game.java:173)
+	at dk.ilios.hivemind.game.Game.start(Game.java:86)
+	at dk.ilios.hivemind.ai.controller.AIGameController.runGame(AIGameController.java:113)
+	at dk.ilios.hivemind.ai.controller.AIGameController.access$000(AIGameController.java:19)
+	at dk.ilios.hivemind.ai.controller.AIGameController$1.run(AIGameController.java:59)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:724)
+TranspositionTable-IDDFS (4) vs. MCTS-UCT (3) - 0 ms.: RESULT_MATCH_IN_PROGRESS
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1105466 ms.: RESULT_TURN_LIMIT_REACHED
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1129184 ms.: RESULT_TURN_LIMIT_REACHED
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1084648 ms.: RESULT_TURN_LIMIT_REACHED
+TranspositionTable-IDDFS (11) vs. MCTS-UCT (10) - 336091 ms.: RESULT_WHITE_WINS
+TranspositionTable-IDDFS (14) vs. MCTS-UCT (13) - 486342 ms.: RESULT_WHITE_WINS
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1067349 ms.: RESULT_TURN_LIMIT_REACHED
+TranspositionTable-IDDFS (19) vs. MCTS-UCT (18) - 661320 ms.: RESULT_WHITE_WINS
+TranspositionTable-IDDFS (11) vs. MCTS-UCT (10) - 337575 ms.: RESULT_WHITE_WINS
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1088306 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (29) vs. TranspositionTable-IDDFS (29) - 1078355 ms.: RESULT_BLACK_WINS
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1110772 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1102749 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (12) vs. TranspositionTable-IDDFS (12) - 407635 ms.: RESULT_BLACK_WINS
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1135956 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1101021 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1126092 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1018912 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1118178 ms.: RESULT_TURN_LIMIT_REACHED
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1104949 ms.: RESULT_TURN_LIMIT_REACHED
+Games done: 6284.103s.
+================
+TranspositionTable-IDDFS (4) vs. MCTS-UCT (3) - 0 ms.: RESULT_MATCH_IN_PROGRESS
+Branching: 29 vs. 40
+Time pr move (max.): 20060 vs. 20096
+Time pr move (avg.): 11312.25 vs. 20054.25
+Time pr move (mean): 12839 vs. 20048
+Positions pr move (max.): 26543 vs. 0
+Positions pr move (avg.): 16862.5 vs. 0.0
+Positions pr move (mean): 22751 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [2012, 10338, 12839, 20060]
+TranspositionTable-IDDFS game states pr. sec.: [1617, 1441, 1772, 1323]
+TranspositionTable-IDDFS game states pr. move: [3254, 14902, 22751, 26543]
+TranspositionTable-IDDFS cache hits pr. move: [3285, 16591, 36205, 53525]
+MCTS-UCT time pr. move: [20048, 20047, 20026, 20096]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1105466 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 27 vs. 63
+Time pr move (max.): 20194 vs. 20091
+Time pr move (avg.): 16795.966666666667 vs. 20049.366666666665
+Time pr move (mean): 20105 vs. 20051
+Positions pr move (max.): 26463 vs. 0
+Positions pr move (avg.): 12888.2 vs. 0.0
+Positions pr move (mean): 12948 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [3258, 7787, 3099, 15132, 20037, 20039, 20118, 20073, 20105, 20132, 20137, 20160, 20147, 20153, 20127, 20091, 20186, 20137, 20194, 20177, 20016, 20108, 20191, 20153, 18018, 20003, 20105, 12494, 1023, 479]
+TranspositionTable-IDDFS game states pr. sec.: [1785, 2093, 1805, 1251, 1320, 1253, 1013, 926, 817, 725, 689, 693, 654, 627, 570, 572, 575, 640, 647, 639, 567, 558, 653, 642, 523, 521, 652, 680, 616, 711]
+TranspositionTable-IDDFS game states pr. move: [5817, 16304, 5595, 18939, 26463, 25119, 20390, 18594, 16432, 14611, 13877, 13987, 13187, 12648, 11487, 11496, 11620, 12898, 13078, 12907, 11366, 11226, 13198, 12948, 9429, 10438, 13114, 8506, 631, 341]
+TranspositionTable-IDDFS cache hits pr. move: [7680, 19319, 23506, 33285, 47168, 64322, 74888, 85649, 90300, 90859, 91567, 93700, 94469, 96377, 97566, 99210, 99960, 100745, 101442, 103470, 107893, 112425, 117040, 120410, 123958, 127220, 131377, 133653, 133778, 133835]
+MCTS-UCT time pr. move: [20061, 20016, 20036, 20016, 20051, 20056, 20086, 20032, 20071, 20061, 20030, 20091, 20090, 20020, 20024, 20040, 20070, 20024, 20052, 20059, 20033, 20028, 20085, 20066, 20027, 20069, 20037, 20049, 20031, 20070]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1129184 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 27 vs. 64
+Time pr move (max.): 20229 vs. 20098
+Time pr move (avg.): 17594.333333333332 vs. 20041.833333333332
+Time pr move (mean): 20093 vs. 20052
+Positions pr move (max.): 35728 vs. 0
+Positions pr move (avg.): 15804.633333333333 vs. 0.0
+Positions pr move (mean): 15082 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [3415, 5542, 20012, 12889, 20067, 20091, 20086, 20212, 20125, 20039, 20154, 20131, 20229, 20144, 20104, 20187, 20028, 20049, 20093, 20091, 20133, 20037, 20046, 20146, 20209, 20095, 20101, 20145, 2299, 931]
+TranspositionTable-IDDFS game states pr. sec.: [1928, 1974, 1785, 1241, 1441, 1308, 1121, 1029, 905, 899, 748, 733, 895, 814, 758, 747, 857, 678, 726, 703, 810, 706, 725, 709, 673, 721, 705, 609, 616, 583]
+TranspositionTable-IDDFS game states pr. move: [6585, 10940, 35728, 15999, 28929, 26282, 22536, 20806, 18231, 18035, 15091, 14763, 18121, 16406, 15258, 15082, 17184, 13598, 14603, 14124, 16319, 14156, 14547, 14297, 13613, 14494, 14181, 12271, 1417, 543]
+TranspositionTable-IDDFS cache hits pr. move: [8432, 16136, 42466, 50049, 62392, 72131, 79065, 88101, 93720, 101572, 108078, 114374, 121233, 126015, 133168, 137488, 143953, 146503, 150038, 153549, 157640, 161350, 163312, 164139, 167590, 170336, 172794, 173442, 173450, 173452]
+MCTS-UCT time pr. move: [20055, 20058, 20062, 20043, 20057, 20058, 20015, 20027, 20041, 20037, 20068, 20035, 20063, 20015, 20009, 20064, 20098, 20067, 20011, 20029, 20064, 20016, 20024, 20052, 20056, 20006, 20008, 20054, 20062, 20001]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1084648 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 36 vs. 59
+Time pr move (max.): 20142 vs. 20082
+Time pr move (avg.): 16109.533333333333 vs. 20043.866666666665
+Time pr move (mean): 20060 vs. 20044
+Positions pr move (max.): 38772 vs. 0
+Positions pr move (avg.): 15763.5 vs. 0.0
+Positions pr move (mean): 14779 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [295, 2521, 1880, 7330, 20106, 20035, 20029, 20087, 20069, 20123, 20065, 20087, 20086, 20084, 20060, 20013, 20063, 20118, 20115, 20142, 20039, 20101, 20033, 20082, 20025, 20028, 20023, 8631, 576, 440]
+TranspositionTable-IDDFS game states pr. sec.: [12481, 2280, 2477, 1706, 1928, 1654, 1775, 1278, 1260, 1279, 1101, 795, 876, 700, 826, 738, 773, 840, 791, 716, 766, 676, 630, 650, 625, 606, 630, 648, 548, 613]
+TranspositionTable-IDDFS game states pr. move: [3682, 5750, 4658, 12511, 38772, 33154, 35555, 25686, 25300, 25749, 22111, 15988, 17607, 14076, 16586, 14779, 15522, 16909, 15924, 14439, 15365, 13593, 12629, 13065, 12528, 12149, 12632, 5600, 316, 270]
+TranspositionTable-IDDFS cache hits pr. move: [3609, 8519, 11913, 18071, 36724, 48823, 68293, 78664, 90538, 101469, 110822, 115319, 122167, 128042, 133119, 137797, 141861, 147649, 151895, 155625, 161513, 162250, 163522, 165065, 166312, 167958, 174966, 175361, 175361, 175472]
+MCTS-UCT time pr. move: [20033, 20002, 20017, 20022, 20029, 20021, 20025, 20065, 20034, 20042, 20023, 20049, 20016, 20060, 20059, 20068, 20030, 20057, 20074, 20044, 20073, 20017, 20060, 20055, 20027, 20068, 20062, 20063, 20082, 20039]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (11) vs. MCTS-UCT (10) - 336091 ms.: RESULT_WHITE_WINS
+Branching: 55 vs. 61
+Time pr move (max.): 20108 vs. 20074
+Time pr move (avg.): 12341.272727272728 vs. 20032.1
+Time pr move (mean): 20020 vs. 20029
+Positions pr move (max.): 35826 vs. 0
+Positions pr move (avg.): 17640.545454545456 vs. 0.0
+Positions pr move (mean): 21684 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [221, 2910, 1758, 10438, 20020, 20066, 20038, 20039, 20108, 20105, 51]
+TranspositionTable-IDDFS game states pr. sec.: [13045, 2557, 2614, 2077, 1789, 1477, 1336, 1140, 1019, 1083, 1333]
+TranspositionTable-IDDFS game states pr. move: [2883, 7441, 4596, 21684, 35826, 29640, 26786, 22848, 20493, 21781, 68]
+TranspositionTable-IDDFS cache hits pr. move: [2918, 8608, 11569, 20991, 36047, 48152, 61021, 68193, 73182, 79292, 79308]
+MCTS-UCT time pr. move: [20043, 20008, 20023, 20011, 20029, 20021, 20057, 20074, 20005, 20050]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (14) vs. MCTS-UCT (13) - 486342 ms.: RESULT_WHITE_WINS
+Branching: 53 vs. 71
+Time pr move (max.): 20224 vs. 20076
+Time pr move (avg.): 16134.42857142857 vs. 20034.0
+Time pr move (mean): 20057 vs. 20022
+Positions pr move (max.): 45797 vs. 0
+Positions pr move (avg.): 24259.928571428572 vs. 0.0
+Positions pr move (mean): 25413 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [263, 13676, 10868, 20024, 20054, 20077, 20057, 20051, 20114, 20142, 20101, 20127, 20224, 104]
+TranspositionTable-IDDFS game states pr. sec.: [14041, 3348, 2686, 2119, 1953, 1733, 1431, 1267, 1080, 1015, 827, 781, 780, 846]
+TranspositionTable-IDDFS game states pr. move: [3693, 45797, 29194, 42445, 39174, 34801, 28702, 25413, 21724, 20456, 16634, 15735, 15783, 88]
+TranspositionTable-IDDFS cache hits pr. move: [3707, 37743, 59771, 82033, 102244, 120314, 135921, 150380, 160678, 167847, 173758, 177338, 179816, 179818]
+MCTS-UCT time pr. move: [20050, 20022, 20010, 20016, 20066, 20000, 20076, 20022, 20022, 20016, 20021, 20050, 20071]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1067349 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 46 vs. 66
+Time pr move (max.): 20199 vs. 20073
+Time pr move (avg.): 15540.4 vs. 20036.4
+Time pr move (mean): 20023 vs. 20039
+Positions pr move (max.): 54573 vs. 0
+Positions pr move (avg.): 22116.133333333335 vs. 0.0
+Positions pr move (mean): 20086 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [413, 11305, 20008, 20019, 20038, 20018, 20023, 20020, 20008, 20016, 20046, 20023, 20100, 20092, 20094, 20107, 20116, 20098, 20043, 20057, 20149, 3655, 3547, 20145, 57, 20113, 20199, 3670, 1675, 358]
+TranspositionTable-IDDFS game states pr. sec.: [14159, 3479, 2727, 2017, 2170, 1876, 1854, 1626, 1934, 1746, 1443, 1423, 1138, 1101, 999, 1004, 950, 938, 923, 999, 871, 867, 867, 861, 1105, 812, 831, 886, 1000, 932]
+TranspositionTable-IDDFS game states pr. move: [5848, 39336, 54573, 40392, 43497, 37565, 37132, 32560, 38714, 34964, 28928, 28510, 22884, 22128, 20086, 20196, 19130, 18858, 18506, 20052, 17561, 3169, 3078, 17356, 63, 16337, 16797, 3255, 1675, 334]
+TranspositionTable-IDDFS cache hits pr. move: [5962, 38985, 77447, 103917, 128808, 156467, 189742, 209499, 239275, 265581, 284863, 307290, 318708, 331679, 341121, 349619, 355504, 360944, 368290, 375804, 380541, 381268, 381962, 386597, 386610, 398017, 401677, 402760, 403033, 403081]
+MCTS-UCT time pr. move: [20033, 20041, 20014, 20057, 20014, 20019, 20034, 20001, 20029, 20029, 20028, 20057, 20046, 20041, 20052, 20007, 20000, 20039, 20062, 20041, 20024, 20011, 20063, 20069, 20073, 20024, 20027, 20040, 20048, 20069]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (19) vs. MCTS-UCT (18) - 661320 ms.: RESULT_WHITE_WINS
+Branching: 60 vs. 64
+Time pr move (max.): 20196 vs. 20085
+Time pr move (avg.): 15824.736842105263 vs. 20034.666666666668
+Time pr move (mean): 20058 vs. 20034
+Positions pr move (max.): 38195 vs. 0
+Positions pr move (avg.): 19685.21052631579 vs. 0.0
+Positions pr move (mean): 19412 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [364, 4381, 5125, 9445, 20034, 20057, 20118, 20073, 20166, 20120, 20058, 20037, 20044, 20085, 20105, 20196, 20101, 20107, 54]
+TranspositionTable-IDDFS game states pr. sec.: [15307, 3096, 2532, 1950, 1906, 1721, 1508, 1336, 1399, 1176, 1145, 1147, 989, 966, 737, 699, 705, 660, 740]
+TranspositionTable-IDDFS game states pr. move: [5572, 13566, 12981, 18421, 38195, 34523, 30338, 26836, 28217, 23680, 22985, 22999, 19834, 19412, 14830, 14130, 14178, 13282, 40]
+TranspositionTable-IDDFS cache hits pr. move: [5367, 16487, 22984, 31549, 52180, 66179, 80765, 98002, 108722, 116758, 123522, 132643, 141040, 148542, 152949, 158350, 163170, 168038, 168048]
+MCTS-UCT time pr. move: [20021, 20054, 20020, 20043, 20047, 20034, 20032, 20026, 20020, 20010, 20037, 20014, 20054, 20042, 20014, 20054, 20017, 20085]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (11) vs. MCTS-UCT (10) - 337575 ms.: RESULT_WHITE_WINS
+Branching: 51 vs. 72
+Time pr move (max.): 20089 vs. 20064
+Time pr move (avg.): 12475.181818181818 vs. 20033.4
+Time pr move (mean): 20013 vs. 20046
+Positions pr move (max.): 52939 vs. 0
+Positions pr move (avg.): 22939.0 vs. 0.0
+Positions pr move (mean): 24956 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [190, 5038, 20013, 20016, 20031, 20088, 20053, 20089, 7542, 4058, 109]
+TranspositionTable-IDDFS game states pr. sec.: [13973, 3090, 2645, 2164, 1897, 1604, 1491, 1242, 1137, 994, 1146]
+TranspositionTable-IDDFS game states pr. move: [2655, 15568, 52939, 43324, 38003, 32229, 29912, 24956, 8581, 4037, 125]
+TranspositionTable-IDDFS cache hits pr. move: [2733, 14639, 53886, 79086, 97297, 115480, 130033, 139667, 142153, 143345, 143375]
+MCTS-UCT time pr. move: [20011, 20003, 20030, 20064, 20047, 20025, 20053, 20046, 20055, 20000]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+TranspositionTable-IDDFS (30) vs. MCTS-UCT (30) - 1088306 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 45 vs. 64
+Time pr move (max.): 20126 vs. 20087
+Time pr move (avg.): 16244.966666666667 vs. 20030.333333333332
+Time pr move (mean): 20069 vs. 20025
+Positions pr move (max.): 37578 vs. 0
+Positions pr move (avg.): 17233.1 vs. 0.0
+Positions pr move (mean): 16579 vs. 0
+------------------
+TranspositionTable-IDDFS time pr. move: [163, 4354, 2987, 7871, 20037, 20049, 20060, 20046, 20089, 20073, 20068, 20069, 20117, 20110, 20096, 20111, 20070, 20087, 20094, 20126, 20061, 20094, 20105, 20058, 20090, 20064, 20100, 9008, 464, 628]
+TranspositionTable-IDDFS game states pr. sec.: [13067, 3047, 2573, 1965, 1875, 1800, 1460, 1266, 1189, 1264, 1181, 998, 996, 1016, 834, 839, 826, 888, 739, 801, 803, 815, 759, 729, 782, 834, 745, 751, 728, 796]
+TranspositionTable-IDDFS game states pr. move: [2130, 13267, 7688, 15467, 37578, 36106, 29307, 25393, 23890, 25381, 23709, 20033, 20051, 20438, 16767, 16885, 16579, 17846, 14866, 16140, 16109, 16380, 15270, 14639, 15724, 16748, 14990, 6774, 338, 500]
+TranspositionTable-IDDFS cache hits pr. move: [2134, 11802, 17033, 24415, 40679, 57589, 68504, 77501, 85689, 95548, 104343, 110263, 116711, 121531, 126021, 128520, 130862, 133414, 134880, 138119, 143437, 144729, 145596, 147327, 149343, 150733, 151022, 151551, 151551, 151551]
+MCTS-UCT time pr. move: [20025, 20022, 20007, 20003, 20025, 20049, 20017, 20072, 20055, 20047, 20046, 20003, 20012, 20031, 20014, 20087, 20027, 20036, 20043, 20013, 20016, 20072, 20011, 20019, 20042, 20013, 20011, 20022, 20053, 20017]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+------------------
+MCTS-UCT (29) vs. TranspositionTable-IDDFS (29) - 1078355 ms.: RESULT_BLACK_WINS
+Branching: 65 vs. 52
+Time pr move (max.): 20079 vs. 20192
+Time pr move (avg.): 20035.241379310344 vs. 17147.862068965518
+Time pr move (mean): 20040 vs. 20062
+Positions pr move (max.): 0 vs. 42625
+Positions pr move (avg.): 0.0 vs. 17858.137931034482
+Positions pr move (mean): 0 vs. 14333
+------------------
+MCTS-UCT time pr. move: [20011, 20042, 20051, 20060, 20036, 20052, 20040, 20016, 20079, 20044, 20008, 20017, 20014, 20016, 20004, 20020, 20054, 20005, 20053, 20006, 20060, 20048, 20008, 20046, 20049, 20057, 20040, 20053, 20033]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [2293, 2466, 13784, 20041, 20018, 20070, 20032, 20061, 20062, 20017, 20026, 20046, 20116, 20124, 20111, 20072, 20167, 20141, 20090, 20142, 11525, 20192, 13228, 20121, 20089, 11986, 20109, 20081, 78]
+TranspositionTable-IDDFS game states pr. sec.: [2128, 2989, 1933, 2126, 1977, 1772, 1666, 1368, 1160, 1194, 981, 887, 900, 817, 761, 692, 757, 702, 695, 649, 672, 692, 644, 709, 699, 705, 694, 713, 871]
+TranspositionTable-IDDFS game states pr. move: [4880, 7372, 26654, 42625, 39586, 35576, 33376, 27457, 23289, 23920, 19656, 17792, 18115, 16458, 15316, 13906, 15273, 14144, 13979, 13077, 7752, 13990, 8525, 14284, 14058, 8461, 13964, 14333, 68]
+TranspositionTable-IDDFS cache hits pr. move: [6156, 11306, 30658, 48481, 77558, 90497, 109508, 123121, 131482, 141027, 147737, 153491, 157603, 161842, 167397, 172157, 174163, 176605, 178670, 179534, 180153, 180293, 181155, 182304, 182456, 187057, 187114, 187910, 187921]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1110772 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 60 vs. 51
+Time pr move (max.): 20114 vs. 20283
+Time pr move (avg.): 20043.033333333333 vs. 16981.1
+Time pr move (mean): 20042 vs. 20057
+Positions pr move (max.): 0 vs. 38119
+Positions pr move (avg.): 0.0 vs. 16597.7
+Positions pr move (mean): 0 vs. 14773
+------------------
+MCTS-UCT time pr. move: [20042, 20039, 20009, 20056, 20067, 20007, 20031, 20040, 20028, 20025, 20037, 20052, 20046, 20069, 20062, 20064, 20038, 20064, 20016, 20005, 20068, 20017, 20080, 20067, 20009, 20054, 20052, 20008, 20025, 20114]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [2030, 2292, 1712, 20031, 20034, 20069, 20037, 20066, 20032, 20128, 20129, 20093, 20058, 20057, 20116, 20080, 20121, 20120, 20098, 20088, 20049, 20041, 20091, 20038, 20021, 20283, 20023, 20050, 916, 530]
+TranspositionTable-IDDFS game states pr. sec.: [2939, 2860, 1687, 1903, 1632, 1703, 1575, 1494, 1263, 1110, 1073, 983, 832, 745, 748, 676, 734, 748, 748, 733, 714, 679, 701, 649, 619, 659, 659, 606, 638, 443]
+TranspositionTable-IDDFS game states pr. move: [5968, 6556, 2889, 38119, 32700, 34180, 31576, 29998, 25302, 22348, 21610, 19759, 16692, 14957, 15049, 13582, 14773, 15066, 15039, 14744, 14319, 13612, 14089, 13018, 12413, 13384, 13210, 12159, 585, 235]
+TranspositionTable-IDDFS cache hits pr. move: [5616, 10052, 12093, 25346, 41536, 58696, 72952, 84232, 91255, 95812, 102022, 103945, 108022, 110335, 111625, 112508, 114851, 116234, 118815, 118880, 119209, 119464, 119882, 120595, 120687, 126376, 126789, 126829, 126829, 126829]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1102749 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 62 vs. 49
+Time pr move (max.): 20117 vs. 20258
+Time pr move (avg.): 20047.233333333334 vs. 16709.6
+Time pr move (mean): 20048 vs. 20099
+Positions pr move (max.): 0 vs. 37158
+Positions pr move (avg.): 0.0 vs. 13049.033333333333
+Positions pr move (mean): 0 vs. 11946
+------------------
+MCTS-UCT time pr. move: [20056, 20050, 20061, 20024, 20039, 20052, 20037, 20033, 20010, 20018, 20023, 20044, 20065, 20075, 20025, 20083, 20013, 20058, 20063, 20018, 20012, 20087, 20080, 20117, 20077, 20048, 20030, 20066, 20011, 20042]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [1997, 2775, 2401, 20052, 20057, 20077, 20075, 20024, 20060, 20028, 20140, 20043, 20111, 20103, 20153, 20234, 20214, 20136, 20165, 20195, 20189, 20137, 20099, 20092, 20113, 20258, 20144, 9966, 740, 510]
+TranspositionTable-IDDFS game states pr. sec.: [2310, 2425, 1751, 1853, 1690, 1349, 1061, 926, 783, 707, 639, 635, 657, 679, 651, 613, 560, 649, 547, 498, 547, 518, 526, 537, 593, 540, 571, 638, 605, 696]
+TranspositionTable-IDDFS game states pr. move: [4614, 6730, 4205, 37158, 33908, 27094, 21316, 18557, 15708, 14165, 12888, 12736, 13225, 13669, 13137, 12405, 11325, 13070, 11043, 10070, 11056, 10442, 10581, 10804, 11946, 10940, 11508, 6368, 448, 355]
+TranspositionTable-IDDFS cache hits pr. move: [4528, 9586, 12161, 32277, 49410, 59725, 65087, 67677, 67741, 67786, 67899, 67920, 67990, 68040, 68061, 68078, 68089, 68103, 68126, 68126, 68242, 72340, 72344, 72344, 72350, 72372, 72381, 72403, 72403, 72403]
+------------------
+MCTS-UCT (12) vs. TranspositionTable-IDDFS (12) - 407635 ms.: RESULT_BLACK_WINS
+Branching: 65 vs. 48
+Time pr move (max.): 20064 vs. 20071
+Time pr move (avg.): 20030.666666666668 vs. 13937.25
+Time pr move (mean): 20033 vs. 20040
+Positions pr move (max.): 0 vs. 39861
+Positions pr move (avg.): 0.0 vs. 20412.166666666668
+Positions pr move (mean): 0 vs. 25131
+------------------
+MCTS-UCT time pr. move: [20021, 20023, 20011, 20031, 20033, 20044, 20010, 20005, 20039, 20041, 20046, 20064]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [2180, 3061, 1501, 20038, 20017, 20059, 20058, 20071, 20063, 20040, 20071, 88]
+TranspositionTable-IDDFS game states pr. sec.: [2696, 2978, 1872, 1989, 1665, 1484, 1468, 1252, 1286, 1162, 1014, 1227]
+TranspositionTable-IDDFS game states pr. move: [5879, 9117, 2811, 39861, 33331, 29777, 29465, 25131, 25806, 23288, 20372, 108]
+TranspositionTable-IDDFS cache hits pr. move: [5618, 12114, 13939, 31302, 42231, 54011, 63308, 71547, 79358, 83557, 88451, 88471]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1135956 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 86 vs. 38
+Time pr move (max.): 20120 vs. 20202
+Time pr move (avg.): 20033.933333333334 vs. 17829.933333333334
+Time pr move (mean): 20035 vs. 20072
+Positions pr move (max.): 0 vs. 57811
+Positions pr move (avg.): 0.0 vs. 23380.7
+Positions pr move (mean): 0 vs. 19264
+------------------
+MCTS-UCT time pr. move: [20040, 20046, 20022, 20010, 20030, 20021, 20005, 20014, 20078, 20005, 20006, 20047, 20004, 20058, 20036, 20015, 20003, 20036, 20057, 20054, 20030, 20120, 20073, 20036, 20003, 20043, 20035, 20042, 20017, 20032]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [9329, 17064, 14105, 20028, 20024, 20040, 20075, 20072, 20070, 20044, 20078, 20080, 20091, 20033, 20135, 20202, 20108, 20126, 20064, 20059, 20185, 20128, 20111, 20108, 20110, 20130, 19717, 11663, 512, 407]
+TranspositionTable-IDDFS game states pr. sec.: [3808, 3387, 2624, 2442, 2348, 1899, 1563, 1340, 1324, 1372, 1444, 1200, 1168, 1037, 956, 834, 805, 829, 839, 868, 864, 760, 780, 807, 796, 790, 852, 835, 902, 970]
+TranspositionTable-IDDFS game states pr. move: [35534, 57811, 37017, 48912, 47028, 38058, 31385, 26905, 26583, 27504, 29010, 24108, 23470, 20786, 19264, 16865, 16201, 16685, 16837, 17414, 17455, 15301, 15703, 16245, 16016, 15911, 16808, 9748, 462, 395]
+TranspositionTable-IDDFS cache hits pr. move: [38702, 84436, 110388, 135526, 157731, 175213, 189439, 198743, 207333, 214885, 223566, 232339, 243061, 250481, 256607, 261124, 266020, 270701, 275857, 281056, 286255, 291071, 296414, 300565, 305371, 309582, 317226, 321731, 321876, 321980]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1101021 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 70 vs. 46
+Time pr move (max.): 20085 vs. 20167
+Time pr move (avg.): 20034.066666666666 vs. 16665.233333333334
+Time pr move (mean): 20034 vs. 20072
+Positions pr move (max.): 0 vs. 36475
+Positions pr move (avg.): 0.0 vs. 16228.8
+Positions pr move (mean): 0 vs. 14758
+------------------
+MCTS-UCT time pr. move: [20007, 20022, 20036, 20013, 20030, 20027, 20036, 20033, 20020, 20034, 20011, 20019, 20070, 20030, 20036, 20013, 20002, 20040, 20005, 20046, 20009, 20049, 20001, 20074, 20038, 20069, 20052, 20085, 20049, 20066]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [5026, 7104, 12482, 20025, 20025, 20059, 20153, 20151, 20072, 20101, 20159, 20123, 20094, 20129, 20053, 20152, 20079, 20086, 20161, 20167, 20101, 14960, 13415, 7490, 20124, 20060, 20041, 16171, 673, 521]
+TranspositionTable-IDDFS game states pr. sec.: [3265, 3009, 2041, 1821, 1592, 1568, 1236, 1107, 963, 908, 824, 714, 739, 725, 730, 732, 753, 717, 666, 691, 602, 704, 642, 684, 738, 680, 724, 736, 646, 710]
+TranspositionTable-IDDFS game states pr. move: [16411, 21379, 25486, 36475, 31892, 31456, 24911, 22309, 19343, 18271, 16631, 14372, 14851, 14606, 14648, 14758, 15125, 14403, 13433, 13941, 12117, 10542, 8616, 5127, 14860, 13660, 14523, 11913, 435, 370]
+TranspositionTable-IDDFS cache hits pr. move: [15340, 29182, 44509, 58795, 68782, 79084, 85866, 89745, 93991, 97963, 101113, 101266, 101294, 101313, 101350, 101394, 101439, 101491, 101854, 102390, 102564, 102780, 102934, 103169, 103272, 103396, 103468, 103509, 103528, 103528]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1126092 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 69 vs. 59
+Time pr move (max.): 20089 vs. 20439
+Time pr move (avg.): 20030.533333333333 vs. 17504.366666666665
+Time pr move (mean): 20027 vs. 20080
+Positions pr move (max.): 0 vs. 35118
+Positions pr move (avg.): 0.0 vs. 17982.333333333332
+Positions pr move (mean): 0 vs. 16896
+------------------
+MCTS-UCT time pr. move: [20006, 20009, 20023, 20019, 20089, 20051, 20000, 20016, 20058, 20028, 20027, 20026, 20060, 20002, 20026, 20045, 20020, 20069, 20024, 20013, 20047, 20007, 20034, 20045, 20041, 20030, 20009, 20008, 20037, 20047]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [5278, 3229, 11737, 20082, 20084, 20044, 20026, 20086, 20072, 20080, 20049, 20118, 20061, 20078, 20069, 20068, 20088, 20064, 20200, 20172, 20439, 20162, 20127, 20091, 20155, 20207, 20053, 20111, 1399, 702]
+TranspositionTable-IDDFS game states pr. sec.: [3250, 1894, 2246, 1748, 1427, 1499, 1291, 1032, 1052, 1174, 1072, 974, 799, 952, 881, 785, 782, 716, 814, 771, 808, 817, 849, 840, 803, 777, 813, 797, 802, 626]
+TranspositionTable-IDDFS game states pr. move: [17157, 6117, 26372, 35118, 28663, 30046, 25869, 20748, 21133, 23593, 21495, 19595, 16046, 19134, 17688, 15759, 15725, 14366, 16449, 15570, 16521, 16489, 17099, 16896, 16193, 15710, 16322, 16035, 1122, 440]
+TranspositionTable-IDDFS cache hits pr. move: [18700, 24669, 42962, 61031, 72031, 84994, 95311, 102903, 109727, 117366, 121802, 126174, 129743, 133725, 138029, 139345, 139711, 141162, 142451, 143725, 145591, 146804, 148873, 149101, 149344, 149488, 149726, 149728, 149728, 149728]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1018912 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 33 vs. 41
+Time pr move (max.): 20079 vs. 20110
+Time pr move (avg.): 20033.466666666667 vs. 13928.733333333334
+Time pr move (mean): 20029 vs. 20022
+Positions pr move (max.): 0 vs. 51064
+Positions pr move (avg.): 0.0 vs. 15752.666666666666
+Positions pr move (mean): 0 vs. 14049
+------------------
+MCTS-UCT time pr. move: [20079, 20038, 20044, 20037, 20028, 20023, 20011, 20017, 20034, 20053, 20022, 20019, 20058, 20052, 20023, 20018, 20029, 20007, 20034, 20062, 20023, 20033, 20048, 20072, 20021, 20012, 20009, 20074, 20005, 20019]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [5023, 4317, 20037, 20054, 20020, 20027, 20051, 20088, 20039, 20014, 20022, 20089, 20080, 20076, 20110, 14063, 10720, 5524, 8513, 20108, 20065, 20072, 20056, 14027, 5040, 7334, 983, 891, 327, 92]
+TranspositionTable-IDDFS game states pr. sec.: [3145, 2198, 2548, 2096, 1855, 1828, 1627, 1538, 1231, 1055, 903, 729, 704, 624, 629, 621, 644, 688, 688, 708, 628, 706, 700, 633, 670, 653, 597, 699, 776, 815]
+TranspositionTable-IDDFS game states pr. move: [15800, 9489, 51064, 42038, 37141, 36610, 32626, 30913, 24686, 21126, 18093, 14655, 14146, 12547, 12650, 8738, 6911, 3803, 5860, 14250, 12609, 14180, 14049, 8884, 3378, 4795, 587, 623, 254, 75]
+TranspositionTable-IDDFS cache hits pr. move: [16839, 24726, 58477, 76333, 93069, 108078, 125002, 137938, 145519, 153329, 155104, 156056, 157697, 158948, 161580, 163573, 165461, 166267, 166547, 166938, 167255, 167479, 169913, 171293, 172201, 176487, 176562, 176571, 176601, 176601]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1118178 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 59 vs. 35
+Time pr move (max.): 20097 vs. 20198
+Time pr move (avg.): 20029.5 vs. 17241.533333333333
+Time pr move (mean): 20023 vs. 20043
+Positions pr move (max.): 0 vs. 42909
+Positions pr move (avg.): 0.0 vs. 19265.6
+Positions pr move (mean): 0 vs. 17689
+------------------
+MCTS-UCT time pr. move: [20022, 20009, 20097, 20047, 20036, 20018, 20030, 20014, 20025, 20000, 20023, 20012, 20019, 20001, 20034, 20080, 20043, 20023, 20018, 20042, 20001, 20048, 20037, 20007, 20016, 20062, 20058, 20018, 20005, 20040]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [2705, 10264, 5019, 20026, 20040, 20015, 20043, 20028, 20023, 20048, 20009, 20064, 20053, 20100, 20073, 20147, 19154, 20126, 20072, 20060, 20042, 20108, 20027, 20198, 20077, 20082, 20088, 16648, 1245, 662]
+TranspositionTable-IDDFS game states pr. sec.: [2093, 2517, 1797, 2142, 2051, 1863, 1605, 1400, 1288, 1299, 1118, 1039, 893, 843, 912, 824, 796, 817, 881, 948, 905, 825, 811, 737, 778, 681, 703, 713, 712, 725]
+TranspositionTable-IDDFS game states pr. move: [5663, 25839, 9021, 42909, 41104, 37295, 32173, 28046, 25802, 26057, 22371, 20865, 17914, 16948, 18309, 16604, 15259, 16460, 17689, 19028, 18156, 16590, 16257, 14905, 15633, 13693, 14127, 11884, 887, 480]
+TranspositionTable-IDDFS cache hits pr. move: [6011, 29866, 35723, 63445, 90141, 112137, 129568, 144470, 156502, 167059, 176782, 184808, 190008, 193727, 198463, 202605, 205599, 208340, 212619, 217034, 220699, 224677, 227729, 230406, 233017, 235186, 237830, 238833, 238861, 238911]
+------------------
+MCTS-UCT (30) vs. TranspositionTable-IDDFS (30) - 1104949 ms.: RESULT_TURN_LIMIT_REACHED
+Branching: 72 vs. 28
+Time pr move (max.): 20098 vs. 20159
+Time pr move (avg.): 20040.766666666666 vs. 16789.433333333334
+Time pr move (mean): 20043 vs. 20065
+Positions pr move (max.): 0 vs. 37067
+Positions pr move (avg.): 0.0 vs. 15431.266666666666
+Positions pr move (mean): 0 vs. 14559
+------------------
+MCTS-UCT time pr. move: [20023, 20030, 20021, 20006, 20016, 20043, 20057, 20047, 20033, 20013, 20016, 20010, 20071, 20079, 20049, 20010, 20058, 20051, 20006, 20037, 20016, 20098, 20061, 20069, 20069, 20017, 20060, 20059, 20057, 20041]
+MCTS-UCT game states pr. sec.: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT game states pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MCTS-UCT cache hits pr. move: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+TranspositionTable-IDDFS time pr. move: [3535, 6237, 6923, 20027, 20031, 20060, 20076, 20118, 20055, 20129, 20065, 20157, 20121, 20118, 20125, 20159, 20093, 20130, 20044, 20135, 20042, 20052, 20080, 20151, 20041, 20142, 16375, 7410, 548, 504]
+TranspositionTable-IDDFS game states pr. sec.: [3307, 2530, 2149, 1850, 1551, 1260, 1159, 1023, 1006, 1004, 923, 844, 797, 744, 643, 647, 677, 649, 726, 652, 585, 591, 661, 735, 594, 718, 708, 734, 704, 753]
+TranspositionTable-IDDFS game states pr. move: [11693, 15780, 14883, 37067, 31085, 25277, 23271, 20599, 20181, 20225, 18535, 17027, 16053, 14981, 12956, 13048, 13615, 13069, 14559, 13139, 11735, 11866, 13285, 14813, 11924, 14463, 11597, 5446, 386, 380]
+TranspositionTable-IDDFS cache hits pr. move: [11796, 20435, 31772, 54713, 66658, 78053, 86513, 95126, 100427, 104751, 110169, 110626, 112088, 113240, 113814, 113827, 113842, 113855, 113860, 113873, 114185, 114269, 114364, 114608, 114757, 117710, 117872, 118024, 118024, 118024]
+------------------
+================
+
+Process finished with exit code 0
