@@ -20,7 +20,8 @@ public class Main {
         HiveAI opponentE = new MonteCarloTreeSearchAI("MCTS", 100, 30000);
         HiveAI opponentF = new UCTMonteCarloTreeSearchAI("MCTS-UCT", 70, 20000);
         HiveAI opponentG = new TranspostionTableIDDFSAlphaBetaMiniMaxAI("TranspositionTable-IDDFS", new SimpleHeuristicV3(), 2, 20000);
-        HiveAI opponentH = new KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI("KillerMove-TT-IDDFS-AB", new SimpleHeuristicV3(), 5, 180000);
+        HiveAI opponentH = new KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI("KillerMove-TT-IDDFS-AB", new SimpleHeuristicV3(), 3, 180000);
+        HiveAI opponentI = new MTDFAI("MTD(f)", new SimpleHeuristicV3(), 3, 20000);
 
         gameController.addOpponent(opponentF);
 //        gameController.addOpponent(opponentA2);
@@ -33,7 +34,7 @@ public class Main {
         gameController.setTurnLimit(30);
         gameController.setNumberOfMatches(10);
 //        gameController.start();
-        gameController.startSingleGame(opponentA, opponentH, false);
+        gameController.startSingleGame(opponentA, opponentI, false);
         gameController.printLog(true);
     }
 }

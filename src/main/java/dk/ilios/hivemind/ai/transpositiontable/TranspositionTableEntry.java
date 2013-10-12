@@ -10,8 +10,8 @@ import dk.ilios.hivemind.game.GameCommand;
 public class TranspositionTableEntry {
 
     public static final int PV_NODE = 0;        // Exact match. For bounds [a,b]: a < x < b
-    public static final int CUT_NODE = 1;       // Lower bound - Beta cutoff. For bounds [a,b]: x >= b
-    public static final int ALL_NODE = 2;       // No move higher than alpha. For bounds [a,b]: x <= a
+    public static final int CUT_NODE = 1;       // Lower bound - Beta cutoff. Fail high. For bounds [a,b]: x >= b
+    public static final int ALL_NODE = 2;       // No move higher than alpha. Fail low. For bounds [a,b]: x <= a
 
     public final int value; // Value for the node
     public final int depth; // Search depth
