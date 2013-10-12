@@ -28,11 +28,11 @@ public class SimpleHeuristicV3 implements BoardValueHeuristic {
         boolean whiteWon = Rules.getInstance().isQueenSurrounded(blackPlayer, state.getBoard());
 
         if (blackWon && whiteWon) {
-            // A draw is considered a LOSS (no one wants an AI that tries to DRAW)
+            // A draw is considered almost as bad as a LOSS (no one wants an AI that tries to DRAW)
             if (state.getActivePlayer().isWhitePlayer()) {
-                return Integer.MIN_VALUE;
+                return Integer.MIN_VALUE + 1;
             }  else {
-                return Integer.MAX_VALUE;
+                return Integer.MAX_VALUE - 1;
             }
         } else if (blackWon) {
             return Integer.MIN_VALUE;
