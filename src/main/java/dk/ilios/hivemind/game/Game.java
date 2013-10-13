@@ -115,7 +115,7 @@ public class Game {
      */
     public GameCommand forward() {
         if (!replayMode) throw new IllegalStateException("Replay mode not enabled");
-        if (replayIndex == moves.size()) return null;
+        if (replayIndex == moves.size()) throw new IllegalStateException("Cannot go forward any futher, at end of game.");
         GameCommand command = moves.get(replayIndex);
         command.execute(this);
         replayIndex++;
@@ -127,7 +127,7 @@ public class Game {
      */
     public GameCommand backwards() {
         if (!replayMode) throw new IllegalStateException("Replay mode not enabled");
-        if (replayIndex == 0) return null;
+        if (replayIndex == 0) throw new IllegalStateException("Cannot go back any further, at beginning of game.");
         replayIndex--;
         GameCommand command = moves.get(replayIndex);
         command.undo(this);

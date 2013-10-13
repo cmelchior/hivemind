@@ -13,7 +13,7 @@ import java.util.Set;
 public class Player {
 
     public enum PlayerType {
-        BLACK, WHITE;
+        UNKNOWN, BLACK, WHITE;
     }
     private CommandProvider commandProvider;
 

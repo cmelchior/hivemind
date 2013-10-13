@@ -30,18 +30,21 @@ import java.util.*;
  * If enabled, the board is maintained in "Standard Position" (SP), which is defined by the following properties:
  *  - White Queen Bee is always (0,0)
  *  - Black Queen coordinates must be min(R) <= 0 and 0 < Q < MAX_Q. Rotate the board clockwise until this is true.
+ *    This is effectively a place on the Q axis or if not able to land on R = 0, the last rotation before crossing, so
+ *    R > 0.
  *
- * Before queens are placed, SP is defined the same way like in Randell Ringersolls book [1], expect we look at the 3rd/
- * 4th token instead of the queen (although it usually will be the queen anyway).
+ * Before both queens are placed, SP is defined slightly different. In that case we adopt a small variant of the SP
+ * definition in Randell Ringersolls book [1]. The only difference is that we always use the 3rd / 4th token even though
+ * they might not be queens (although it usually will be the queen anyway).
  *
- *  - 1st token (white) is placed at (0,0) -> Start
+ *  - 1st token (white) is placed at (0,0).
  *  - 2nd token (black) is placed at (1,0).
- *  - 3rd token (white) if R > 0, flip board around Q, so R < 0.
- *  - 4th token (black) if 3rd token has R = 0 and 4th has R > 0. Flip around Q so R < 0.
+ *  - 3rd token (white) if R > 0, flip board around Q axis, so R < 0.
+ *  - 4th token (black) if 3rd token has R = 0 and 4th has R > 0. Flip around Q axis so R < 0.
  *
  * Standard position uses the queens as "center points" as they are the most likely to be locked in place and they cannot
- * move very far. This minimizes the chance of origin changes or rotations. Analysis of Boardspace.net games has shown that
- * Queen Bee moves are only 4.8% of all moves.
+ * move very far. This minimizes the chance of origin changes or rotations. Analysis of Boardspace.net games has shown
+ * that Queen Bee moves are only 4.8% of all moves.
  *
  * Note SP doesn't guarantee that all similar board positions have the same Zobrist Key [3]. Mirror or reflected boards
  * around the Q axis do not have the same Zobrist key. For now this is in acceptable inaccuracy as we still reduce
@@ -53,7 +56,7 @@ import java.util.*;
  * the Zobrist key is always calculated on the SP board.
  *
  * Note the backing hashes for the Zobrist key have a pretty high memory requirement, due to the potential board size.
- * Currently about 51*51*7*2*8 ~ 2.2 MB.
+ * Currently about 51*51*7*2*8 bytes ~ 2.2 MB.
  *
  * @see [1] Randy Ingersoll: Play Hive like a champion
  * @see [2] http://www.redblobgames.com/grids/hexagons/
@@ -79,33 +82,18 @@ public class Board {
     private Token[] firstTokens = new Token[4]; // Keep track of the first 4 tokens placed on the board. 2 white and 2 black
 
     // The board state is hashed as a Zobrist key.
-    // Instead of using coordinates, which are in principal unlimited, we use token edges instead.
-//    private int tokenId = 0;
-//    private static final int COLORS = 2;
-//    private static final int TOKEN_TYPES = 9; // Including all expansions + "empty" token
-//    private static final int EDGES = 8; // 6 sides + up + down
-
-//    Player zobristPlayer = null;
-//    long[] nodeHash = new long[2*13];
-//    long[][][][][] edgeHash = new long[COLORS][TOKEN_TYPES][EDGES][COLORS][TOKEN_TYPES];
-//    long whiteMoved = 0;
-//    long blackMoved = 0;
     long zobristKey = 0;
 
     // See [2] for details about storing hexagon maps.
     // Maximum size is 26 tokens in each directions that can be stacked 7 high.
     // This is not entirely true, but for simplicity we just use that as a first implementation
-    // hashes := [q][r][height][color][bug_types];
+    // q, r, height, color, token type
     private long[][][][][] zobristHashes = new long[51][51][7][2][8];
 
     public Board(Player white, Player black) {
         this.whitePlayer = white;
         this.blackPlayer = black;
     }
-
-//    private static int EMPTY_HEX = 0;
-//    private static int BOTTOM_EDGE = 6;
-//    private static int TOP_EDGE = 7;
 
     private void loadZobristHashes() {
         Random random = new Random();
@@ -272,10 +260,10 @@ public class Board {
         int oldRotation = spRotation;
         int[] sp = getSPCoordinatesFor(token.getHex());
         int maxRotations = 6;
-        while(!(sp[0] >= 0 && sp[1] >= 1)) {
+        while(!(sp[0] >= 0 && sp[1] >= 1)) {  // q >= 0 && r >= 1
             if (maxRotations == 0) {
                 printer.print(this);
-                throw new IllegalStateException("Keep rotating: Cannot find Standard Position");
+                throw new IllegalStateException("Keeps rotating: Cannot find Standard Position");
             }
             rotateClockwise();
             sp = getSPCoordinatesFor(token.getHex());
@@ -729,18 +717,6 @@ public class Board {
     public long getZobristKey() {
         return zobristKey;
     }
-//
-//    /**
-//     * Returns the next token id.
-//     */
-//    public int getTokenId() {
-//        tokenId++;
-//        return tokenId;
-//    }
-//
-//    public void setReplayMode(boolean enabled) {
-//        this.replayMode = enabled;
-//    }
 
     public boolean isUsingStandardPosition() {
         return standardPosition;

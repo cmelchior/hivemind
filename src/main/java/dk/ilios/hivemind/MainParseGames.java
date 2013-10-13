@@ -80,17 +80,17 @@ public class MainParseGames {
 //        testFiles.add(new File("./plays/test.sgf"));
 //        files.put(BoardspaceGameType.PLAYER, testFiles);
 
-//        Stack<File> tournamentFiles = new Stack<File>();
-//        tournamentFiles.add(new File(TOURNAMENT_DIR));
-//        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
+        Stack<File> tournamentFiles = new Stack<File>();
+        tournamentFiles.add(new File(TOURNAMENT_DIR));
+        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, new ArrayList<File>()));
 
-//        Stack<File> playerFiles = new Stack<File>();
-//        playerFiles.add(new File(PLAYER_DIR));
-//        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
+        Stack<File> playerFiles = new Stack<File>();
+        playerFiles.add(new File(PLAYER_DIR));
+        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, new ArrayList<File>()));
 
-        Stack<File> dumbotFiles = new Stack<File>();
-        dumbotFiles.add(new File(DUMBOT_DIR));
-        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
+//        Stack<File> dumbotFiles = new Stack<File>();
+//        dumbotFiles.add(new File(DUMBOT_DIR));
+//        files.put(BoardspaceGameType.DUMBOT, findAllFiles(dumbotFiles, new ArrayList<File>()));
 
     }
 
@@ -114,7 +114,8 @@ public class MainParseGames {
 //        metrics.add(new HighRankedGamesMetric());
 //        metrics.add(new CompareOpeningsMetric());
 //        metrics.add(new LeastMovedTokenMetric());
-        metrics.add(new IngersollOpeningsMetric());
+//        metrics.add(new IngersollOpeningsMetric());
+        metrics.add(new LinaelOpeningList());
     }
 
     private void setupFilters() {
