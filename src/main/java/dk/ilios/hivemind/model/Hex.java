@@ -5,14 +5,13 @@ import java.util.Stack;
 /**
  * Describe a Hex on the board
  */
-public class Hex {
+public class Hex implements Comparable<Hex> {
 
     public static final int SUPPLY = Integer.MAX_VALUE;
 
     private Stack<Token> tokens = new Stack<Token>();
     private int q = 0;
     private int r = 0;
-
 
     /**
      * Construct empty hex with no neighbors
@@ -64,15 +63,27 @@ public class Hex {
         return r;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (o == null || !(o instanceof Hex)) return false;
-//        Hex otherHex = (Hex) o;
-//        return q == otherHex.getQ() && r == otherHex.getR();
-//    }
-
     @Override
     public String toString() {
         return "(" + q + ", " + r + ")";
+    }
+
+    @Override
+    public int compareTo(Hex another) {
+        if (another == null) return 1;
+        if (q == another.getQ()) {
+            return compareInt(r,another.getR());
+        } else {
+            return compareInt(q,another.getQ());
+        }
+    }
+
+    private int compareInt(int a, int b) {
+         if (a == b) return 0;
+         if (a > b) {
+             return 1;
+         } else {
+             return -1;
+         }
     }
 }

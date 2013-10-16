@@ -36,6 +36,7 @@ public class MainParseGames {
 
         // Start parsing
         // If a game breaks, quit parsing and report progress so far
+        int i = 0;
         for (BoardspaceGameType type : files.keySet()) {
             List<File> fileList = files.get(type);
             for (File file : fileList) {
@@ -115,7 +116,8 @@ public class MainParseGames {
 //        metrics.add(new CompareOpeningsMetric());
 //        metrics.add(new LeastMovedTokenMetric());
 //        metrics.add(new IngersollOpeningsMetric());
-        metrics.add(new LinaelOpeningList());
+//        metrics.add(new LinaelOpeningList());
+        metrics.add(new LinaelOpeningComparison());
     }
 
     private void setupFilters() {

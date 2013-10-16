@@ -5,16 +5,14 @@ import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Hex;
 import dk.ilios.hivemind.model.Player;
+import dk.ilios.hivemind.model.StandardPositionMode;
 import dk.ilios.hivemind.model.Token;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,7 +143,7 @@ public class BoardspaceGameParser {
         }
 
         game.addPlayers(white, black);
-        game.getBoard().setStandardPositionMode(true);
+        game.getBoard().setStandardPositionMode(StandardPositionMode.ENABLED);
         game.setManualStepping(true);
         game.setPrintGameStateAfterEachMove(DEBUG);
         game.start();

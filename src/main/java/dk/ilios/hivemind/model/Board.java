@@ -67,7 +67,6 @@ public class Board {
     private HiveAsciiPrettyPrinter printer = new HiveAsciiPrettyPrinter();
 
     private Map<String, Hex> hexes = new HashMap<String, Hex>(); // Key := (q,r), Value: hex. List of hexes visited in the game
-
     private Set<Token> tokens = new HashSet<Token>();
     private int[][] neighbors =  new int[][] {{0,-1},{+1,-1},{1,0},{0,1},{-1, +1},{-1,0}}; // From top and clockwise round.
 
@@ -75,11 +74,11 @@ public class Board {
     private Player whitePlayer;
     private Player blackPlayer;
 
-    private boolean standardPosition = false; // If true, board is maintained in Standard Position
+    private StandardPositionMode standardPosition = StandardPositionMode.DISABLED; // Type of Standard Position used
     private boolean spQFlip = false;          // Flip around the Q axis
     private int spRotation = 0;               // How many clockwise rotations are needed to achieve Standard Position
     private int[] spOrigin = new int[2];      // Displacement of origin
-    private Token[] firstTokens = new Token[4]; // Keep track of the first 4 tokens placed on the board. 2 white and 2 black
+    private Token[] firstTokens = new Token[5]; // Keep track of the first 4 tokens placed on the board. 2 white and 2 black
 
     // The board state is hashed as a Zobrist key.
     long zobristKey = 0;
@@ -129,19 +128,18 @@ public class Board {
         tokens.add(token);
 
         updateZobristKey(token);
-//        updateZobristKeyForPlayer(token.getPlayer());
 
         // Keep track of first 4 tokens
-        if (tokens.size() < 5) {
+        if (tokens.size() < 6) {
             firstTokens[tokens.size() - 1] = token;
         }
         maintainStandardPosition(token);
     }
 
     private void maintainStandardPosition(Token token) {
-        if (!standardPosition) return;
+        if (standardPosition == StandardPositionMode.DISABLED) return;
         boolean rebuildZobristKey;
-        if (bothQueensPlaced()) {
+        if (bothQueensPlaced() && standardPosition == StandardPositionMode.ENABLED) {
             rebuildZobristKey = maintainSPForMidGame(token);
         } else {
             rebuildZobristKey = maintainSPForOpenings(token);
@@ -158,9 +156,14 @@ public class Board {
 
     // INVARIANT: All tokens are placed in a legal position
     private boolean maintainSPForOpenings(Token token) {
-        int turn = whitePlayer.getMoves() + blackPlayer.getMoves();
         boolean rebuildZobristKey = false;
-        if (firstTokens[3] != null) {
+
+        if (firstTokens[4] != null ) {
+            // Should only be called if standardPostion = StandardPostionMode.LIMITED
+            // This only acts as sentinel.
+            return false;
+
+        } if (firstTokens[3] != null) {
             // TURN 4+, after turn 4 pieces can move
             rebuildZobristKey = moveOrigin(firstTokens[0]) || rebuildZobristKey;
             rebuildZobristKey = rotateToStandardPosition(firstTokens[1]) || rebuildZobristKey;
@@ -190,7 +193,7 @@ public class Board {
     }
 
     private boolean swapAxisIfNeededForThirdToken() {
-        int[] coords = getSPCoordinatesFor(firstTokens[2].getHex());
+        int[] coords = getRotatedSPCoordinatesFor(firstTokens[2].getHex());
         boolean oldFlip = spQFlip;
         // R must be negative for 3rd token to be in SP
         if (coords[1] > 0) {
@@ -266,7 +269,7 @@ public class Board {
                 throw new IllegalStateException("Keeps rotating: Cannot find Standard Position");
             }
             rotateClockwise();
-            sp = getSPCoordinatesFor(token.getHex());
+            sp = getRotatedSPCoordinatesFor(token.getHex());
             maxRotations--;
         }
 
@@ -309,6 +312,21 @@ public class Board {
     }
 
     /**
+     * Returns the SP coordinates, only taking rotation into account
+     */
+    private int[] getRotatedSPCoordinatesFor(Hex hex) {
+        int q = hex.getQ();
+        int r = hex.getR();
+        int[] cubeCoords = HexagonUtils.convertToCubeCoordinates(q - spOrigin[0], r - spOrigin[1]);
+        for (int i = 0; i < spRotation; i++) {
+            cubeCoords = HexagonUtils.rotateRight(cubeCoords);
+        }
+        return HexagonUtils.convertToAxialCoordinates(cubeCoords[0], cubeCoords[1], cubeCoords[2]);
+    }
+
+
+
+    /**
      * Returns the hex for the given Standard Position
      *
      * @param q Q coordinate in Standard Position
@@ -336,12 +354,12 @@ public class Board {
 
     /**
      * Enable standard position for the board. Can only be enabled when the board is empty.
-     * @param enabled
+     * @param mode
      */
-    public void setStandardPositionMode(boolean enabled) {
-        if (hexes.size() > 0 && enabled) throw new IllegalStateException("Cannot enable Standard Position for non-empty board");
-        this.standardPosition = enabled;
-        if (enabled) {
+    public void setStandardPositionMode(StandardPositionMode mode) {
+        if (tokens.size() > 0 && mode != StandardPositionMode.DISABLED) throw new IllegalStateException("Cannot enable Standard Position for non-empty board");
+        this.standardPosition = mode;
+        if (mode != StandardPositionMode.DISABLED) {
             loadZobristHashes();
             spOrigin = new int[2];
             spRotation = 0;
@@ -392,8 +410,13 @@ public class Board {
         tokens.remove(token);
 
         // Maintain tracking of first 4 tokens.
-        if (tokens.size() < 4) {
+        if (tokens.size() < 5) {
             firstTokens[tokens.size()] = null;
+        }
+
+        if (tokens.size() == 0) {
+            spOrigin[0] = 0;
+            spOrigin[1] = 0;
         }
     }
 
@@ -433,8 +456,6 @@ public class Board {
         Hex toHex = findOrCreateHex(toQ, toR);
         toHex.addToken(token);
         token.setHex(toHex);
-//        updateZobristKey(token); // Insert new position
-//        updateZobristKeyForPlayer(token.getPlayer());
         maintainStandardPosition(token);
     }
 
@@ -562,7 +583,7 @@ public class Board {
         int result = Integer.MAX_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int q = standardPosition ? getSPCoordinatesFor(hex)[0] : hex.getQ();
+            int q = isUsingStandardPosition() ? getSPCoordinatesFor(hex)[0] : hex.getQ();
             if (q < result) {
                 result = q;
             }
@@ -578,7 +599,7 @@ public class Board {
         int result = Integer.MAX_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int r = standardPosition ? getSPCoordinatesFor(hex)[1] : hex.getR();
+            int r = isUsingStandardPosition() ? getSPCoordinatesFor(hex)[1] : hex.getR();
             if (r < result) {
                 result = r;
             }
@@ -591,7 +612,7 @@ public class Board {
         int result = Integer.MIN_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int q = standardPosition ? getSPCoordinatesFor(hex)[0] : hex.getQ();
+            int q = isUsingStandardPosition() ? getSPCoordinatesFor(hex)[0] : hex.getQ();
             if (q > result) {
                 result = q;
             }
@@ -604,7 +625,7 @@ public class Board {
         int result = Integer.MIN_VALUE;
         for (Hex hex : hexes.values()) {
             if (hex.getTopToken() == null) continue;
-            int r = standardPosition ? getSPCoordinatesFor(hex)[1] : hex.getR();
+            int r = isUsingStandardPosition() ? getSPCoordinatesFor(hex)[1] : hex.getR();
             if (r > result) {
                 result = r;
             }
@@ -719,6 +740,6 @@ public class Board {
     }
 
     public boolean isUsingStandardPosition() {
-        return standardPosition;
+        return (standardPosition != StandardPositionMode.DISABLED);
     }
 }

@@ -7,6 +7,7 @@ import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
 import dk.ilios.hivemind.model.Player;
+import dk.ilios.hivemind.model.StandardPositionMode;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -108,7 +109,7 @@ public class AIGameController {
         game.setTurnLimit(turnLimit);
         game.setPrintGameStateAfterEachMove(printGameState);
         game.addPlayers(whitePlayer, blackPlayer);
-        game.setStandardPositionMode(whiteAI.maintainsStandardPosition() || blackAI.maintainsStandardPosition());
+        game.setStandardPositionMode((whiteAI.maintainsStandardPosition() || blackAI.maintainsStandardPosition()) ? StandardPositionMode.ENABLED : StandardPositionMode.DISABLED);
         try {
             game.start();
         } catch (RuntimeException e) {

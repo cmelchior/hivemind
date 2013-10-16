@@ -27,7 +27,7 @@ public class BoardTest {
     public void testCreateZobristMap() {
         Board board = new Board(p1, p2);
         long start = System.currentTimeMillis();
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
         System.out.println("Creating board in: " + (System.currentTimeMillis() - start));
     }
 
@@ -75,7 +75,7 @@ public class BoardTest {
         game.addPlayers(p1, p2);
 
         Board board = game.getBoard();
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
 
         Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
         Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
@@ -90,6 +90,28 @@ public class BoardTest {
         assertArrayEquals(new int[] {1, 0}, beeCoords);
     }
 
+    @Test
+    public void testStandardPosition_rotate2ndToken_fromOrigin() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(StandardPositionMode.LIMITED);
+
+        Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
+        Token spider = p2.getFromSupply(BugType.SPIDER);
+
+        board.addToken(grasshopper, 0, 0);
+        board.addToken(spider, 1, -1);
+
+        int[] grasshopperCoords = board.getSPCoordinatesFor(grasshopper.getHex());
+        int[] spiderCoords = board.getSPCoordinatesFor(spider.getHex());
+
+        assertArrayEquals(new int[] {0, 0}, grasshopperCoords);
+        assertArrayEquals(new int[] {1, 0}, spiderCoords);
+    }
+
+
 
     @Test
     public void testStandardPosition_flip3rdToken() {
@@ -97,7 +119,7 @@ public class BoardTest {
         game.addPlayers(p1, p2);
 
         Board board = game.getBoard();
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
 
         Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
         Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
@@ -118,7 +140,7 @@ public class BoardTest {
         game.addPlayers(p1, p2);
 
         Board board = game.getBoard();
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
 
         Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
         Token beetle = p2.getFromSupply(BugType.BEETLE);
@@ -145,7 +167,7 @@ public class BoardTest {
         game.addPlayers(p1, p2);
 
         Board board = game.getBoard();
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
 
         Token gh1 = p1.getFromSupply(BugType.GRASSHOPPER);
         Token gh2 = p2.getFromSupply(BugType.GRASSHOPPER);
@@ -167,7 +189,7 @@ public class BoardTest {
         game.addPlayers(p1, p2);
 
         Board board = game.getBoard();
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
 
         Token gh1 = p1.getFromSupply(BugType.GRASSHOPPER);
         Token gh2 = p2.getFromSupply(BugType.GRASSHOPPER);
@@ -188,13 +210,10 @@ public class BoardTest {
         assertEquals(blackQueen, originalHex.getTopToken());
     }
 
-
-
-
     @Test
     public void testZobristKey_empty() {
         Board board = new Board(p1, p2);
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
         assertEquals(0, board.getZobristKey());
     }
 //
@@ -221,7 +240,7 @@ public class BoardTest {
     @Test
     public void testZobristKey_boardState() {
         Board board = new Board(p1, p2);
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
         Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
         Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
         Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
@@ -251,7 +270,7 @@ public class BoardTest {
     @Test
     public void testZobristKey_sameForStandardPositionForMultiplePositions() {
         Board board = new Board(p1, p2);
-        board.setStandardPositionMode(true);
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
         Token whiteBee = p1.getFromSupply(BugType.QUEEN_BEE);
         Token whiteSoldier = p1.getFromSupply(BugType.SOLDIER_ANT);
         Token blackBee = p2.getFromSupply(BugType.QUEEN_BEE);
@@ -277,6 +296,53 @@ public class BoardTest {
         // If the board maintain Standard Position the Zobrist keys should be equal.
         assertEquals(firstKey, board.getZobristKey());
     }
+
+    @Test
+    public void testGetHexForStandardPosition() {
+        Game game = new Game();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
+
+        Token grasshopper = p1.getFromSupply(BugType.GRASSHOPPER);
+        Token bee = p2.getFromSupply(BugType.QUEEN_BEE);
+
+        board.addToken(grasshopper, 0, 0);
+        board.addToken(bee, 1, -1);
+
+        int[] grasshopperCoords = board.getSPCoordinatesFor(grasshopper.getHex());
+        int[] beeCoords = board.getSPCoordinatesFor(bee.getHex());
+
+        assertArrayEquals(new int[]{0, 0}, grasshopperCoords);
+        assertArrayEquals(new int[] {1, 0}, beeCoords);
+    }
+
+    @Test
+    public void testOpeningStandardPosition() {
+        Game game = new Game();
+        p1.useAllExpansions();
+        p2.useAllExpansions();
+        game.addPlayers(p1, p2);
+
+        Board board = game.getBoard();
+        board.setStandardPositionMode(StandardPositionMode.ENABLED);
+
+        Token ladybug = p1.getFromSupply(BugType.LADY_BUG);
+        Token mosquito = p2.getFromSupply(BugType.MOSQUITO);
+        Token spider = p1.getFromSupply(BugType.SPIDER);
+        Token grasshopper = p2.getFromSupply(BugType.GRASSHOPPER);
+
+        board.addToken(ladybug, 0, 0);
+        board.addToken(mosquito, -1, 1);
+        board.addToken(spider, 0, -1);
+        board.addToken(grasshopper, -2, 2);
+
+        assertArrayEquals(new int[] {1, 0}, board.getSPCoordinatesFor(mosquito.getHex()));
+        assertArrayEquals(new int[] {0, -1}, board.getSPCoordinatesFor(spider.getHex()));
+    }
+
+
 
 
 }

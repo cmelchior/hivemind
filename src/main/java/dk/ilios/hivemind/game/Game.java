@@ -2,10 +2,7 @@ package dk.ilios.hivemind.game;
 
 import dk.ilios.hivemind.ai.statistics.GameStatistics;
 import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
-import dk.ilios.hivemind.model.Board;
-import dk.ilios.hivemind.model.Hex;
-import dk.ilios.hivemind.model.Player;
-import dk.ilios.hivemind.model.Token;
+import dk.ilios.hivemind.model.*;
 import dk.ilios.hivemind.model.rules.Rules;
 
 import java.util.ArrayList;
@@ -52,8 +49,8 @@ public class Game {
     private boolean enforceForcedDraw = true;       // If true, game is declared a draw after a set number of repeat moves by each player.
     private int repeatMovesBeforeForcedDraw = 3;    // Number of moves each player must make that are "the same" before forcing a draw.
     private int whiteDuplicateMoves = 0;
-
     private int blackDuplicateMoves = 0;
+
     // Debug properties
     private boolean printGameStateAfterEachMove = false;
     private GameStatistics statistics = new GameStatistics();
@@ -115,7 +112,7 @@ public class Game {
      */
     public GameCommand forward() {
         if (!replayMode) throw new IllegalStateException("Replay mode not enabled");
-        if (replayIndex == moves.size()) throw new IllegalStateException("Cannot go forward any futher, at end of game.");
+        if (replayIndex == moves.size()) throw new IllegalStateException("Cannot go forward any further, at end of game.");
         GameCommand command = moves.get(replayIndex);
         command.execute(this);
         replayIndex++;
@@ -379,9 +376,9 @@ public class Game {
     /**
      * Enable the calculation of Zobrist keys for the board. Enabling Zobrist key also enabled Standard Position.
      */
-    public void setStandardPositionMode(boolean enabled) {
-        if (enabled) board.setStandardPositionMode(enabled);
-        useZobristKey = enabled;
+    public void setStandardPositionMode(StandardPositionMode mode) {
+        board.setStandardPositionMode(mode);
+        useZobristKey = (mode != StandardPositionMode.DISABLED);
 
         // Initialize Game state hashes
         Random random = new Random();
