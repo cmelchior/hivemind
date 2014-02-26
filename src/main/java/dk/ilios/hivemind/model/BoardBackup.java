@@ -23,9 +23,6 @@ import java.util.*;
  *        \  +y   /
  *         \ _ _ /
  *
- * The board is also maintained as a graph, which is eg. is used to re
- *
- *
  */
 public class BoardBackup {
 

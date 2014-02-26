@@ -1,6 +1,7 @@
 package dk.ilios.hivemind.model;
-
+import dk.ilios.hivemind.model.Token;
 import java.util.Stack;
+
 
 /**
  * Describe a Hex on the board

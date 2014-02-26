@@ -20,9 +20,6 @@ public enum BugType {
         this.boardspaceKey = boardspaceKey;
     }
 
-
-
-
     /**
      * Generate a unique token ID that corrosponds the ID system used by Boardspace.net
      */

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Spider extends Bug {
-
     @Override
     public boolean isFreeToMove(Token token, Board board) {
         return isRoomToSlideAwayOnGround(token, board);
