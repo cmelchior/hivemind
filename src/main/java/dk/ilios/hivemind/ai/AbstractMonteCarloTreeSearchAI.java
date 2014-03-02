@@ -20,7 +20,7 @@ public abstract class AbstractMonteCarloTreeSearchAI implements HiveAI {
 
     protected MoveGenerator moveGenerator = new StandardMoveGenerator();
 
-    protected AIStatistics aiStats = new AIStatistics();
+    protected AIStatistics aiStats = new AIStatistics(this);
     protected long start; // Start time for requesting a new move.
 
 

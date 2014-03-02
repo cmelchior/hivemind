@@ -16,7 +16,7 @@ public abstract class AbstractMinMaxAI implements HiveAI {
 
     protected String name;
     protected Game state;
-    protected AIStatistics aiStats = new AIStatistics();
+    protected AIStatistics aiStats = new AIStatistics(this);
 
     protected MoveGenerator moveGenerator = new StandardMoveGenerator();
     protected BoardValueHeuristic heuristic;

@@ -1,5 +1,8 @@
 package dk.ilios.hivemind.ai.statistics;
 
+import dk.ilios.hivemind.ai.HiveAI;
+import dk.ilios.hivemind.model.Player;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +14,8 @@ import java.util.UUID;
 public class AIStatistics {
 
     private boolean DEBUG = true;
+
+    private final HiveAI ai;
 
     // Result arrays
     ArrayList<Long> millisecondsPrMove = new ArrayList<Long>(); // Time in milliseconds pr. move of the game
@@ -29,6 +34,10 @@ public class AIStatistics {
     String currentKey;
     int aiDepth = 3;
     int positionsEvaluated = 0;    // How many moves has been considered when getting the next move.
+
+    public AIStatistics(HiveAI ai) {
+        this.ai = ai;
+    }
 
     /**
      * A new move request has been made.
@@ -52,7 +61,7 @@ public class AIStatistics {
         cacheHits.add(cacheHit);
 
         if (DEBUG) {
-            System.out.println("Turn length: " + (time/1000d) + " s.");
+            System.out.println("(" + millisecondsPrMove.size() + ") " + ai.getName() + " : " + (time/1000d) + " s.");
         }
     }
 

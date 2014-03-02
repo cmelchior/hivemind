@@ -20,7 +20,7 @@ public class RandomAI implements HiveAI {
     private String name;
     private Random random = new Random();
     private Game state;
-    private AIStatistics stats = new AIStatistics();
+    private AIStatistics stats = new AIStatistics(this);
 
     public RandomAI(String name) {
         this.name = name;
