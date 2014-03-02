@@ -1,5 +1,6 @@
 package dk.ilios.hivemind.ai.heuristics;
 
+import dk.ilios.hivemind.ai.HiveAI;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.model.BugType;
 import dk.ilios.hivemind.model.Hex;
@@ -30,14 +31,14 @@ public class SimpleHeuristicV3 implements BoardValueHeuristic {
         if (blackWon && whiteWon) {
             // A draw is considered almost as bad as a LOSS (no one wants an AI that tries to DRAW)
             if (state.getActivePlayer().isWhitePlayer()) {
-                return Integer.MIN_VALUE + 1;
+                return HiveAI.MIN + 1;
             }  else {
-                return Integer.MAX_VALUE - 1;
+                return HiveAI.MAX - 1;
             }
         } else if (blackWon) {
-            return Integer.MIN_VALUE;
+            return HiveAI.MIN;
         } else if (whiteWon) {
-            return Integer.MAX_VALUE;
+            return HiveAI.MAX;
         }
 
         int whiteAntsInPlay = 0;
@@ -47,7 +48,7 @@ public class SimpleHeuristicV3 implements BoardValueHeuristic {
         for (Hex hex: hexes) {
             Token t = hex.getTopToken();
             if (t.getOriginalType() == BugType.SOLDIER_ANT) {
-                if (t.getPlayer().isBlackPlayer()) {
+                if (t.getPlayer().isBlack()) {
                     blackAntsInPlay++;
                 } else {
                     whiteAntsInPlay++;

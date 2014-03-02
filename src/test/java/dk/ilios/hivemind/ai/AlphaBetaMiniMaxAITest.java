@@ -5,6 +5,7 @@ import dk.ilios.hivemind.ai.heuristics.TestSetups;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Player;
+import dk.ilios.hivemind.model.StandardPositionMode;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,8 +41,8 @@ public class AlphaBetaMiniMaxAITest {
 
         game.addPlayers(p1, p2);
         game.setTurnLimit(10);
+        game.setStandardPositionMode(StandardPositionMode.DISABLED);
         game = TestSetups.sureWinInTwoTurns(game);
-
         GameCommand command = ai.nextMove(game, game.getBoard());
 
         assertEquals(2, command.getToQ());

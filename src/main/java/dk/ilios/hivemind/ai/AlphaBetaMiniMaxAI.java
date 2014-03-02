@@ -3,10 +3,10 @@ package dk.ilios.hivemind.ai;
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
-import dk.ilios.hivemind.model.*;
-import dk.ilios.hivemind.model.rules.Rules;
+import dk.ilios.hivemind.model.Board;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 /**
  * AI that implements Minimax tree search algorithm with Alpha-Beta prunning.
@@ -32,16 +32,17 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
         // Minimax traversal of game tree
         List<GameCommand> moves = generateMoves(state);
-        int bestValue = Integer.MIN_VALUE;
+        int bestValue = HiveAI.MIN;
         GameCommand bestMove = GameCommand.PASS;
 
         for (GameCommand move : moves) {
             // Update game state and continue traversel
             applyMove(move, state);
-            int value = alphabeta(state, searchDepth - 1, bestValue, Integer.MAX_VALUE, false);
-            if (value > bestValue || value == bestValue && random.nextBoolean()) {
+            int value = alphabeta(state, searchDepth - 1, bestValue, HiveAI.MAX, false);
+            if (value > bestValue) {
                 bestValue = value;
                 bestMove = move;
+                if (bestValue == HiveAI.MAX) break;
             }
             undoMove(move, state);
         }
@@ -51,11 +52,12 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
 
     private int alphabeta(Game state, int depth, int alpha, int beta, boolean maximizingPlayer) {
 
-        if (isGameOver(state, depth) || depth <= 0 || System.currentTimeMillis() - start > maxTimeInMillis) {
+        boolean timeout = System.currentTimeMillis() - start > maxTimeInMillis;
+        boolean maxDepthReached = depth <= 0;
+
+        if (isGameOver(state, depth) || maxDepthReached || timeout) {
             return value(state);
-
         } else {
-
             List<GameCommand> moves = generateMoves(state);
             int moveEvaluated = 0;
             if (maximizingPlayer) {
@@ -64,7 +66,7 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                     moveEvaluated++;
                     int value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value > alpha) {
-                        alpha  = value;
+                        alpha = value;
                     }
                     undoMove(move, state);
 
@@ -74,12 +76,14 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                         break;
                     }
                 }
+
                 return alpha;
 
             } else {
 
                 for (GameCommand move : moves) {
                     applyMove(move, state);
+                    moveEvaluated++;
                     int value = alphabeta(state, depth - 1, alpha, beta, !maximizingPlayer);
                     if (value < beta) {
                         beta = value;
@@ -92,6 +96,7 @@ public class AlphaBetaMiniMaxAI extends AbstractMinMaxAI {
                         break;
                     }
                 }
+
                 return beta;
             }
         }

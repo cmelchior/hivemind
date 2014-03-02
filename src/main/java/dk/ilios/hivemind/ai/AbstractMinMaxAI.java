@@ -1,15 +1,16 @@
 package dk.ilios.hivemind.ai;
 
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
-import dk.ilios.hivemind.ai.moves.AggressiveMovesFirstGenerator;
 import dk.ilios.hivemind.ai.moves.MoveGenerator;
+import dk.ilios.hivemind.ai.moves.StandardMoveGenerator;
 import dk.ilios.hivemind.ai.statistics.AIStatistics;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
-import dk.ilios.hivemind.model.*;
+import dk.ilios.hivemind.model.Player;
 import dk.ilios.hivemind.model.rules.Rules;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractMinMaxAI implements HiveAI {
 
@@ -17,7 +18,7 @@ public abstract class AbstractMinMaxAI implements HiveAI {
     protected Game state;
     protected AIStatistics aiStats = new AIStatistics();
 
-    protected MoveGenerator moveGenerator = new AggressiveMovesFirstGenerator();
+    protected MoveGenerator moveGenerator = new StandardMoveGenerator();
     protected BoardValueHeuristic heuristic;
 
     protected int searchDepth;      // Search limit in depth
@@ -58,13 +59,13 @@ public abstract class AbstractMinMaxAI implements HiveAI {
      */
     protected int value(Game state) {
         int result = calculateBoardValue(state);
-        if (maximizingPlayer.isBlackPlayer()) {
-            if (result == Integer.MIN_VALUE) result = Integer.MAX_VALUE;
-            else if (result == Integer.MAX_VALUE) result = Integer.MIN_VALUE;
-            else result = result * -1; // Negative values are good for black in the heuristic function, so if he is maximizing we invert all values
+        if (maximizingPlayer.isBlack()) {
+            result = result * -1; // Negative values are good for black in the heuristic function, so if he is maximizing we invert all values
         }
         return result;
     }
+
+
 
     protected Game applyMove(GameCommand command, Game state) {
         command.execute(state);

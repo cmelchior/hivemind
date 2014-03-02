@@ -22,8 +22,6 @@ public abstract class Bug {
     /**
      * Returns the squares the token can move to.
      *
-     * @param token
-     * @param board
      * @return Legal hexes the token can move to
      */
     public abstract List<Hex> getTargetHexes(Token token, Board board);
@@ -37,7 +35,6 @@ public abstract class Bug {
 
     /**
      * Returns true if the given bug type has the ability to move other bugs around, eg. the PillBug
-     * @return
      */
     public abstract boolean canMoveOthers();
 
@@ -48,29 +45,27 @@ public abstract class Bug {
      *
      * INVARIANT: Only works at the ground level.
      *
-     *
-     * @param token
-     * @param board
      * @return True if token can slide away.
      */
     protected boolean isRoomToSlideAwayOnGround(Token token, Board board) {
-        List<Hex> hexes = board.getNeighborHexes(token.getHex());
+        List<Hex> hexes = board.getNeighborHexes(token.getHex()); // Clockwise, starting from top
 
         // Fullfill the "Freedom to move" rule if two hexes next to each other is empty
+        // Go a full round + 1 to check for empty spaces across list start/end.
         int free = 0;
-        for (Hex hex : hexes) {
+        for (int i = 0; i < hexes.size() + 1; i++) {
+            Hex hex = hexes.get(i % hexes.size());
             if (hex.isEmpty()) {
                 free++;
                 if (free == 2) {
                     return true;
                 }
             } else {
-                free = Math.max(0, free - 1);
+                free = 0;
             }
         }
 
         return false;
-
     }
 
 }

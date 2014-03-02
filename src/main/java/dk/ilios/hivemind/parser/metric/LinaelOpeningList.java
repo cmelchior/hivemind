@@ -142,9 +142,9 @@ public class LinaelOpeningList extends Metric {
         return (w1 != null && w1.getPlayer().isWhitePlayer() && w1.getOriginalType() == BugType.LADY_BUG)
                 && (w2 != null && w2.getPlayer().isWhitePlayer() && w2.getOriginalType() == BugType.QUEEN_BEE)
                 && (w3 != null && w3.getPlayer().isWhitePlayer() && w3.getOriginalType() == BugType.GRASSHOPPER)
-                && (b1 != null && b1.getPlayer().isBlackPlayer() && b1.getOriginalType() == BugType.BEETLE)
-                && (b2 != null && b2.getPlayer().isBlackPlayer() && b2.getOriginalType() == BugType.QUEEN_BEE)
-                && (b3 != null && b3.getPlayer().isBlackPlayer() && b3.getOriginalType() == BugType.SPIDER);
+                && (b1 != null && b1.getPlayer().isBlack() && b1.getOriginalType() == BugType.BEETLE)
+                && (b2 != null && b2.getPlayer().isBlack() && b2.getOriginalType() == BugType.QUEEN_BEE)
+                && (b3 != null && b3.getPlayer().isBlack() && b3.getOriginalType() == BugType.SPIDER);
     }
 
 
@@ -162,9 +162,9 @@ public class LinaelOpeningList extends Metric {
         return (w1 != null && w1.getPlayer().isWhitePlayer() && w1.getOriginalType() == BugType.LADY_BUG)
                 && (w2 != null && w2.getPlayer().isWhitePlayer() && w2.getOriginalType() == BugType.QUEEN_BEE)
                 && (w3 != null && w3.getPlayer().isWhitePlayer() && w3.getOriginalType() == BugType.SOLDIER_ANT)
-                && (b1 != null && b1.getPlayer().isBlackPlayer() && b1.getOriginalType() == BugType.BEETLE)
-                && (b2 != null && b2.getPlayer().isBlackPlayer() && b2.getOriginalType() == BugType.QUEEN_BEE)
-                && (b3 != null && b3.getPlayer().isBlackPlayer() && b3.getOriginalType() == BugType.SPIDER);
+                && (b1 != null && b1.getPlayer().isBlack() && b1.getOriginalType() == BugType.BEETLE)
+                && (b2 != null && b2.getPlayer().isBlack() && b2.getOriginalType() == BugType.QUEEN_BEE)
+                && (b3 != null && b3.getPlayer().isBlack() && b3.getOriginalType() == BugType.SPIDER);
     }
 
     private boolean isType3(Game game) {
@@ -181,9 +181,9 @@ public class LinaelOpeningList extends Metric {
         return (w1 != null && w1.getPlayer().isWhitePlayer() && w1.getOriginalType() == BugType.LADY_BUG)
                 && (w2 != null && w2.getPlayer().isWhitePlayer() && w2.getOriginalType() == BugType.QUEEN_BEE)
                 && (w3 != null && w3.getPlayer().isWhitePlayer() && w3.getOriginalType() == BugType.SPIDER)
-                && (b1 != null && b1.getPlayer().isBlackPlayer() && b1.getOriginalType() == BugType.BEETLE)
-                && (b2 != null && b2.getPlayer().isBlackPlayer() && b2.getOriginalType() == BugType.QUEEN_BEE)
-                && (b3 != null && b3.getPlayer().isBlackPlayer() && b3.getOriginalType() == BugType.SPIDER);
+                && (b1 != null && b1.getPlayer().isBlack() && b1.getOriginalType() == BugType.BEETLE)
+                && (b2 != null && b2.getPlayer().isBlack() && b2.getOriginalType() == BugType.QUEEN_BEE)
+                && (b3 != null && b3.getPlayer().isBlack() && b3.getOriginalType() == BugType.SPIDER);
     }
 
     private boolean isTypeRelaxed(Game game) {
@@ -197,8 +197,8 @@ public class LinaelOpeningList extends Metric {
 
         return (w1 != null && w1.getPlayer().isWhitePlayer() && w1.getOriginalType() == BugType.LADY_BUG)
                 && (w2 != null && w2.getPlayer().isWhitePlayer() && w2.getOriginalType() == BugType.QUEEN_BEE)
-                && (b1 != null && b1.getPlayer().isBlackPlayer() && b1.getOriginalType() == BugType.BEETLE)
-                && (b2 != null && b2.getPlayer().isBlackPlayer() && b2.getOriginalType() == BugType.QUEEN_BEE);
+                && (b1 != null && b1.getPlayer().isBlack() && b1.getOriginalType() == BugType.BEETLE)
+                && (b2 != null && b2.getPlayer().isBlack() && b2.getOriginalType() == BugType.QUEEN_BEE);
     }
 
 

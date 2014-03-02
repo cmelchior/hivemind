@@ -1,7 +1,6 @@
 package dk.ilios.hivemind.parser.metric;
 
 import dk.ilios.hivemind.game.Game;
-import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.game.GameStatus;
 import dk.ilios.hivemind.model.*;
 import dk.ilios.hivemind.parser.BoardspaceGameType;
@@ -136,11 +135,11 @@ public class IngersollOpeningsMetric extends Metric {
             return false;
         }
 
-        if (!t2.getPlayer().isBlackPlayer()) {
+        if (!t2.getPlayer().isBlack()) {
             return false;
         }
 
-        if (!t3.getPlayer().isBlackPlayer() || t3.getOriginalType() != BugType.QUEEN_BEE) {
+        if (!t3.getPlayer().isBlack() || t3.getOriginalType() != BugType.QUEEN_BEE) {
             return false;
         }
 

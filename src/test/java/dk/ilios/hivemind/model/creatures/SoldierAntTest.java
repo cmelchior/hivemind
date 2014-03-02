@@ -8,8 +8,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class SoldierAntTest {
 
@@ -89,4 +88,99 @@ public class SoldierAntTest {
 
         assertFalse(Rules.getInstance().isFreeToMove(ant, board));
     }
+
+    /**
+     * A1 is almost surrounded, but still free to move.
+     *
+     * | = = = = = = = = = = = = | 
+     * |                  _ _    |
+     * |                /# # #\  |
+     * |           _ _ /# S2  #\ |
+     * |         /+ + +\# -W- #/ |
+     * |    _ _ /+ A1  +\#_#_#/  |
+     * |  /+ + +\+ -B- +/# # #\  |
+     * | /+ B2  +\+_+_+/#  Q  #\ |
+     * | \+ -B- +/+ + +\# -W- #/ |
+     * |  \+_+_+/+  Q  +\#_#_#/  |
+     * |        \+ -B- +/        |
+     * |         \+_+_+/         |
+     * |         /+ + +\         |
+     * |        /+ A2  +\        |
+     * |        \+ -B- +/        |
+     * |         \+_+_+/         |
+     * |                         |
+     * | = = = = = = = = = = = = |
+     */
+    @Test
+    public void freeToMove_almostSurrounded() {
+        Board board = new Board(p1, p2);
+
+        // Black setup
+        board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 0, 3);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 4);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 2);
+        board.addToken(p2.getFromSupply(BugType.BEETLE), -1, 3);
+
+        // White setup
+        board.addToken(p1.getFromSupply(BugType.SPIDER), 1, 1);
+        board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 1, 2);
+
+        assertTrue(Rules.getInstance().isFreeToMove(board.getHex(0, 2).getTopToken(), board));
+    }
+
+    /**
+     *
+     * | = = = = = = = = = = = = = = = = = = = |
+     * |                         _ _           |
+     * |                       /# # #\         |
+     * |                  _ _ /# ANT #\        |
+     * |                /# # #\# -W- #/        |
+     * |               /# ANT #\#_#_#/         |
+     * |               \# -W- #/               |
+     * |                \#_#_#/                |
+     * |                /# # #\                |
+     * |           _ _ /# SPI #\               |
+     * |         /     \# -W- #/               |
+     * |    _ _ /  WIN  \#_#_#/         _ _    |
+     * |  /+ + +\       /# # #\       /# # #\  |
+     * | /+ B1  +\ _ _ /# QBE #\ _ _ /# ANT #\ |
+     * | \+ -B- +/+ + +\# -W- #/# # #\# -W- #/ |
+     * |  \+_+_+/+ QBE +\#_#_#/# SPI #\#_#_#/  |
+     * |  /+ + +\+ -B- +/+ + +\# -W- #/+ + +\  |
+     * | /+ A1  +\+_+_+/+ ANT +\#_#_#/+ HOP +\ |
+     * | \+ -B- +/+ + +\+ -B- +/     \+ -B- +/ |
+     * |  \+_+_+/+ A2  +\+_+_+/       \+_+_+/  |
+     * |        \+ -B- +/                      |
+     * |         \+_+_+/                       |
+     * |                                       |
+     * | = = = = = = = = = = = = = = = = = = = |
+     *
+     */
+    @Test
+    public void canMoveToEndGame() {
+        Board board = new Board(p1, p2);
+
+        // Black setup
+        board.addToken(p2.getFromSupply(BugType.QUEEN_BEE), 0, 3);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 4);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), -1, 4);
+        board.addToken(p2.getFromSupply(BugType.BEETLE), -1, 3);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 3);
+        board.addToken(p2.getFromSupply(BugType.GRASSHOPPER), 3, 2);
+
+        // White setup
+        board.addToken(p1.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
+        board.addToken(p1.getFromSupply(BugType.SPIDER), 1, 1);
+        board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 1, 2);
+        board.addToken(p1.getFromSupply(BugType.SOLDIER_ANT), 2, -1);
+        board.addToken(p1.getFromSupply(BugType.SPIDER), 2, 2);
+        board.addToken(p1.getFromSupply(BugType.SOLDIER_ANT), 3, 1);
+
+        Token ant = board.getHex(2, -1).getTopToken();
+        List<Hex> targets = Rules.getInstance().getBugSpecificRules(ant).getTargetHexes(ant, board);
+        assertTrue(targets.contains(board.getHex(0, 2)));
+    }
+
+
+
 }

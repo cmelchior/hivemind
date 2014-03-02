@@ -120,7 +120,7 @@ public class Player {
         this.moves = tokensMoved;
     }
 
-    public boolean isBlackPlayer() {
+    public boolean isBlack() {
         return type == PlayerType.BLACK;
     }
 

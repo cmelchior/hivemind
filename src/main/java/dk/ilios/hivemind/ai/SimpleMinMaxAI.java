@@ -4,7 +4,6 @@ import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.*;
-import dk.ilios.hivemind.model.rules.Rules;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ import java.util.*;
 public class SimpleMinMaxAI extends AbstractMinMaxAI {
 
     private Random random = new Random();
-    private int searchDepth = 0; // Search depth for tree
+    private int searchDepth = 0; // Search depth for tree. 0 is the starting depth
 
     public SimpleMinMaxAI(String name, BoardValueHeuristic heuristic, int depth, int maxTimeInMillis) {
         super(name, heuristic, depth, maxTimeInMillis);
@@ -33,6 +32,7 @@ public class SimpleMinMaxAI extends AbstractMinMaxAI {
         start = System.currentTimeMillis();
 
         // Minimax traversal of game tree
+        // Ply 1
         List<GameCommand> moves = generateMoves(state);
         int bestValue = Integer.MIN_VALUE;
         GameCommand bestMove = GameCommand.PASS;
@@ -62,7 +62,7 @@ public class SimpleMinMaxAI extends AbstractMinMaxAI {
         } else {
 
             List<GameCommand> moves = generateMoves(state);
-            int bestValue = Integer.MIN_VALUE;
+            int bestValue = (maximizingPlayer) ? HiveAI.MIN : HiveAI.MAX;
 
             for (GameCommand move : moves) {
                 // Update game state and continue traversel

@@ -42,7 +42,7 @@ public class Rules {
 
         // 1. Pick a random neighbor and mark it.
         // 2. Visit all neighbors recursively (ignoring startGame) and mark them
-        // 3. When marking is done. Counht marked. Must be equal to hexes - 1 to be a consistent hive
+        // 3. When marking is done. Count marked. Must be equal to hexes - 1 to be a consistent hive
         List<Token> neighbors = board.getNeighborTokens(token.getHex());
         if (neighbors.size() == 0) return false;
 
@@ -59,10 +59,6 @@ public class Rules {
 
     /**
      * Recursively mark all tokens connected to a token
-     * @param startToken
-     * @param ignore
-     * @param board
-     * @param marked
      * @return The set of all tokens connected
      */
     private Set<Token> mark(Token startToken, Token ignore, Board board, HashSet<Token> marked) {
@@ -102,8 +98,8 @@ public class Rules {
             return board.getNeighborHexes(board.getFilledHexes().get(0));
         }
 
-        List<Hex> result = new ArrayList<Hex>();
-        Set<Hex> targets = new HashSet<Hex>();
+        List<Hex> result = new ArrayList<>();
+        Set<Hex> targets = new HashSet<>();
 
         // 1. Get all empty neighbor hexes to player tokens.
         List<Hex> hexes = board.getFilledHexes();
@@ -213,11 +209,11 @@ public class Rules {
      * Returns all tokens free to move for the given player
      */
     public Set<Token> getFreeTokens(Player p, Board board) {
-        Set<Token> result = new HashSet<Token>();
+        Set<Token> result = new HashSet<>();
 
         List<Hex> hexes = board.getFilledHexes();
         for (Hex hex : hexes) {
-            if (hex.getTopToken() == null) continue;
+            if (hex.isEmpty()) continue;
             Token token = hex.getTopToken();
             if (token.getPlayer().equals(p)) {
                 if (isFreeToMove(token, board)) {

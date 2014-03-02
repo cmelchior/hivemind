@@ -6,7 +6,6 @@ import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Hive AI using Negamax with Alpha/beta prunning.
@@ -14,8 +13,6 @@ import java.util.Random;
  * @see http://en.wikipedia.org/wiki/Negamax
  */
 public class NegamaxAI extends AbstractMinMaxAI {
-
-    private Random random = new Random();
 
     public NegamaxAI(String name, BoardValueHeuristic heuristicFunction, int depth, int maxTimeInMillis) {
         super(name, heuristicFunction, depth, maxTimeInMillis);
@@ -31,16 +28,25 @@ public class NegamaxAI extends AbstractMinMaxAI {
         maximizingPlayer = state.getActivePlayer();
         start = System.currentTimeMillis();
 
-        // Minimax traversal of game tree
+        // Player A = white, Player B = black
+        if (state.getActivePlayer().isWhitePlayer()) {
+            return negamaxRoot(state, searchDepth, HiveAI.MIN, HiveAI.MAX, 1);
+        } else {
+            return negamaxRoot(state, searchDepth, HiveAI.MIN, HiveAI.MAX, -1);
+        }
+    }
+
+    private GameCommand negamaxRoot(Game state, int depth, int alpha, int beta, int color) {
         List<GameCommand> moves = generateMoves(state);
-        int bestValue = Integer.MIN_VALUE;
+        int bestValue = HiveAI.MIN;
         GameCommand bestMove = GameCommand.PASS;
 
+        int i = 0;
         for (GameCommand move : moves) {
-            // Update game state and continue traversel
             applyMove(move, state);
-            int value = negamax(state, searchDepth - 1, bestValue, Integer.MAX_VALUE, false);
-            if (value > bestValue || value == bestValue && random.nextBoolean()) {
+            int value = -negamax(state, searchDepth - 1, -beta, -alpha, -color);
+            alpha = Math.max(alpha, value);
+            if (value > bestValue) {
                 bestValue = value;
                 bestMove = move;
             }
@@ -50,23 +56,22 @@ public class NegamaxAI extends AbstractMinMaxAI {
         return bestMove;
     }
 
-    private int negamax(Game state, int depth, int alpha, int beta, boolean maximizingPlayer) {
+    private int negamax(Game state, int depth, int alpha, int beta, int color) {
         if (isGameOver(state, depth) || depth <= 0 || System.currentTimeMillis() - start > maxTimeInMillis) {
-            return value(state);
+            return color * calculateBoardValue(state);
 
         } else {
+            int bestValue = HiveAI.MIN;
             List<GameCommand> moves = generateMoves(state);
             for (GameCommand move : moves) {
                 applyMove(move, state);
-                int value = negamax(state, depth - 1, -beta, -alpha, !maximizingPlayer) * -1;
+                int value = -negamax(state, depth - 1, -beta, -alpha, -color);
                 undoMove(move, state);
-                if (value >= beta) {
-                    return value;
-                } else if (value > alpha) {
-                    alpha = value;
-                }
+                bestValue = Math.max(bestValue, value);
+                alpha = Math.max(alpha, value);
+                if (alpha >= beta) break;
             }
-            return alpha;
+            return bestValue;
         }
     }
 }

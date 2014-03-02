@@ -12,7 +12,7 @@ public class MonteCarloAITest {
 
     @Test
     public void testCanDetectWinTurnOne() {
-        final HiveAI ai = new UCTMonteCarloTreeSearchAI("MCTS", 3, 10000);
+        final HiveAI ai = new UCTMonteCarloTreeSearchAI("MCTS", 1, 10000);
 
         Game game = new Game();
         Player p1 = new Player("White", Player.PlayerType.WHITE); p1.fillBaseSupply();

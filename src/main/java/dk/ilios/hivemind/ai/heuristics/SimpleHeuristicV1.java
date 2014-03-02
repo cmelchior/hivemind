@@ -1,5 +1,6 @@
 package dk.ilios.hivemind.ai.heuristics;
 
+import dk.ilios.hivemind.ai.HiveAI;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.model.Player;
 import dk.ilios.hivemind.model.rules.Rules;
@@ -26,14 +27,14 @@ public class SimpleHeuristicV1 implements BoardValueHeuristic {
         if (blackWon && whiteWon) {
             // A draw is considered a LOSS
             if (state.getActivePlayer().isWhitePlayer()) {
-                return Integer.MIN_VALUE;
+                return HiveAI.MIN + 5;
             }  else {
-                return Integer.MAX_VALUE;
+                return HiveAI.MAX - 5;
             }
         } else if (blackWon) {
-            return Integer.MIN_VALUE;
+            return HiveAI.MIN;
         } else if (whiteWon) {
-            return Integer.MAX_VALUE;
+            return HiveAI.MAX;
         }
 
         int whiteFreeTokens = Rules.getInstance().getFreeTokens(whitePlayer, state.getBoard()).size();
@@ -45,7 +46,7 @@ public class SimpleHeuristicV1 implements BoardValueHeuristic {
         int blackTokensOnBoard = blackPlayer.getNoStartingBugs() - blackPlayer.getSupply().size();
         int blackHexesFilledAroundOpposingQueen = state.getBoard().getNeighborTokens(whitePlayer.getQueen().getHex()).size();
 
-        return 3*(whiteHexesFilledAroundOpposingQueen - blackHexesFilledAroundOpposingQueen)
+        return 10*(whiteHexesFilledAroundOpposingQueen - blackHexesFilledAroundOpposingQueen)
                 + 2*(whiteFreeTokens - blackFreeTokens)
                 + 1*(whiteTokensOnBoard-blackTokensOnBoard);
     }

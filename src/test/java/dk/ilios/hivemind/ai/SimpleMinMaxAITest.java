@@ -7,10 +7,7 @@ import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 import dk.ilios.hivemind.game.CommandProvider;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
-import dk.ilios.hivemind.model.Board;
-import dk.ilios.hivemind.model.BugType;
-import dk.ilios.hivemind.model.Hex;
-import dk.ilios.hivemind.model.Player;
+import dk.ilios.hivemind.model.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -83,15 +80,17 @@ public class SimpleMinMaxAITest {
 
     @Test
     public void testTwoDepth() {
+
         final HiveAI ai = new SimpleMinMaxAI("TwoDepth", new BoardValueHeuristic() {
             @Override
             public int calculateBoardValue(Game state) {
-                // White really wants his queen at (0,1), so black will put his token there.
-                Hex whiteQueenHex = state.getWhitePlayer().getQueen().getHex();
-                if (whiteQueenHex.getQ() == 0 && whiteQueenHex.getR() == 1) {
-                    return 100; // White really likes this move
+                // Black really wants token at (0,1).
+                if (state.getActivePlayer().isBlack()) {
+                    Hex hex = state.getBoard().getHex(0, 1);
+                    Token t = hex.getTopToken();
+                    return (t != null && t.getPlayer().isBlack()) ? -100 : -25;
                 } else {
-                    return -25;
+                    return 50;
                 }
             }
         }, 2, 30000);
@@ -117,8 +116,8 @@ public class SimpleMinMaxAITest {
 
         // Test placement of first bug once another bug has been placed
         Game game = new Game();
-        game.setManualStepping(true);
         game.addPlayers(p1, p2);
+        game.setManualStepping(true);
         game.setTurnLimit(2);
         game.start();
         game.continueGame(); // Turn 1 (White)
@@ -178,7 +177,6 @@ public class SimpleMinMaxAITest {
         game = TestSetups.sureWinInTwoTurns(game);
 
         GameCommand command = ai.nextMove(game, game.getBoard());
-
         assertEquals(2, command.getToQ());
         assertEquals(1, command.getToR());
     }

@@ -11,8 +11,8 @@ import dk.ilios.hivemind.model.Player;
 public class TestSetups {
 
     /**
-     * Blacks have 2 pieces that can be moved to ensure the win.
-     * The returned state has black as the active player
+     * Blacks have 2 pieces (HOP/SPI) that can be moved to ensure the win.
+     * The returned state has black as the active player.
      *
      * | = = = = = = = = = = = = = = =  |
      * |                  _ _           |
@@ -29,7 +29,7 @@ public class TestSetups {
      * |         /+ + +\# -W- #/# # #\  |
      * |    _ _ /+ QBE +\#_#_#/# ANT #\ |
      * |  /+ + +\+ -B- +/+ + +\# -W- #/ |
-     * | /+ HOP +\+_+_+/+ BTL +\#_#_#/  |
+     * | /+ HOP +\+_+_+/+ ANT +\#_#_#/  |
      * | \+ -B- +/+ + +\+ -B- +/+ + +\  |
      * |  \+_+_+/+ SPI +\+_+_+/+ SPI +\ |
      * |        \+ -B- +/# # #\+ -B- +/ |
@@ -66,7 +66,7 @@ public class TestSetups {
         board.addToken(black.getFromSupply(BugType.SOLDIER_ANT), -1, 2);
         board.addToken(black.getFromSupply(BugType.QUEEN_BEE), -1, 3);
         board.addToken(black.getFromSupply(BugType.SPIDER), -1, 4);
-        board.addToken(black.getFromSupply(BugType.BEETLE), 0, 3);
+        board.addToken(black.getFromSupply(BugType.SOLDIER_ANT), 0, 3);
         board.addToken(black.getFromSupply(BugType.SPIDER), 1, 3);
         white.setTokensMoved(6);
 
@@ -78,7 +78,7 @@ public class TestSetups {
      * Blacks have 4 pieces that can be moved to ensure the win in 2 turns.
      * The returned state has black as the active player.
      *
-     * 1) Black: Move either of two ants to other queen
+     * 1) Black: Move either B1 to T2 or A1/A2 to T1
      * 2) White: Block one piece
      * 3) Black: Use either Beetle, Ant or Hopper to win
      *
@@ -92,16 +92,16 @@ public class TestSetups {
      * |                \#_#_#/                |
      * |                /# # #\                |
      * |           _ _ /# SPI #\ _ _           |
-     * |         /     \# -W- #/     \          |
+     * |         /     \# -W- #/     \         |
      * |    _ _ /  T2   \#_#_#/  T1   \ _ _    |
      * |  /+ + +\       /# # #\       /# # #\  |
-     * | /+ BTL +\ _ _ /# QBE #\ _ _ /# ANT #\ |
+     * | /+ B1  +\ _ _ /# QBE #\ _ _ /# ANT #\ |
      * | \+ -B- +/+ + +\# -W- #/# # #\# -W- #/ |
      * |  \+_+_+/+ QBE +\#_#_#/# SPI #\#_#_#/  |
      * |  /+ + +\+ -B- +/+ + +\# -W- #/+ + +\  |
-     * | /+ ANT +\+_+_+/+ ANT +\#_#_#/+ HOP +\ |
+     * | /+ A1  +\+_+_+/+ ANT +\#_#_#/+ HOP +\ |
      * | \+ -B- +/+ + +\+ -B- +/     \+ -B- +/ |
-     * |  \+_+_+/+ ANT +\+_+_+/       \+_+_+/  |
+     * |  \+_+_+/+ A2  +\+_+_+/       \+_+_+/  |
      * |        \+ -B- +/                      |
      * |         \+_+_+/                       |
      * |                                       |

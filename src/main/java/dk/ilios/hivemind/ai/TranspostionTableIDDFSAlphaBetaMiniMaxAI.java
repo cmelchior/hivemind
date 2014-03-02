@@ -3,7 +3,6 @@ package dk.ilios.hivemind.ai;
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
 import dk.ilios.hivemind.ai.transpositiontable.TranspositionTable;
 import dk.ilios.hivemind.ai.transpositiontable.TranspositionTableEntry;
-import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
 import dk.ilios.hivemind.model.Board;
@@ -58,7 +57,7 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
             if (val > bestValue || val == bestValue && random.nextBoolean()) {
                 bestValue = val;
                 bestCommand = (GameCommand) result[1];
-                if (bestValue == Integer.MAX_VALUE) {
+                if (bestValue == HiveAI.MAX) {
                     return bestCommand; // Game winning move
                 }
             }
@@ -79,7 +78,7 @@ public class TranspostionTableIDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
         for (GameCommand move : moves) {
             // Update game state and continue traversel
             applyMove(move, state);
-            int value = alphabeta(state, searchDepth - 1, bestValue, Integer.MAX_VALUE, false);
+            int value = alphabeta(state, searchDepth - 1, bestValue, HiveAI.MAX, false);
             if (value > bestValue || value == bestValue && random.nextBoolean()) {
                 bestValue = value;
                 bestMove = move;

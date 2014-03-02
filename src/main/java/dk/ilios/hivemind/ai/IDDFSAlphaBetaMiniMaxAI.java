@@ -3,10 +3,10 @@ package dk.ilios.hivemind.ai;
 import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic;
 import dk.ilios.hivemind.game.Game;
 import dk.ilios.hivemind.game.GameCommand;
-import dk.ilios.hivemind.model.*;
-import dk.ilios.hivemind.model.rules.Rules;
+import dk.ilios.hivemind.model.Board;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 /**
  * AI that implements Minimax tree search algorithm with Alpha-Beta prunning and Iterative Deepening Depth-First Search.
@@ -50,10 +50,10 @@ public class IDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
         while(depth <= searchDepth && System.currentTimeMillis() - start < maxTimeInMillis) {
             result = runMinMax(state, depth, result);
             int val = (Integer) result[0];
-            if (val > bestValue || val == bestValue && random.nextBoolean()) {
+            if (val > bestValue) {
                 bestValue = val;
                 bestCommand = (GameCommand) result[1];
-                if (bestValue == Integer.MAX_VALUE) {
+                if (bestValue == HiveAI.MAX) {
                     return bestCommand; // Game winning move
                 }
             }
@@ -74,10 +74,11 @@ public class IDDFSAlphaBetaMiniMaxAI extends AbstractMinMaxAI {
         for (GameCommand move : moves) {
             // Update game state and continue traversel
             applyMove(move, state);
-            int value = alphabeta(state, searchDepth - 1, bestValue, Integer.MAX_VALUE, false);
+            int value = alphabeta(state, searchDepth - 1, bestValue, HiveAI.MAX, false);
             if (value > bestValue || value == bestValue && random.nextBoolean()) {
                 bestValue = value;
                 bestMove = move;
+                if (bestValue == HiveAI.MAX) break;
             }
             undoMove(move, state);
         }

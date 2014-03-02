@@ -56,7 +56,7 @@ public class MTDFAI extends AbstractMinMaxAI {
             result = MTDF(state, bestValue, depth);
             bestValue = (Integer) result[0];
             bestCommand = (GameCommand) result[1];
-            if (bestValue == Integer.MAX_VALUE) {
+            if (bestValue == HiveAI.MAX) {
                 return bestCommand; // Game winning move
             }
 
@@ -70,8 +70,8 @@ public class MTDFAI extends AbstractMinMaxAI {
         int value = bestValue;
         Object[] result = new Object[2];
 
-        int upperbound = Integer.MAX_VALUE;
-        int lowerbound = Integer.MIN_VALUE;
+        int upperbound = HiveAI.MAX;
+        int lowerbound = HiveAI.MIN;
         int beta;
 
         do {
@@ -98,7 +98,7 @@ public class MTDFAI extends AbstractMinMaxAI {
         for (GameCommand move : moves) {
             // Update game state and continue traversel
             applyMove(move, state);
-            int value = alphaBetaWithMemory(state, bestValue, Integer.MAX_VALUE, searchDepth - 1, false);
+            int value = alphaBetaWithMemory(state, bestValue, HiveAI.MAX, searchDepth - 1, false);
             if (value > bestValue || value == bestValue && random.nextBoolean()) {
                 bestValue = value;
                 bestMove = move;

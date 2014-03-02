@@ -137,7 +137,7 @@ public class Game {
      * @param command
      */
     public void continueGame(GameCommand command) {
-        if (!isRunning || replayMode) return;
+        if (!isRunning || replayMode) throw new RuntimeException("Not in replay mode.");
 
         // Use CommandProvider if command is not provided
         if (command == null) {
@@ -355,7 +355,7 @@ public class Game {
      */
     public GameCommand getMove(Player player, int turn) {
         if (turn <= 0) return null;
-        int turnIndex = (turn - 1)*2  + (player.isBlackPlayer() ? 1 : 0);
+        int turnIndex = (turn - 1)*2  + (player.isBlack() ? 1 : 0);
         return (moves.size() > turnIndex) ? moves.get(turnIndex) : null;
     }
 

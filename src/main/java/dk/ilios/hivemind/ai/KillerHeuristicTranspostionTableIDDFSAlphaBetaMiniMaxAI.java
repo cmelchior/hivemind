@@ -56,7 +56,7 @@ public class KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI extends Abs
             if (val > bestValue || val == bestValue && random.nextBoolean()) {
                 bestValue = val;
                 bestCommand = (GameCommand) result[1];
-                if (bestValue == Integer.MAX_VALUE) {
+                if (bestValue == HiveAI.MAX) {
                     return bestCommand; // Game winning move
                 }
             }

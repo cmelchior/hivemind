@@ -10,6 +10,9 @@ import dk.ilios.hivemind.model.Board;
  */
 public interface HiveAI {
 
+    public final static int MAX = Integer.MAX_VALUE;        // Maximum value when evaluating a hive board.
+    public final static int MIN = Integer.MIN_VALUE + 1;    // Minimum value when evaluating a hive board.
+
     /**
      * Return the next game move which the AI considers the best depending on the state of the game.
      */

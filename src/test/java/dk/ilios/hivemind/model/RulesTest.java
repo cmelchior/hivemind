@@ -8,7 +8,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class RulesTest {
 
@@ -232,5 +231,65 @@ public class RulesTest {
         assertEquals(0, result.size());
     }
 
+    @Test
+    public void isQueenSurronded_false() {
+        Board board = new Board(p1, p2);
+        board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
+        board.addToken(p2.getFromSupply(BugType.BEETLE), 1, -1);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
+        board.addToken(p2.getFromSupply(BugType.GRASSHOPPER), 0, 1);
+        board.addToken(p2.getFromSupply(BugType.SPIDER), -1, 1);
+
+        assertFalse(Rules.getInstance().isQueenSurrounded(p1, board));
+    }
+
+    /**
+     *  | = = = = = = = = = = = = |
+     *  |           _ _           |
+     *  |         /+ + +\         |
+     *  |    _ _ /+ A2  +\ _ _    |
+     *  |  /+ + +\+ -B- +/+ + +\  |
+     *  | /+ A1  +\+_+_+/+ B1  +\ |
+     *  | \+ -B- +/# # #\+ -B- +/ |
+     *  |  \+_+_+/#  Q  #\+_+_+/  |
+     *  |  /+ + +\# -W- #/+ + +\  |
+     *  | /+ S1  +\#_#_#/+ A3  +\ |
+     *  | \+ -B- +/+ + +\+ -B- +/ |
+     *  |  \+_+_+/+ G2  +\+_+_+/  |
+     *  |        \+ -B- +/        |
+     *  |         \+_+_+/         |
+     *  |                         |
+     *  | = = = = = = = = = = = = |
+     */
+    @Test
+    public void isQueenSurronded_true() {
+        Board board = new Board(p1, p2);
+        board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
+        board.addToken(p2.getFromSupply(BugType.BEETLE), 1, -1);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
+        board.addToken(p2.getFromSupply(BugType.GRASSHOPPER), 0, 1);
+        board.addToken(p2.getFromSupply(BugType.SPIDER), -1, 1);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), -1, 0);
+
+        assertTrue(Rules.getInstance().isQueenSurrounded(p1, board));
+    }
+
+
+    @Test
+    public void isQueenSurronded_falseAfterMove() {
+        Board board = new Board(p1, p2);
+        board.addToken(p1.getFromSupply(BugType.QUEEN_BEE), 0, 0);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, -1);
+        board.addToken(p2.getFromSupply(BugType.BEETLE), 1, -1);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0);
+        board.addToken(p2.getFromSupply(BugType.GRASSHOPPER), 0, 1);
+        board.addToken(p2.getFromSupply(BugType.SPIDER), -1, 1);
+        board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), -1, 0);
+
+        board.moveToken(-1, 0, -1, -1);
+        assertFalse(Rules.getInstance().isQueenSurrounded(p1, board));
+    }
 
 }

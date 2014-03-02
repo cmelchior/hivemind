@@ -58,7 +58,6 @@ public class UCTMonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAI {
             simulationsMade++;
         }
 
-//        System.out.println("Simulations played: " + simulationsMade);
         return max(root);
     }
 
@@ -167,11 +166,11 @@ public class UCTMonteCarloTreeSearchAI extends AbstractMonteCarloTreeSearchAI {
     private int evaluate(Game state) {
         int result = evaluationFunction.calculateBoardValue(state);
 
-        if (result == Integer.MIN_VALUE || result == Integer.MAX_VALUE) {
+        if (result == HiveAI.MIN || result == HiveAI.MAX) {
             if (startPlayer.isWhitePlayer()) {
-                return (result == Integer.MAX_VALUE ? 1 : -1);
+                return (result == HiveAI.MAX ? 1 : -1);
             } else {
-                return (result == Integer.MIN_VALUE ? 1 : -1);
+                return (result == HiveAI.MIN ? 1 : -1);
             }
         } else {
             return 0; // Any intermediate results are a "draw"
