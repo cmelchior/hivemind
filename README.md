@@ -99,7 +99,7 @@ Then run the sorting to extract games and put them in the correct folders:
 Then modify *MainParseGames.java* for your needs. No Jar + commandline interface currently exists, so you have to
 edit the java file manually. When done, run the following command:
 
-    $ > gradle run
+    $ > ./gradlew run
 
 All results are saved in the */results* folder. To generate graphs after the analysis. Run the following:
 
