@@ -1,15 +1,13 @@
 plugins {
-    java
+    kotlin("jvm") version "2.4.20"
     application
 }
 
 group = "dk.ilios.hivemind"
 version = "1.0-SNAPSHOT"
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+kotlin {
+    jvmToolchain(21)
 }
 
 application {

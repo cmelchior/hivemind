@@ -3,7 +3,7 @@ HIVEMIND v.0.1
 
 Document is Work-in-Progres!
 
-HiveMind is a Java based stand-alone AI implementation for the board game Hive by John Yianni.
+HiveMind is a Kotlin 2.4.20 stand-alone AI implementation for the board game Hive by John Yianni, targeting Java 21.
 
 HiveMind currently consists of 3 seperate modules:
 
@@ -96,8 +96,8 @@ Then run the sorting to extract games and put them in the correct folders:
 
     $ ./tools > bash sort_hivegames.sh
 
-Then modify *MainParseGames.java* for your needs. No Jar + commandline interface currently exists, so you have to
-edit the java file manually. When done, run the following command:
+Then modify *MainParseGames.kt* for your needs. No Jar + commandline interface currently exists, so you have to
+edit the Kotlin file manually. When done, run the following command:
 
     $ > ./gradlew run
 
