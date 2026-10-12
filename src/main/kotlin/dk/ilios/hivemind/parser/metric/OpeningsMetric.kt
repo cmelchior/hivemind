@@ -2,14 +2,14 @@ package dk.ilios.hivemind.parser.metric
 
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 
 /**
  * Analyzes openings, ie. the first 4 moves for White player
  */
 class OpeningsMetric : Metric() {
-    private val whiteResults: MutableMap<String?, Result> = HashMap<String?, Result>()
-    private val blackResults: MutableMap<String?, Result> = HashMap<String?, Result>()
+    private val whiteResults: MutableMap<String, Result> = hashMapOf<String, Result>()
+    private val blackResults: MutableMap<String, Result> = hashMapOf<String, Result>()
     private var whiteTotal = 0
     private var blackTotal = 0
 
@@ -19,12 +19,12 @@ class OpeningsMetric : Metric() {
     }
 
     private fun analyzeBlack(type: BoardspaceGameType, variant: String, game: Game) {
-        if (game.getBlackPlayer().moves < 4) return
+        if (game.blackPlayer.moves < 4) return
         val sb = StringBuilder()
 
         // Collect first 4 moves from white
         for (i in 1..4) {
-            val command = game.getMove(game.getBlackPlayer(), i)
+            val command = game.getMove(game.blackPlayer, i)
             if (i > 1) {
                 sb.append("-")
             }
@@ -37,23 +37,23 @@ class OpeningsMetric : Metric() {
 
         val opening = sb.toString()
         if (!blackResults.containsKey(opening)) {
-            blackResults.put(opening, Result(opening, 1))
+            blackResults[opening] = Result(opening, 1)
         } else {
-            val r: Result = blackResults.get(opening)!!
+            val r: Result = blackResults[opening]!!
             r.count += 1
-            blackResults.put(opening, r)
+            blackResults[opening] = r
         }
 
         blackTotal++
     }
 
     private fun analyzeWhite(type: BoardspaceGameType, variant: String, game: Game) {
-        if (game.getWhitePlayer().moves < 4) return
+        if (game.whitePlayer.moves < 4) return
         val sb = StringBuilder()
 
         // Collect first 4 moves from white
         for (i in 1..4) {
-            val command = game.getMove(game.getWhitePlayer(), i)
+            val command = game.getMove(game.whitePlayer, i)
             if (i > 1) {
                 sb.append("-")
             }
@@ -66,11 +66,11 @@ class OpeningsMetric : Metric() {
 
         val opening = sb.toString()
         if (!whiteResults.containsKey(opening)) {
-            whiteResults.put(opening, Result(opening, 1))
+            whiteResults[opening] = Result(opening, 1)
         } else {
-            val r: Result = whiteResults.get(opening)!!
+            val r: Result = whiteResults[opening]!!
             r.count += 1
-            whiteResults.put(opening, r)
+            whiteResults[opening] = r
         }
 
         whiteTotal++
@@ -81,16 +81,15 @@ class OpeningsMetric : Metric() {
         save(BLACK_FILE_NAME, blackResults, blackTotal)
     }
 
-    private fun save(fileName: String?, results: MutableMap<String?, Result>, total: Int) {
-        val file = Array<Array<String?>>(results.size + 2) { arrayOfNulls<String>(3) }
+    private fun save(fileName: String?, results: Map<String, Result>, total: Int) {
+        val file = Array(results.size + 2) { arrayOfNulls<String>(3) }
         file[0] = arrayOf<String?>("Opening", "Count", "%")
 
-        val keys = ArrayList<Result?>(results.values).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.values.sorted()
 
         var row = 1
         for (i in keys.indices.reversed()) {
-            val r = keys[i] as Result
+            val r = keys[i]
             file[row][0] = r.key
             file[row][1] = r.count.toString()
             file[row][2] = (r.count * 100 / total.toFloat()).toString()

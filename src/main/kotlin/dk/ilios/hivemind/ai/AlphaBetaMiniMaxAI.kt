@@ -4,7 +4,7 @@ import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameCommand
 import dk.ilios.hivemind.model.Board
-import java.util.*
+import kotlin.random.Random
 
 /**
  * AI that implements Minimax tree search algorithm with Alpha-Beta prunning.
@@ -12,11 +12,9 @@ import java.util.*
  */
 class AlphaBetaMiniMaxAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, maxTimeInMillis: Int) :
     AbstractMinMaxAI(name, heuristicFunction, depth, maxTimeInMillis) {
-    private val random = Random()
+    private val random = Random.Default
 
-    override fun copy(): HiveAI {
-        return AlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
-    }
+    override fun copy(): HiveAI = AlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
 
     override fun nextMove(state: Game, board: Board): GameCommand {
         maximizingPlayer = state.requireActivePlayer()

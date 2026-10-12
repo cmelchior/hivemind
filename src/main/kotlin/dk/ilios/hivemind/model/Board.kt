@@ -1,7 +1,7 @@
 package dk.ilios.hivemind.model
 
 import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter
-import java.util.*
+import kotlin.random.Random
 import kotlin.math.abs
 
 /**
@@ -67,9 +67,9 @@ import kotlin.math.abs
 class Board(white: Player, black: Player) {
     private val printer = HiveAsciiPrettyPrinter()
 
-    private val hexes: MutableMap<String?, Hex> =
-        HashMap<String?, Hex>() // Key := (q,r), Value: hex. List of hexes visited in the game
-    private val tokens: MutableSet<Token> = HashSet<Token>()
+    private val hexes: MutableMap<String, Hex> =
+        hashMapOf<String, Hex>() // Key := (q,r), Value: hex. List of hexes visited in the game
+    private val tokens: MutableSet<Token> = hashSetOf<Token>()
     private val neighbors: Array<IntArray> = arrayOf(
         intArrayOf(0, -1),
         intArrayOf(+1, -1),
@@ -113,7 +113,7 @@ class Board(white: Player, black: Player) {
     }
 
     private fun loadZobristHashes() {
-        val random = Random()
+        val random = Random.Default
 
         // Create the zobrist hashes needed for all edges
         // Is it possible to convert this to a recursive call?
@@ -168,9 +168,7 @@ class Board(white: Player, black: Player) {
         }
     }
 
-    private fun bothQueensPlaced(): Boolean {
-        return !whitePlayer.queen!!.inSupply() && !blackPlayer.queen!!.inSupply()
-    }
+    private fun bothQueensPlaced(): Boolean = !whitePlayer.queen!!.inSupply() && !blackPlayer.queen!!.inSupply()
 
     // INVARIANT: All tokens are placed in a legal position
     private fun maintainSPForOpenings(token: Token): Boolean {
@@ -302,9 +300,7 @@ class Board(white: Player, black: Player) {
         }
     }
 
-    fun getSPCoordinatesFor(hex: Hex): IntArray {
-        return getSPCoordinatesFor(hex.q, hex.r)
-    }
+    fun getSPCoordinatesFor(hex: Hex): IntArray = getSPCoordinatesFor(hex.q, hex.r)
 
     fun getSPCoordinatesFor(q: Int, r: Int): IntArray {
         var cubeCoords = HexagonUtils.convertToCubeCoordinates(q - spOrigin[0], r - spOrigin[1])
@@ -370,7 +366,7 @@ class Board(white: Player, black: Player) {
      * @param mode
      */
     fun setStandardPositionMode(mode: StandardPositionMode?) {
-        check(!(tokens.size > 0 && mode != StandardPositionMode.DISABLED)) { "Cannot enable Standard Position for non-empty board" }
+        check(!(tokens.isNotEmpty() && mode != StandardPositionMode.DISABLED)) { "Cannot enable Standard Position for non-empty board" }
         this.standardPosition = mode
         if (mode != StandardPositionMode.DISABLED) {
             loadZobristHashes()
@@ -405,9 +401,7 @@ class Board(white: Player, black: Player) {
             zobristKey xor zobristHashes[coords[0] + 25][coords[1] + 25][tokenHex.height - 1][getColorIndex(token.player)][typeIndex]
     }
 
-    private fun getColorIndex(player: Player): Int {
-        return if (player.isWhitePlayer) 0 else 1
-    }
+    private fun getColorIndex(player: Player): Int = if (player.isWhitePlayer) 0 else 1
 
     /**
      * Removes a token from the board and puts in back into the players supply.
@@ -427,7 +421,7 @@ class Board(white: Player, black: Player) {
             firstTokens[tokens.size] = null
         }
 
-        if (tokens.size == 0) {
+        if (tokens.isEmpty()) {
             spOrigin[0] = 0
             spOrigin[1] = 0
         }
@@ -467,21 +461,9 @@ class Board(white: Player, black: Player) {
         maintainStandardPosition(token)
     }
 
-    val filledHexes: MutableList<Hex>
-        /**
-         * Returns a list of all hexes with 1 or more creatures
-         */
-        get() {
-            val result =
-                ArrayList<Hex>()
-            for (hex in hexes.values) {
-                if (!hex.isEmpty) {
-                    result.add(hex)
-                }
-            }
-
-            return result
-        }
+    /** Returns all hexes containing one or more tokens. */
+    val filledHexes: List<Hex>
+        get() = hexes.values.filterNot { it.isEmpty }
 
     /**
      * Returns the hex for the given position or create a new if it doesn't exists
@@ -494,19 +476,17 @@ class Board(white: Player, black: Player) {
 
         // Create new hex if needed
         hex = Hex(q, r)
-        hexes.put(getKey(q, r), hex)
+        hexes[getKey(q, r)] = hex
         return hex
     }
 
-    private fun getKey(q: Int, r: Int): String {
-        return "" + q + r
-    }
+    private fun getKey(q: Int, r: Int): String = "" + q + r
 
     /**
      * Returns the hex for the given position or null it no creatures reside there.
      */
     fun findHex(q: Int, r: Int): Hex? {
-        val hex = hexes.get(getKey(q, r))
+        val hex = hexes[getKey(q, r)]
         if (hex == null) {
             return null
         } else {
@@ -653,40 +633,24 @@ class Board(white: Player, black: Player) {
     /**
      * Returns a list of neighbor tokens
      */
-    fun getNeighborTokens(centerHex: Hex?): MutableList<Token> {
-        if (centerHex == null) return mutableListOf<Token>()
-
-        val result: MutableList<Token> = ArrayList<Token>()
-        for (i in neighbors.indices) {
-            val coordAdjustment = neighbors[i]
-            val q = centerHex.q + coordAdjustment[0]
-            val r = centerHex.r + coordAdjustment[1]
-            val hex = findHex(q, r)
-            hex?.topToken?.let { result.add(it) }
+    fun getNeighborTokens(centerHex: Hex?): List<Token> {
+        if (centerHex == null) return emptyList()
+        return neighbors.mapNotNull { offset ->
+            findHex(centerHex.q + offset[0], centerHex.r + offset[1])?.topToken
         }
-
-        return result
     }
 
     /**
      * Returns a list of neighbor hexes from top and clockwise round.
      */
-    fun getNeighborHexes(hex: Hex?): MutableList<Hex> {
-        if (hex == null) return mutableListOf<Hex>()
-        val result: MutableList<Hex> = ArrayList<Hex>()
-        for (i in neighbors.indices) {
-            val coordAdjustment = neighbors[i]
-            val q = hex.q + coordAdjustment[0]
-            val r = hex.r + coordAdjustment[1]
-            result.add(findOrCreateHex(q, r))
+    fun getNeighborHexes(hex: Hex?): List<Hex> {
+        if (hex == null) return emptyList()
+        return neighbors.map { offset ->
+            findOrCreateHex(hex.q + offset[0], hex.r + offset[1])
         }
-
-        return result
     }
 
-    fun getHex(q: Int, r: Int): Hex {
-        return findOrCreateHex(q, r)
-    }
+    fun getHex(q: Int, r: Int): Hex = findOrCreateHex(q, r)
 
     /**
      * Return the hex that is the clockwise neighbor of the target hex when looking from the starting hex.
@@ -737,16 +701,8 @@ class Board(white: Player, black: Player) {
     /**
      * Get list of empty hexes around a hex.
      */
-    fun getEmptyNeighborHexes(token: Token): MutableList<Hex> {
-        val result: MutableList<Hex> = ArrayList<Hex>()
-        for (hex in getNeighborHexes(token.hex)) {
-            if (hex.isEmpty) {
-                result.add(hex)
-            }
-        }
-
-        return result
-    }
+    fun getEmptyNeighborHexes(token: Token): List<Hex> =
+        getNeighborHexes(token.hex).filter { it.isEmpty }
 
     fun clear() {
         hexes.clear()

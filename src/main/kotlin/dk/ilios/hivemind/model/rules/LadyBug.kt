@@ -11,13 +11,11 @@ class LadyBug : Bug() {
         return true
     }
 
-    override fun getTargetHexes(token: Token, board: Board): MutableList<Hex> {
+    override fun getTargetHexes(token: Token, board: Board): List<Hex> {
         // Recursively find all squares you can slide to. Only squares at distance 3 count
-        val visitedHexes = ArrayList<Hex>()
-        visitedHexes.add(checkNotNull(token.hex))
-        val result = recursiveVisit(token, 1, board, HashSet<Hex>())
+        val result = recursiveVisit(token, 1, board, hashSetOf<Hex>())
         result.remove(token.hex) // Remove starting hex
-        return ArrayList<Hex>(result)
+        return result.toList()
     }
 
     private fun recursiveVisit(
@@ -75,11 +73,7 @@ class LadyBug : Bug() {
         return targetHexes
     }
 
-    override fun canMimic(): Boolean {
-        return false
-    }
+    override fun canMimic(): Boolean = false
 
-    override fun canMoveOthers(): Boolean {
-        return false
-    }
+    override fun canMoveOthers(): Boolean = false
 }

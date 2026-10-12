@@ -6,7 +6,7 @@ import dk.ilios.hivemind.ai.transpositiontable.TranspositionTableEntry
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameCommand
 import dk.ilios.hivemind.model.Board
-import java.util.*
+import kotlin.random.Random
 
 /**
  * AI that implements Minimax tree search algorithm with Alpha-Beta prunning and Iterative Deepening Depth-First Search.
@@ -31,12 +31,11 @@ class TranspostionTableIDDFSAlphaBetaMiniMaxAI(
     depth: Int,
     maxTimeInMillis: Int
 ) : AbstractMinMaxAI(name, heuristicFunction, depth, maxTimeInMillis) {
-    private val random = Random()
+    private val random = Random.Default
     private val table = TranspositionTable()
 
-    override fun copy(): HiveAI {
-        return TranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
-    }
+    override fun copy(): HiveAI =
+        TranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
 
     override fun nextMove(state: Game, board: Board): GameCommand? {
         start = System.currentTimeMillis()
@@ -175,7 +174,5 @@ class TranspostionTableIDDFSAlphaBetaMiniMaxAI(
         return value
     }
 
-    override fun maintainsStandardPosition(): Boolean {
-        return true
-    }
+    override fun maintainsStandardPosition(): Boolean = true
 }

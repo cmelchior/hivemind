@@ -3,16 +3,14 @@ package dk.ilios.hivemind.parser.metric
 import dk.ilios.hivemind.debug.HiveAsciiPrettyPrinter
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
 import java.io.IOException
 
 /**
  * Interface for gathering 1 metric about the game
  */
 abstract class Metric {
-    protected var printer: HiveAsciiPrettyPrinter = HiveAsciiPrettyPrinter()
+    protected val printer = HiveAsciiPrettyPrinter()
 
     /**
      * Analyse game for given metric
@@ -24,9 +22,7 @@ abstract class Metric {
      */
     abstract fun save()
 
-    protected fun getKey(type: BoardspaceGameType, variant: String): String {
-        return type.prefix + "-" + variant
-    }
+    protected fun getKey(type: BoardspaceGameType, variant: String): String = type.prefix + "-" + variant
 
 
     /**
@@ -34,23 +30,10 @@ abstract class Metric {
      *
      * @param file  String[y][x]
      */
-    protected fun matrixToString(file: Array<Array<String?>>): String {
-        val sb = StringBuilder()
-        for (i in file.indices) {
-            val line: Array<String?> = file[i]
-            for (j in line.indices) {
-                sb.append(file[i][j])
-                if (j < line.size - 1) sb.append('\t')
-            }
-            if (i < file.size - 1) sb.append('\n')
-        }
+    protected fun matrixToString(file: Array<Array<String?>>): String =
+        file.joinToString("\n") { row -> row.joinToString("\t") }
 
-        return sb.toString()
-    }
-
-    protected fun ensureSize(list: ArrayList<Int?>, size: Int) {
-        // Prevent excessive copying while we're adding
-        list.ensureCapacity(size)
+    protected fun ensureSize(list: MutableList<Int>, size: Int) {
         while (list.size < size) {
             list.add(0)
         }
@@ -59,11 +42,9 @@ abstract class Metric {
     protected fun saveStringToDisc(fileName: String?, content: String) {
         try {
             val file = File("results/" + fileName)
-            println(file.getAbsolutePath())
+            println(file.absolutePath)
             println(content)
-            val output = BufferedWriter(FileWriter(file))
-            output.write(content)
-            output.close()
+            file.bufferedWriter().use { it.write(content) }
         } catch (e: IOException) {
             e.printStackTrace()
         }

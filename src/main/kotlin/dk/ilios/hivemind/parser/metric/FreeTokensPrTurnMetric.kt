@@ -27,14 +27,14 @@ class FreeTokensPrTurnMetric(winnerTurns: Int) : Metric() {
         val status = game.status
         var p: Player? = null
         var data: Array<IntArray?>? = null
-        if (status == GameStatus.RESULT_BLACK_WINS && game.getBlackPlayer().turns == gamesWithWinnerTurns) {
+        if (status == GameStatus.RESULT_BLACK_WINS && game.blackPlayer.turns == gamesWithWinnerTurns) {
             data = blackData
-            p = game.getBlackPlayer()
+            p = game.blackPlayer
             game.setReplayMode(true)
             game.forward()
-        } else if (status == GameStatus.RESULT_WHITE_WINS && game.getWhitePlayer().turns == gamesWithWinnerTurns) {
+        } else if (status == GameStatus.RESULT_WHITE_WINS && game.whitePlayer.turns == gamesWithWinnerTurns) {
             data = whiteData
-            p = game.getWhitePlayer()
+            p = game.whitePlayer
             game.setReplayMode(true)
         } else {
             return
@@ -42,9 +42,9 @@ class FreeTokensPrTurnMetric(winnerTurns: Int) : Metric() {
 
         for (i in 0..<gamesWithWinnerTurns) {
             val winnerFreeTokens: Int =
-                Rules.instance.getFreeTokens(game.requireActivePlayer(), game.getBoard()).size
+                Rules.instance.getFreeTokens(game.requireActivePlayer(), game.board).size
             val looserFreeTokens: Int =
-                Rules.instance.getFreeTokens(game.otherPlayer, game.getBoard()).size
+                Rules.instance.getFreeTokens(game.otherPlayer, game.board).size
             val diff = winnerFreeTokens - looserFreeTokens
             data[i]!![diff + 14] = data[i]!![diff + 14] + 1
 
@@ -74,7 +74,7 @@ class FreeTokensPrTurnMetric(winnerTurns: Int) : Metric() {
         }
 
         val file: Array<Array<String?>>? =
-            Array<Array<String?>>(data.size + 1) { arrayOfNulls<String>(rightBound - leftBound + 2) }
+            Array(data.size + 1) { arrayOfNulls<String>(rightBound - leftBound + 2) }
 
         // Labels
         file!![0][0] = "Turns"

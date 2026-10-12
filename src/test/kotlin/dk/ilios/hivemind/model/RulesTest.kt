@@ -209,9 +209,9 @@ class RulesTest {
         board.addToken(mos1, 0, 0)
         board.addToken(bee, 1, 0)
 
-        val result: MutableList<Token> = Rules.instance.getMimicList(mos1, board)
+        val result: List<Token> = Rules.instance.getMimicList(mos1, board)
         Assert.assertEquals(1, result.size.toLong())
-        Assert.assertEquals(bee, result.get(0))
+        Assert.assertEquals(bee, result[0])
     }
 
     @Test
@@ -224,7 +224,7 @@ class RulesTest {
         val mos1 = p1.getFromSupply(BugType.MOSQUITO)
         board.addToken(mos1, 0, 0)
 
-        val result: MutableList<Token> = Rules.instance.getMimicList(mos1, board)
+        val result: List<Token> = Rules.instance.getMimicList(mos1, board)
         Assert.assertEquals(0, result.size.toLong())
     }
 

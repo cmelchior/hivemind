@@ -5,19 +5,13 @@ import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.Token
 
 class Mosquito : Bug() {
-    override fun isFreeToMove(token: Token, board: Board): Boolean {
-        return false // A mosquito never moves except by mimicing other bugs.
-    }
+    override fun isFreeToMove(token: Token, board: Board): Boolean =
+        false // A mosquito never moves except by mimicing other bugs.
 
-    override fun getTargetHexes(token: Token, board: Board): MutableList<Hex> {
-        return mutableListOf<Hex>() // A mosquito can only move my mimicing other bugs.
-    }
+    override fun getTargetHexes(token: Token, board: Board): List<Hex> =
+        emptyList() // A mosquito can only move my mimicing other bugs.
 
-    override fun canMimic(): Boolean {
-        return true
-    }
+    override fun canMimic(): Boolean = true
 
-    override fun canMoveOthers(): Boolean {
-        return false
-    }
+    override fun canMoveOthers(): Boolean = false
 }

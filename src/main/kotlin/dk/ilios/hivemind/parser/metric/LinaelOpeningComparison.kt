@@ -5,19 +5,19 @@ import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.StandardPositionMode
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 
 /**
  * Compare all opening variants when looking at the first 3 tokens for both sides. No moves are allowed.
  */
 class LinaelOpeningComparison : Metric() {
-    private val allResults = HashMap<String?, Result>()
-    private val whiteResults = HashMap<String?, Result>()
-    private val blackResults = HashMap<String?, Result>()
+    private val allResults = hashMapOf<String, Result>()
+    private val whiteResults = hashMapOf<String, Result>()
+    private val blackResults = hashMapOf<String, Result>()
     private var totalGames = 0
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
-        if (game.getWhitePlayer().turns < 3 || game.getBlackPlayer()
+        if (game.whitePlayer.turns < 3 || game.blackPlayer
                 .turns < 3
         ) return  // Both players must have had 3 turns
 
@@ -32,7 +32,7 @@ class LinaelOpeningComparison : Metric() {
             val gc = game.forward()
             if (gc.fromQ != Hex.SUPPLY) return  // We only care about games where players put tokens on the board for the first 3 turns.
 
-            val spCoords = game.getBoard().getSPCoordinatesFor(gc.toQ, gc.toR)
+            val spCoords = game.board.getSPCoordinatesFor(gc.toQ, gc.toR)
             hexes[i] = Hex(spCoords[0], spCoords[1])
             if (gc.token!!.player.isWhitePlayer) {
                 whiteHexes[i / 2] = Hex(spCoords[0], spCoords[1])
@@ -52,14 +52,14 @@ class LinaelOpeningComparison : Metric() {
         totalGames++
     }
 
-    private fun saveResults(key: String?, status: GameStatus, results: HashMap<String?, Result>, game: Game) {
-        var result = results.get(key)
+    private fun saveResults(key: String, status: GameStatus, results: MutableMap<String, Result>, game: Game) {
+        var result = results[key]
         if (result == null) {
-            val example = printer.toString(game.getBoard())
+            val example = printer.toString(game.board)
             println((results.size + 1).toString() + ". " + key)
             println(example)
             result = Result(example)
-            results.put(key, result)
+            results[key] = result
         }
 
         when (status) {
@@ -72,7 +72,7 @@ class LinaelOpeningComparison : Metric() {
 
 
     private fun createKey(hexes: Array<Hex>): String {
-        Arrays.sort(hexes)
+        hexes.sort()
         val key = StringBuilder()
         for (hex in hexes) {
             key.append('(')
@@ -90,7 +90,7 @@ class LinaelOpeningComparison : Metric() {
         save(FILE_NAME_BLACK, blackResults)
     }
 
-    private fun save(fileName: String?, results: HashMap<String?, Result>) {
+    private fun save(fileName: String?, results: Map<String, Result>) {
         val sb = StringBuilder()
         sb.append("Total games: " + totalGames + "\n")
         sb.append("WhiteWin\tBlackWin\tDraw\tOther\tTotal\n")

@@ -25,8 +25,8 @@ import kotlin.math.abs
  *
  */
 class BoardBackup {
-    var hexes: MutableMap<String?, Hex> =
-        HashMap<String?, Hex>() // Key := (q,r), Value: hex. List of hexes visited in the game
+    private val hexes: MutableMap<String, Hex> =
+        hashMapOf<String, Hex>() // Key := (q,r), Value: hex. List of hexes visited in the game
     var neighbors: Array<IntArray> = arrayOf(
         intArrayOf(0, -1),
         intArrayOf(+1, -1),
@@ -97,21 +97,9 @@ class BoardBackup {
         token.hex = toHex
     }
 
-    val filledHexes: MutableList<Hex>
-        /**
-         * Returns a list of all hexes with 1 or more creatures
-         */
-        get() {
-            val result =
-                ArrayList<Hex>()
-            for (hex in hexes.values) {
-                if (!hex.isEmpty) {
-                    result.add(hex)
-                }
-            }
-
-            return result
-        }
+    /** Returns all hexes containing one or more tokens. */
+    val filledHexes: List<Hex>
+        get() = hexes.values.filterNot { it.isEmpty }
 
     /**
      * Returns the hex for the given position or create a new if it doesn't exists
@@ -124,19 +112,17 @@ class BoardBackup {
 
         // Create new hex if needed
         hex = Hex(q, r)
-        hexes.put(getKey(q, r), hex)
+        hexes[getKey(q, r)] = hex
         return hex
     }
 
-    private fun getKey(q: Int, r: Int): String {
-        return "" + q + r
-    }
+    private fun getKey(q: Int, r: Int): String = "" + q + r
 
     /**
      * Returns the hex for the given position or null it no creatures reside there.
      */
     fun findHex(q: Int, r: Int): Hex? {
-        val hex = hexes.get(getKey(q, r))
+        val hex = hexes[getKey(q, r)]
         if (hex == null) {
             return null
         } else {
@@ -283,40 +269,24 @@ class BoardBackup {
     /**
      * Returns a list of neighbor tokens
      */
-    fun getNeighborTokens(centerHex: Hex?): MutableList<Token> {
-        if (centerHex == null) return mutableListOf<Token>()
-
-        val result: MutableList<Token> = ArrayList<Token>()
-        for (i in neighbors.indices) {
-            val coordAdjustment = neighbors[i]
-            val q = centerHex.q + coordAdjustment[0]
-            val r = centerHex.r + coordAdjustment[1]
-            val hex = findHex(q, r)
-            hex?.topToken?.let { result.add(it) }
+    fun getNeighborTokens(centerHex: Hex?): List<Token> {
+        if (centerHex == null) return emptyList()
+        return neighbors.mapNotNull { offset ->
+            findHex(centerHex.q + offset[0], centerHex.r + offset[1])?.topToken
         }
-
-        return result
     }
 
     /**
      * Returns a list of neighbor hexes from top and clockwise round.
      */
-    fun getNeighborHexes(hex: Hex?): MutableList<Hex> {
-        if (hex == null) return mutableListOf<Hex>()
-        val result: MutableList<Hex> = ArrayList<Hex>()
-        for (i in neighbors.indices) {
-            val coordAdjustment = neighbors[i]
-            val q = hex.q + coordAdjustment[0]
-            val r = hex.r + coordAdjustment[1]
-            result.add(findOrCreateHex(q, r))
+    fun getNeighborHexes(hex: Hex?): List<Hex> {
+        if (hex == null) return emptyList()
+        return neighbors.map { offset ->
+            findOrCreateHex(hex.q + offset[0], hex.r + offset[1])
         }
-
-        return result
     }
 
-    fun getHex(q: Int, r: Int): Hex {
-        return findOrCreateHex(q, r)
-    }
+    fun getHex(q: Int, r: Int): Hex = findOrCreateHex(q, r)
 
     /**
      * Return the hex that is the clockwise neighbor of the target hex when looking from the starting hex.
@@ -367,16 +337,8 @@ class BoardBackup {
     /**
      * Get list of empty hexes around a hex.
      */
-    fun getEmptyNeighborHexes(token: Token): MutableList<Hex> {
-        val result: MutableList<Hex> = ArrayList<Hex>()
-        for (hex in getNeighborHexes(token.hex)) {
-            if (hex.isEmpty) {
-                result.add(hex)
-            }
-        }
-
-        return result
-    }
+    fun getEmptyNeighborHexes(token: Token): List<Hex> =
+        getNeighborHexes(token.hex).filter { it.isEmpty }
 
     fun clear() {
         hexes.clear()
@@ -393,7 +355,5 @@ class BoardBackup {
      * Having zobrist keys that z(b) = z(rotate(b)) or z(b) = z(shift(b)) would however be an interesting optimization.
      *
      */
-    fun getZobristKey(): Int {
-        return hashCode()
-    }
+    fun getZobristKey(): Int = hashCode()
 }

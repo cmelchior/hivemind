@@ -41,7 +41,7 @@ class MosquitoTest {
         board.addToken(mos1, 0, 0)
         board.addToken(mos2, 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(mos1, board))
+        val targets = Rules.instance.getTargetHexes(mos1, board)
         Assert.assertEquals(0, targets.size.toLong())
     }
 
@@ -58,7 +58,7 @@ class MosquitoTest {
         board.addToken(mos1, 0, 0)
         board.addToken(bee, 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(mos1, board))
+        val targets = Rules.instance.getTargetHexes(mos1, board)
         Assert.assertEquals(2, targets.size.toLong())
         Assert.assertTrue(targets.contains(board.getHex(1, -1)))
         Assert.assertTrue(targets.contains(board.getHex(0, 1)))

@@ -6,14 +6,11 @@ import dk.ilios.hivemind.game.GameCommand
 import dk.ilios.hivemind.model.Player
 import dk.ilios.hivemind.model.Player.PlayerType
 import dk.ilios.hivemind.model.StandardPositionMode
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 
 /**
  * Parser for games played at boardgames.net
@@ -21,7 +18,7 @@ import java.util.regex.Pattern
 class BoardspaceGameParser(game: File) {
     private val gameFile: File // Reference to game file
     private var gameFileContent: String? = null // Game file loaded as a string with new lines removed
-    private var gameType: String? = null // String describing the game: "hive", "hive-mlp", "hive-p" etc.
+    private var parsedGameType: String? = null // String describing the game: "hive", "hive-mlp", "hive-p" etc.
     private var game: Game? = null // Reference to actual game object
 
     private var player1: String? = null
@@ -53,62 +50,61 @@ class BoardspaceGameParser(game: File) {
     @Throws(IOException::class)
     private fun loadGameData() {
         val sb = StringBuilder()
-        val br = BufferedReader(FileReader(gameFile))
-        var line: String?
-        while ((br.readLine().also { line = it }) != null) {
-            sb.append(line) // Remove linebreaks, so we later can match moved tokens properly (identified by dropb -> done)
+        gameFile.useLines { lines ->
+            for (line in lines) {
+                sb.append(line) // Remove linebreaks, so we later can match moved tokens properly (identified by dropb -> done)
 
-            // Game type
-            if (line!!.startsWith("SU[")) {
-                gameType = line.substring(3, line.length - 1)
-                continue
-            }
+                // Game type
+                if (line.startsWith("SU[")) {
+                    parsedGameType = line.substring(3, line.length - 1)
+                    continue
+                }
 
-            // Player 1 (white) name
-            if (line.startsWith("P0[id")) {
-                player1 = line.substring(7, line.length - 2)
-                continue
-            }
+                // Player 1 (white) name
+                if (line.startsWith("P0[id")) {
+                    player1 = line.substring(7, line.length - 2)
+                    continue
+                }
 
-            // Player 2 (black) name
-            if (line.startsWith("P1[id")) {
-                player2 = line.substring(7, line.length - 2)
-                continue
-            }
+                // Player 2 (black) name
+                if (line.startsWith("P1[id")) {
+                    player2 = line.substring(7, line.length - 2)
+                    continue
+                }
 
-            // Player 1 game time
-            if (line.startsWith("P0[time")) {
-                player1GameTime = parseTime(line.substring(8, line.length - 2))
-                continue
-            }
+                // Player 1 game time
+                if (line.startsWith("P0[time")) {
+                    player1GameTime = parseTime(line.substring(8, line.length - 2))
+                    continue
+                }
 
-            // Player 2 game time
-            if (line.startsWith("P1[time")) {
-                player2GameTime = parseTime(line.substring(8, line.length - 2))
-                continue
-            }
+                // Player 2 game time
+                if (line.startsWith("P1[time")) {
+                    player2GameTime = parseTime(line.substring(8, line.length - 2))
+                    continue
+                }
 
-            // Player 1 ranking
-            if (line.startsWith("P0[ranking")) {
-                player1Ranking = line.substring(11, line.length - 2).toInt()
-                continue
-            }
+                // Player 1 ranking
+                if (line.startsWith("P0[ranking")) {
+                    player1Ranking = line.substring(11, line.length - 2).toInt()
+                    continue
+                }
 
-            // Player 2 ranking
-            if (line.startsWith("P1[ranking")) {
-                player2Ranking = line.substring(11, line.length - 2).toInt()
-                continue
+                // Player 2 ranking
+                if (line.startsWith("P1[ranking")) {
+                    player2Ranking = line.substring(11, line.length - 2).toInt()
+                    continue
+                }
             }
         }
-        br.close()
 
         // Verify that data is loaded
-        require(!(player1 == null || player2 == null || player1GameTime == -1L || player2GameTime == -1L || gameType == null)) { "Game could not be parsed properly: " + gameFile.getAbsolutePath() }
+        require(!(player1 == null || player2 == null || player1GameTime == -1L || player2GameTime == -1L || parsedGameType == null)) { "Game could not be parsed properly: " + gameFile.absolutePath }
 
         gameFileContent = sb.toString()
 
         game = Game()
-        game!!.name = gameFile.getName()
+        game!!.name = gameFile.name
 
         // Setup players
         val white = Player(player1, PlayerType.WHITE)
@@ -121,23 +117,23 @@ class BoardspaceGameParser(game: File) {
         white.fillBaseSupply()
         black.fillBaseSupply()
 
-        if (gameType!!.contains("m")) {
+        if (parsedGameType!!.contains("m")) {
             white.useMosquitoExpansion()
             black.useMosquitoExpansion()
         }
 
-        if (gameType!!.contains("l")) {
+        if (parsedGameType!!.contains("l")) {
             white.useLadyBugExpansion()
             black.useLadyBugExpansion()
         }
 
-        if (gameType!!.contains("p")) {
+        if (parsedGameType!!.contains("p")) {
             white.usePillBugExpansion()
             black.usePillBugExpansion()
         }
 
         game!!.addPlayers(white, black)
-        game!!.getBoard().setStandardPositionMode(StandardPositionMode.ENABLED)
+        game!!.board.setStandardPositionMode(StandardPositionMode.ENABLED)
         game!!.setManualStepping(true)
         game!!.setPrintGameStateAfterEachMove(DEBUG)
         game!!.start()
@@ -149,10 +145,10 @@ class BoardspaceGameParser(game: File) {
             str = "0" + str
         }
 
-        val parts: Array<String?> = str.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val hours = parts[0]!!.toInt() * 60 * 60 * 1000
-        val minutes = parts[1]!!.toInt() * 60 * 1000
-        val seconds = parts[2]!!.toInt() * 1000
+        val parts = str.split(":").dropLastWhile { it.isEmpty() }
+        val hours = parts[0].toInt() * 60 * 60 * 1000
+        val minutes = parts[1].toInt() * 60 * 1000
+        val seconds = parts[2].toInt() * 1000
 
         return (hours + minutes + seconds).toLong()
     }
@@ -182,15 +178,13 @@ class BoardspaceGameParser(game: File) {
         //               ; P0[86 pmove B M1 O 10 bM1-]  // Pillbug moves
         //               ; P0[31 move W P O 11 wQ-]     // Apparently pillbug doesn't have a number?!?
         val p =
-            Pattern.compile("P(.)\\[\\d+ (p?(dropb|move)) (. )?(.{1,3}) [A-Z] \\d+ ([^\\]]*)\\]; P.\\[.{1,3} done\\]")
-        val m = p.matcher(gameFileContent)
-
-        while (m.find()) {
-            val player = m.group(1).toInt()
-            val command = m.group(2).lowercase(Locale.getDefault())
-            var color = if (m.group(4) != null) m.group(4).trim { it <= ' ' }.lowercase(Locale.getDefault()) else null
-            var token = m.group(5).lowercase(Locale.getDefault())
-            val position = m.group(6).lowercase(Locale.getDefault())
+            Regex("P(.)\\[\\d+ (p?(dropb|move)) (. )?(.{1,3}) [A-Z] \\d+ ([^\\]]*)\\]; P.\\[.{1,3} done\\]")
+        for (m in p.findAll(checkNotNull(gameFileContent))) {
+            val player = m.groupValues[1].toInt()
+            val command = m.groupValues[2].lowercase(Locale.getDefault())
+            var color = m.groups[4]?.value?.trim { it <= ' ' }?.lowercase(Locale.getDefault())
+            var token = m.groupValues[5].lowercase(Locale.getDefault())
+            val position = m.groupValues[6].lowercase(Locale.getDefault())
 
             // For pdropb commands we need to extract the color from the tokenId
             if (command == "pdropb") {
@@ -226,13 +220,13 @@ class BoardspaceGameParser(game: File) {
     ): GameCommand {
         // Find player for token being moved
 
-        var p = if (player == 0) game!!.getWhitePlayer() else game!!.getBlackPlayer() // White always start
+        var p = if (player == 0) game!!.whitePlayer else game!!.blackPlayer // White always start
         if (color != null) {
-            p = if (color == "w") game!!.getWhitePlayer() else game!!.getBlackPlayer()
+            p = if (color == "w") game!!.whitePlayer else game!!.blackPlayer
         }
 
         // Find token being moved
-        val token = p.get(tokenId)
+        val token = p[tokenId]
 
         checkNotNull(token) { "Cannot find token with ID: " + tokenId }
 
@@ -305,16 +299,16 @@ class BoardspaceGameParser(game: File) {
             throw IllegalStateException("'" + moveTo + "' is not a valid move description.")
         }
 
-        val p = if (player == "w") game.getWhitePlayer() else game.getBlackPlayer()
-        val t = p.get(tokenId)
-        if (p.get(tokenId) == null) {
-            printer.print(game.getBoard())
+        val p = if (player == "w") game.whitePlayer else game.blackPlayer
+        val t = p[tokenId]
+        if (p[tokenId] == null) {
+            printer.print(game.board)
             throw IllegalStateException("Cannot find token: '" + tokenId + "'")
         }
 
         val hex = t!!.hex
         if (hex == null) {
-            printer.print(game.getBoard())
+            printer.print(game.board)
             throw IllegalStateException("'" + moveTo + "' is not a valid move description. Token " + tokenId + " is not on the board.")
         }
 
@@ -343,9 +337,8 @@ class BoardspaceGameParser(game: File) {
         )
     }
 
-    fun getGameType(): String {
-        return gameType!!
-    }
+    val gameType: String
+        get() = checkNotNull(parsedGameType)
 
     companion object {
         private const val DEBUG = false

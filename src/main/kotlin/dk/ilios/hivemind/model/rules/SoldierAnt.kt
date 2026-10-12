@@ -5,23 +5,20 @@ import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.Token
 
 class SoldierAnt : Bug() {
-    override fun isFreeToMove(token: Token, board: Board): Boolean {
-        return isRoomToSlideAwayOnGround(token, board)
-    }
+    override fun isFreeToMove(token: Token, board: Board): Boolean = isRoomToSlideAwayOnGround(token, board)
 
-    override fun getTargetHexes(token: Token, board: Board): MutableList<Hex> {
+    override fun getTargetHexes(token: Token, board: Board): List<Hex> {
         // Recursively find all squares you can slide to
-        val visitedHexes = ArrayList<Hex>()
-        visitedHexes.add(checkNotNull(token.hex))
-        return recursiveVisit(token, board, ArrayList<Hex>(), visitedHexes)
+        val visitedHexes = hashSetOf(checkNotNull(token.hex))
+        return recursiveVisit(token, board, mutableListOf<Hex>(), visitedHexes)
     }
 
     private fun recursiveVisit(
         from: Token,
         board: Board,
         targetHexes: MutableList<Hex>,
-        visitedHexes: MutableList<Hex>
-    ): MutableList<Hex> {
+        visitedHexes: MutableSet<Hex>
+    ): List<Hex> {
         val neighbors = board.getNeighborHexes(from.hex)
         for (targetHex in neighbors) {
             if (visitedHexes.contains(targetHex)) continue
@@ -38,11 +35,7 @@ class SoldierAnt : Bug() {
         return targetHexes
     }
 
-    override fun canMimic(): Boolean {
-        return false
-    }
+    override fun canMimic(): Boolean = false
 
-    override fun canMoveOthers(): Boolean {
-        return false
-    }
+    override fun canMoveOthers(): Boolean = false
 }

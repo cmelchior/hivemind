@@ -13,9 +13,7 @@ import kotlin.math.max
  */
 class NegamaxAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, maxTimeInMillis: Int) :
     AbstractMinMaxAI(name, heuristicFunction, depth, maxTimeInMillis) {
-    override fun copy(): HiveAI {
-        return NegamaxAI(name, heuristic, searchDepth, maxTimeInMillis)
-    }
+    override fun copy(): HiveAI = NegamaxAI(name, heuristic, searchDepth, maxTimeInMillis)
 
     override fun nextMove(state: Game, board: Board): GameCommand {
         maximizingPlayer = state.requireActivePlayer()

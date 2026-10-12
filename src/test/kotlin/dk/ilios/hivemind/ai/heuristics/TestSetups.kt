@@ -44,9 +44,9 @@ object TestSetups {
      * @return Game state forwarded to the given board setup. Move count might not be accurate.
      */
     fun sureWinInOneTurn(state: Game): Game {
-        val board = state.getBoard()
-        val white = state.getWhitePlayer()
-        val black = state.getBlackPlayer()
+        val board = state.board
+        val white = state.whitePlayer
+        val black = state.blackPlayer
 
         // Black setup
         board.addToken(white.getFromSupply(BugType.SOLDIER_ANT), 0, 0)
@@ -105,9 +105,9 @@ object TestSetups {
      *
      */
     fun sureWinInTwoTurns(state: Game): Game {
-        val board = state.getBoard()
-        val white = state.getWhitePlayer()
-        val black = state.getBlackPlayer()
+        val board = state.board
+        val white = state.whitePlayer
+        val black = state.blackPlayer
 
         // Black setup
         board.addToken(black.getFromSupply(BugType.QUEEN_BEE), 0, 3)

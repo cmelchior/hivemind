@@ -3,21 +3,21 @@ package dk.ilios.hivemind.parser.metric
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 
 /**
  * How many bugs are still left in the supply at the end of the game?
  */
 class BugsInSupplyAtGameEndMetric : Metric() {
-    private val results: MutableMap<Int?, Result> = HashMap<Int?, Result>()
-    private val diffResults: MutableMap<Int?, Int?> = HashMap<Int?, Int?>()
+    private val results: MutableMap<Int, Result> = hashMapOf<Int, Result>()
+    private val diffResults: MutableMap<Int, Int> = hashMapOf<Int, Int>()
     private var diffTotal = 0
 
     init {
-        results.put(11, Result(11))
-        results.put(12, Result(12))
-        results.put(13, Result(13))
-        results.put(14, Result(14))
+        results[11] = Result(11)
+        results[12] = Result(12)
+        results[13] = Result(13)
+        results[14] = Result(14)
     }
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
@@ -26,22 +26,22 @@ class BugsInSupplyAtGameEndMetric : Metric() {
         var winSupply = -1
         var looseSupply = -1
         if (status == GameStatus.RESULT_BLACK_WINS) {
-            winSupply = game.getBlackPlayer().supply.size
-            looseSupply = game.getWhitePlayer().supply.size
+            winSupply = game.blackPlayer.supply.size
+            looseSupply = game.whitePlayer.supply.size
         } else if (status == GameStatus.RESULT_WHITE_WINS) {
-            winSupply = game.getWhitePlayer().supply.size
-            looseSupply = game.getBlackPlayer().supply.size
+            winSupply = game.whitePlayer.supply.size
+            looseSupply = game.blackPlayer.supply.size
         }
 
         val startingBugs = game.requireActivePlayer().noStartingBugs
-        results.get(startingBugs)!!.winner[winSupply] = results.get(startingBugs)!!.winner[winSupply] + 1
-        results.get(startingBugs)!!.looser[looseSupply] = results.get(startingBugs)!!.looser[looseSupply] + 1
+        results[startingBugs]!!.winner[winSupply] = results[startingBugs]!!.winner[winSupply] + 1
+        results[startingBugs]!!.looser[looseSupply] = results[startingBugs]!!.looser[looseSupply] + 1
 
         val diff = winSupply - looseSupply
         if (diffResults.containsKey(diff)) {
-            diffResults.put(diff, diffResults.get(diff)!! + 1)
+            diffResults[diff] = diffResults[diff]!! + 1
         } else {
-            diffResults.put(diff, 1)
+            diffResults[diff] = 1
         }
         diffTotal++
     }
@@ -52,7 +52,7 @@ class BugsInSupplyAtGameEndMetric : Metric() {
     }
 
     private fun saveStandard() {
-        val file = Array<Array<String?>>(16) { arrayOfNulls<String>(9) }  // [y][x]
+        val file = Array(16) { arrayOfNulls<String>(9) }  // [y][x]
 
         // Set labels
         file[0] = arrayOf<String?>(
@@ -68,7 +68,7 @@ class BugsInSupplyAtGameEndMetric : Metric() {
         )
 
         for (i in 11..14) {
-            val r: Result = results.get(i)!!
+            val r: Result = results[i]!!
             val winner = r.winner
             val looser = r.looser
 
@@ -83,19 +83,18 @@ class BugsInSupplyAtGameEndMetric : Metric() {
     }
 
     private fun saveDiff() {
-        val file = Array<Array<String?>>(diffResults.size + 2) { arrayOfNulls<String>(3) }  // [y][x]
+        val file = Array(diffResults.size + 2) { arrayOfNulls<String>(3) }  // [y][x]
 
         // Set labels
         file[0] = arrayOf<String?>("Diff", "Count", "Percent")
 
         // Fill in values
-        val keys = ArrayList<Int?>(diffResults.keys).toTypedArray()
-        Arrays.sort(keys)
+        val keys = diffResults.keys.sorted()
 
         for (i in keys.indices) {
             file[i + 1][0] = keys[i].toString()
-            file[i + 1][1] = diffResults.get(keys[i]).toString()
-            file[i + 1][2] = (diffResults.get(keys[i])!! * 100 / diffTotal.toFloat()).toString()
+            file[i + 1][1] = diffResults[keys[i]].toString()
+            file[i + 1][2] = (diffResults[keys[i]]!! * 100 / diffTotal.toFloat()).toString()
         }
 
         saveStringToDisc(DIFF_FILE_NAME, matrixToString(file))

@@ -34,9 +34,9 @@ class QueenBeeTest {
         board.addToken(bee, 0, 0)
         board.addToken(ant, 1, -1)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(bee, board))
+        val targets = Rules.instance.getTargetHexes(bee, board)
         Assert.assertEquals(2, targets.size.toLong())
-        Assert.assertEquals(board.getHex(0, -1), targets.get(0))
-        Assert.assertEquals(board.getHex(1, 0), targets.get(1))
+        Assert.assertEquals(board.getHex(0, -1), targets[0])
+        Assert.assertEquals(board.getHex(1, 0), targets[1])
     }
 }

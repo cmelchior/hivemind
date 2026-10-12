@@ -7,7 +7,7 @@ import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameCommand
 import dk.ilios.hivemind.model.Board
 import dk.ilios.hivemind.utils.LimitedBuffer
-import java.util.*
+import kotlin.random.Random
 
 /**
  * Implementation of a MTD(f) algorithm search algorithm.
@@ -17,9 +17,9 @@ import java.util.*
  */
 class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, maxTimeInMillis: Int) :
     AbstractMinMaxAI(name, heuristicFunction, depth, maxTimeInMillis) {
-    private val random = Random()
+    private val random = Random.Default
     private val table = TranspositionTable()
-    private val killerMoves = ArrayList<LimitedBuffer<GameCommand?>>()
+    private val killerMoves = mutableListOf<LimitedBuffer<GameCommand?>>()
 
     init {
         for (i in 0..<depth) {
@@ -27,9 +27,8 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
         }
     }
 
-    override fun copy(): HiveAI {
-        return KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
-    }
+    override fun copy(): HiveAI =
+        KillerHeuristicTranspostionTableIDDFSAlphaBetaMiniMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
 
     override fun nextMove(state: Game, board: Board): GameCommand? {
         start = System.currentTimeMillis()
@@ -136,7 +135,7 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
 
         val originalAlpha = alpha
         val originalBeta = beta
-        var bestMove: GameCommand = (if (entry != null) entry.move else null)!!
+        var bestMove: GameCommand? = entry?.move
 
         // Run algorithm as usual
         var value: Int
@@ -145,9 +144,8 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
         } else {
             // Generate moves
 
-            val killMoves = arrayOfNulls<GameCommand>(2)
-            killerMoves.get(depth).toArray<GameCommand?>(killMoves)
-            val moves = generateMoves(state, bestMove, killMoves[0], killMoves[1])
+            val killMoves = killerMoves[depth]
+            val moves = generateMoves(state, bestMove, killMoves.getOrNull(0), killMoves.getOrNull(1))
             var moveEvaluated = 0
 
             if (maximizingPlayer) {
@@ -164,7 +162,7 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
                     // Beta cut-off
                     if (beta <= alpha) {
                         aiStats.cutOffAfter(moveEvaluated)
-                        killerMoves.get(depth).add(move)
+                        killerMoves[depth].add(move)
                         break
                     }
                 }
@@ -184,7 +182,7 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
                     // Alpha cut-off
                     if (beta <= alpha) {
                         aiStats.cutOffAfter(moveEvaluated)
-                        killerMoves.get(depth).add(move)
+                        killerMoves[depth].add(move)
                         break
                     }
                 }
@@ -238,9 +236,8 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
         } else {
             // Generate moves
 
-            val killMoves = arrayOfNulls<GameCommand>(2)
-            killerMoves.get(depth).toArray<GameCommand?>(killMoves)
-            val moves = generateMoves(state, bestMove, killMoves[0], killMoves[1])
+            val killMoves = killerMoves[depth]
+            val moves = generateMoves(state, bestMove, killMoves.getOrNull(0), killMoves.getOrNull(1))
             var moveEvaluated = 0
 
             if (maximizingPlayer) {
@@ -257,7 +254,7 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
                     // Beta cut-off
                     if (beta <= alpha) {
                         aiStats.cutOffAfter(moveEvaluated)
-                        killerMoves.get(depth).add(move)
+                        killerMoves[depth].add(move)
                         break
                     }
                 }
@@ -277,7 +274,7 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
                     // Alpha cut-off
                     if (beta <= alpha) {
                         aiStats.cutOffAfter(moveEvaluated)
-                        killerMoves.get(depth).add(move)
+                        killerMoves[depth].add(move)
                         break
                     }
                 }
@@ -304,7 +301,5 @@ class MTDFAI(name: String?, heuristicFunction: BoardValueHeuristic, depth: Int, 
         return value
     }
 
-    override fun maintainsStandardPosition(): Boolean {
-        return true
-    }
+    override fun maintainsStandardPosition(): Boolean = true
 }

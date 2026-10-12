@@ -2,7 +2,7 @@ package dk.ilios.hivemind.ai.statistics
 
 import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.model.Player
-import java.util.*
+
 
 /**
  * Class that keeps track of a game
@@ -65,35 +65,31 @@ class GameStatistics {
         sb.append('\n')
         sb.append("------------------")
         sb.append('\n')
-        sb.append(whiteName + " time pr. move: " + whiteAI!!.getMillisecondsPrMove().toTypedArray().contentToString())
+        sb.append(whiteName + " time pr. move: " + whiteAI!!.millisecondsPrMove.toString())
         sb.append('\n')
         sb.append(
-            whiteName + " game states pr. sec.: " + whiteAI!!.getGameStatesEvaluatedPrSecond().toTypedArray()
-                .contentToString()
+            whiteName + " game states pr. sec.: " + whiteAI!!.gameStatesEvaluatedPrSecond.toString()
         )
         sb.append('\n')
         sb.append(
-            whiteName + " game states pr. move: " + whiteAI!!.getPositionsEvaluatedPrMove().toTypedArray()
-                .contentToString()
+            whiteName + " game states pr. move: " + whiteAI!!.positionsEvaluatedPrMove.toString()
         )
         sb.append('\n')
-        sb.append(whiteName + " cache hits pr. move: " + whiteAI!!.getCacheHits().toTypedArray().contentToString())
+        sb.append(whiteName + " cache hits pr. move: " + whiteAI!!.cacheHits.toString())
         sb.append('\n')
         sb.append(whiteName + " average cutoff at move: " + whiteAI!!.averageMovesEvaluatedBeforeCutoff)
         sb.append('\n')
-        sb.append(blackName + " time pr. move: " + blackAI!!.getMillisecondsPrMove().toTypedArray().contentToString())
+        sb.append(blackName + " time pr. move: " + blackAI!!.millisecondsPrMove.toString())
         sb.append('\n')
         sb.append(
-            blackName + " game states pr. sec.: " + blackAI!!.getGameStatesEvaluatedPrSecond().toTypedArray()
-                .contentToString()
+            blackName + " game states pr. sec.: " + blackAI!!.gameStatesEvaluatedPrSecond.toString()
         )
         sb.append('\n')
         sb.append(
-            blackName + " game states pr. move: " + blackAI!!.getPositionsEvaluatedPrMove().toTypedArray()
-                .contentToString()
+            blackName + " game states pr. move: " + blackAI!!.positionsEvaluatedPrMove.toString()
         )
         sb.append('\n')
-        sb.append(blackName + " cache hits pr. move: " + blackAI!!.getCacheHits().toTypedArray().contentToString())
+        sb.append(blackName + " cache hits pr. move: " + blackAI!!.cacheHits.toString())
         sb.append('\n')
         sb.append(blackName + " average cutoff at move: " + blackAI!!.averageMovesEvaluatedBeforeCutoff)
         sb.append('\n')
@@ -151,10 +147,10 @@ class GameStatistics {
     }
 
     fun stopGame() {
-        durartionInMillis = Date().getTime() - start
+        durartionInMillis = System.currentTimeMillis() - start
     }
 
     fun startGame() {
-        start = Date().getTime()
+        start = System.currentTimeMillis()
     }
 }

@@ -7,7 +7,7 @@ import dk.ilios.hivemind.game.Game
  */
 class HighRankedGamesFilter : Filter {
     override fun analyseGame(type: String, game: Game): Boolean {
-        return game.getWhitePlayer().ranking >= REQUIRED_RANKING && game.getBlackPlayer()
+        return game.whitePlayer.ranking >= REQUIRED_RANKING && game.blackPlayer
             .ranking >= REQUIRED_RANKING
     }
 

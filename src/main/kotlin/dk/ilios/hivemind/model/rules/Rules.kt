@@ -1,7 +1,7 @@
 package dk.ilios.hivemind.model.rules
 
 import dk.ilios.hivemind.model.*
-import java.util.*
+
 
 class Rules private constructor() {
     private val pillbug: PillBug
@@ -33,10 +33,10 @@ class Rules private constructor() {
         // 3. When marking is done. Count marked. Must be equal to hexes - 1 to be a consistent hive
 
         val neighbors = board.getNeighborTokens(token.hex)
-        if (neighbors.size == 0) return false
+        if (neighbors.isEmpty()) return false
 
-        val startToken = neighbors.get(0)
-        val marked = mark(startToken, token, board, HashSet<Token>())
+        val startToken = neighbors[0]
+        val marked = mark(startToken, token, board, hashSetOf<Token>())
         if (marked.size != board.filledHexes.size - 1) {
             return false // Marked set doesn't match whole board -> Disconnected hive
         }
@@ -50,7 +50,7 @@ class Rules private constructor() {
      * Recursively mark all tokens connected to a token
      * @return The set of all tokens connected
      */
-    private fun mark(startToken: Token, ignore: Token?, board: Board, marked: HashSet<Token>): MutableSet<Token> {
+    private fun mark(startToken: Token, ignore: Token?, board: Board, marked: MutableSet<Token>): Set<Token> {
         marked.add(startToken)
 
         val neighbors = board.getNeighborTokens(startToken.hex)
@@ -63,7 +63,7 @@ class Rules private constructor() {
         return marked
     }
 
-    fun getTargetHexes(token: Token, board: Board): MutableList<Hex>? {
+    fun getTargetHexes(token: Token, board: Board): List<Hex> {
         val bug = getBugSpecificRules(token)
         return bug.getTargetHexes(token, board)
     }
@@ -74,20 +74,20 @@ class Rules private constructor() {
      * @param player
      * @param board
      */
-    fun getStartHexes(player: Player?, board: Board): MutableList<Hex> {
+    fun getStartHexes(player: Player?, board: Board): List<Hex> {
         // Start
 
         if (board.filledHexes.isEmpty()) {
-            return Arrays.asList<Hex>(board.getHex(0, 0))
+            return listOf(board.getHex(0, 0))
         }
 
         // Start for 2nd player
         if (board.filledHexes.size == 1) {
-            return board.getNeighborHexes(board.filledHexes.get(0))
+            return board.getNeighborHexes(board.filledHexes[0])
         }
 
-        val result: MutableList<Hex> = ArrayList<Hex>()
-        val targets: MutableSet<Hex> = HashSet<Hex>()
+        val result: MutableList<Hex> = mutableListOf<Hex>()
+        val targets: MutableSet<Hex> = hashSetOf<Hex>()
 
         // 1. Get all empty neighbor hexes to player tokens.
         val hexes = board.filledHexes
@@ -191,8 +191,8 @@ class Rules private constructor() {
     /**
      * Returns all tokens free to move for the given player
      */
-    fun getFreeTokens(p: Player?, board: Board): MutableSet<Token> {
-        val result: MutableSet<Token> = HashSet<Token>()
+    fun getFreeTokens(p: Player?, board: Board): Set<Token> {
+        val result: MutableSet<Token> = hashSetOf<Token>()
 
         val hexes = board.filledHexes
         for (hex in hexes) {
@@ -262,9 +262,9 @@ class Rules private constructor() {
      * @param token Token that wants to mimic nearby bugs.
      * @param board Current board
      */
-    fun getMimicList(token: Token, board: Board): MutableList<Token> {
+    fun getMimicList(token: Token, board: Board): List<Token> {
         if (token.hex!!.height > 1) {
-            return mutableListOf<Token>()
+            return emptyList()
         } else {
             return board.getNeighborTokens(token.hex)
         }

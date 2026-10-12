@@ -14,11 +14,11 @@ class SimpleHeuristicV2 : BoardValueHeuristic {
          * - Different bugs have different values
          * -
          */
-        val whitePlayer = state.getWhitePlayer()
-        val blackPlayer = state.getBlackPlayer()
+        val whitePlayer = state.whitePlayer
+        val blackPlayer = state.blackPlayer
 
-        val blackWon: Boolean = Rules.instance.isQueenSurrounded(whitePlayer, state.getBoard())
-        val whiteWon: Boolean = Rules.instance.isQueenSurrounded(blackPlayer, state.getBoard())
+        val blackWon: Boolean = Rules.instance.isQueenSurrounded(whitePlayer, state.board)
+        val whiteWon: Boolean = Rules.instance.isQueenSurrounded(blackPlayer, state.board)
 
         if (blackWon && whiteWon) {
             // A draw is considered a LOSS (no one wants an AI that tries to DRAW)
@@ -33,15 +33,15 @@ class SimpleHeuristicV2 : BoardValueHeuristic {
             return HiveAI.MAX
         }
 
-        val whiteFreeTokens: Int = Rules.instance.getFreeTokens(whitePlayer, state.getBoard()).size
+        val whiteFreeTokens: Int = Rules.instance.getFreeTokens(whitePlayer, state.board).size
         val whiteTokensOnBoard = whitePlayer.noStartingBugs - whitePlayer.supply.size
         val whiteHexesFilledAroundOpposingQueen =
-            state.getBoard().getNeighborTokens(blackPlayer.queen!!.hex).size
+            state.board.getNeighborTokens(blackPlayer.queen!!.hex).size
 
-        val blackFreeTokens: Int = Rules.instance.getFreeTokens(blackPlayer, state.getBoard()).size
+        val blackFreeTokens: Int = Rules.instance.getFreeTokens(blackPlayer, state.board).size
         val blackTokensOnBoard = blackPlayer.noStartingBugs - blackPlayer.supply.size
         val blackHexesFilledAroundOpposingQueen =
-            state.getBoard().getNeighborTokens(whitePlayer.queen!!.hex).size
+            state.board.getNeighborTokens(whitePlayer.queen!!.hex).size
 
         return (20 * (whiteHexesFilledAroundOpposingQueen - blackHexesFilledAroundOpposingQueen) + 1 * (whiteTokensOnBoard - blackTokensOnBoard) + 5 * (whiteFreeTokens - blackFreeTokens))
     }

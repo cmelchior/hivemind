@@ -6,7 +6,7 @@ import dk.ilios.hivemind.model.Board
 import dk.ilios.hivemind.model.BugType
 import dk.ilios.hivemind.model.HexagonUtils
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 
 /**
  * Staticstics for openings defined by Randy Ingersoll in "Play Hive like a Champion"
@@ -15,17 +15,17 @@ import java.util.*
  *
  */
 class IngersollOpeningsMetric : Metric() {
-    private val results: MutableMap<String?, Result> = HashMap<String?, Result>()
+    private val results: MutableMap<String, Result> = hashMapOf<String, Result>()
 
     init {
-        results.put("C", Result())
-        results.put("Z", Result())
-        results.put("I", Result())
-        results.put("J", Result())
-        results.put("F", Result())
-        results.put("X", Result())
-        results.put("?", Result())
-        results.put("%", Result())
+        results["C"] = Result()
+        results["Z"] = Result()
+        results["I"] = Result()
+        results["J"] = Result()
+        results["F"] = Result()
+        results["X"] = Result()
+        results["?"] = Result()
+        results["%"] = Result()
     }
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
@@ -33,10 +33,10 @@ class IngersollOpeningsMetric : Metric() {
         val openingType = getOpeningType(game)
         val status = game.status
         when (status) {
-            GameStatus.RESULT_DRAW -> results.get(openingType)!!.draw++
-            GameStatus.RESULT_BLACK_WINS -> results.get(openingType)!!.blackWin++
-            GameStatus.RESULT_WHITE_WINS -> results.get(openingType)!!.whiteWin++
-            else -> results.get(openingType)!!.other++
+            GameStatus.RESULT_DRAW -> results[openingType]!!.draw++
+            GameStatus.RESULT_BLACK_WINS -> results[openingType]!!.blackWin++
+            GameStatus.RESULT_WHITE_WINS -> results[openingType]!!.whiteWin++
+            else -> results[openingType]!!.other++
         }
     }
 
@@ -44,12 +44,12 @@ class IngersollOpeningsMetric : Metric() {
         // Forward game until both queens are placed.
 
         var i = 10
-        while ((game.getWhitePlayer().queen!!.inSupply() || game.getBlackPlayer().queen!!.inSupply()) && i > 0) {
+        while ((game.whitePlayer.queen!!.inSupply() || game.blackPlayer.queen!!.inSupply()) && i > 0) {
             game.forward()
             i--
         }
 
-        if ((game.getWhitePlayer().queen!!.inSupply() || game.getBlackPlayer().queen!!.inSupply())) {
+        if ((game.whitePlayer.queen!!.inSupply() || game.blackPlayer.queen!!.inSupply())) {
             return "%"
         }
 
@@ -71,10 +71,10 @@ class IngersollOpeningsMetric : Metric() {
     }
 
     private fun isX(game: Game): Boolean {
-        val startingWhiteHex = game.getMove(game.getWhitePlayer(), 1)!!.token!!.hex
-        val whiteQueenHex = game.getWhitePlayer().queen!!.hex
-        val startingBlackHex = game.getMove(game.getBlackPlayer(), 1)!!.token!!.hex
-        val blackQueenHex = game.getBlackPlayer().queen!!.hex
+        val startingWhiteHex = game.getMove(game.whitePlayer, 1)!!.token!!.hex
+        val whiteQueenHex = game.whitePlayer.queen!!.hex
+        val startingBlackHex = game.getMove(game.blackPlayer, 1)!!.token!!.hex
+        val blackQueenHex = game.blackPlayer.queen!!.hex
 
         if (HexagonUtils.distance(
                 startingWhiteHex!!.q,
@@ -95,25 +95,19 @@ class IngersollOpeningsMetric : Metric() {
         }
     }
 
-    private fun isF(game: Game): Boolean {
-        return checkTokens(1, 0, 2, -1, 3, -2, game.getBoard()) || checkTokens(1, -1, 2, -1, 3, -1, game.getBoard())
-    }
+    private fun isF(game: Game): Boolean =
+        checkTokens(1, 0, 2, -1, 3, -2, game.board) || checkTokens(1, -1, 2, -1, 3, -1, game.board)
 
-    private fun isJ(game: Game): Boolean {
-        return checkTokens(1, 0, 2, 0, 3, -1, game.getBoard()) || checkTokens(1, -1, 2, -2, 3, -2, game.getBoard())
-    }
+    private fun isJ(game: Game): Boolean =
+        checkTokens(1, 0, 2, 0, 3, -1, game.board) || checkTokens(1, -1, 2, -2, 3, -2, game.board)
 
-    private fun isI(game: Game): Boolean {
-        return checkTokens(1, 0, 2, 0, 3, 0, game.getBoard())
-    }
+    private fun isI(game: Game): Boolean = checkTokens(1, 0, 2, 0, 3, 0, game.board)
 
-    private fun isZ(game: Game): Boolean {
-        return checkTokens(1, 0, 2, -1, 3, -1, game.getBoard()) || checkTokens(1, -1, 2, -1, 3, -2, game.getBoard())
-    }
+    private fun isZ(game: Game): Boolean =
+        checkTokens(1, 0, 2, -1, 3, -1, game.board) || checkTokens(1, -1, 2, -1, 3, -2, game.board)
 
-    private fun isC(game: Game): Boolean {
-        return checkTokens(1, -1, 2, -1, 2, 0, game.getBoard()) || checkTokens(0, 1, 1, 1, 2, 0, game.getBoard())
-    }
+    private fun isC(game: Game): Boolean =
+        checkTokens(1, -1, 2, -1, 2, 0, game.board) || checkTokens(0, 1, 1, 1, 2, 0, game.board)
 
     private fun checkTokens(q1: Int, r1: Int, q2: Int, r2: Int, q3: Int, r3: Int, b: Board): Boolean {
         val t1 = b.getHexForStandardPosition(q1, r1).topToken
@@ -153,11 +147,10 @@ class IngersollOpeningsMetric : Metric() {
         val draw = StringBuilder("draw")
         val other = StringBuilder("other")
 
-        val keys = ArrayList<String?>(results.keys).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.keys.sorted()
 
         for (key in keys) {
-            val r: Result = results.get(key)!!
+            val r: Result = results[key]!!
             labels.append('\t').append(key)
             white.append('\t').append(r.whiteWin)
             black.append('\t').append(r.blackWin)
@@ -182,11 +175,10 @@ class IngersollOpeningsMetric : Metric() {
         val draw = StringBuilder("draw")
         val other = StringBuilder("other")
 
-        val keys = ArrayList<String?>(results.keys).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.keys.sorted()
 
         for (key in keys) {
-            val r: Result = results.get(key)!!
+            val r: Result = results[key]!!
             labels.append('\t').append(key)
             white.append('\t').append(if (r.total > 0) r.whiteWin * 100 / r.total else "0.0")
             black.append('\t').append(if (r.total > 0) r.blackWin * 100 / r.total else "0.0")

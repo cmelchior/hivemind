@@ -67,7 +67,7 @@ class BoardTest {
         game.addPlayers(p1, p2)
         game.turnLimit = 10
         game = TestSetups.sureWinInOneTurn(game)
-        Assert.assertEquals(6, game.getBoard().getNeighborTokens(game.getBoard().getHex(0, 3)).size.toLong())
+        Assert.assertEquals(6, game.board.getNeighborTokens(game.board.getHex(0, 3)).size.toLong())
     }
 
     @Test
@@ -75,7 +75,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val grasshopper = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -96,7 +96,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.LIMITED)
 
         val grasshopper = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -118,7 +118,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val grasshopper = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -138,7 +138,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val grasshopper = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -165,7 +165,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val gh1 = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -187,7 +187,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val gh1 = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -302,7 +302,7 @@ class BoardTest {
         val game = Game()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val grasshopper = p1.getFromSupply(BugType.GRASSHOPPER)
@@ -325,7 +325,7 @@ class BoardTest {
         p2.useAllExpansions()
         game.addPlayers(p1, p2)
 
-        val board = game.getBoard()
+        val board = game.board
         board.setStandardPositionMode(StandardPositionMode.ENABLED)
 
         val ladybug = p1.getFromSupply(BugType.LADY_BUG)

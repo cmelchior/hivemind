@@ -30,26 +30,26 @@ class BoardspaceGameParserTest {
 
         val parser = BoardspaceGameParser(file)
         val game = parser.parse()
-        val white = game.getWhitePlayer()
-        val black = game.getBlackPlayer()
+        val white = game.whitePlayer
+        val black = game.blackPlayer
 
-        assertEquals("hive", parser.getGameType())
+        assertEquals("hive", parser.gameType)
         assertEquals("White", white.name)
         assertEquals("Black", black.name)
         assertEquals(1700, white.ranking)
         assertEquals(1600, black.ranking)
         assertEquals(5000L, white.playTime)
         assertEquals(7000L, black.playTime)
-        assertSame(white.queen, game.getBoard().getHex(0, 0).topToken)
-        assertSame(black.queen, game.getBoard().getHex(0, 1).topToken)
-        assertEquals(BugType.QUEEN_BEE, game.getBoard().getHex(0, 1).topToken!!.type)
+        assertSame(white.queen, game.board.getHex(0, 0).topToken)
+        assertSame(black.queen, game.board.getHex(0, 1).topToken)
+        assertEquals(BugType.QUEEN_BEE, game.board.getHex(0, 1).topToken!!.type)
         assertEquals(1, white.turns)
         assertEquals(1, black.turns)
 
         game.setReplayMode(true)
-        assertTrue(game.getBoard().filledHexes.isEmpty())
+        assertTrue(game.board.filledHexes.isEmpty())
         game.forward()
         game.forward()
-        assertSame(black.queen, game.getBoard().getHex(0, 1).topToken)
+        assertSame(black.queen, game.board.getHex(0, 1).topToken)
     }
 }

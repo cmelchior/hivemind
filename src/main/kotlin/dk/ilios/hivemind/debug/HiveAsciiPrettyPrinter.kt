@@ -19,9 +19,7 @@ class HiveAsciiPrettyPrinter {
         println(asciiBoard.prettPrint(true))
     }
 
-    fun toString(board: Board): String? {
-        return prettyPrintBoard(board).prettPrint(true)
-    }
+    fun toString(board: Board): String? = prettyPrintBoard(board).prettPrint(true)
 
 
     private fun prettyPrintBoard(board: Board): AsciiBoard {

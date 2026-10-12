@@ -34,9 +34,9 @@ class SpiderTest {
         board.addToken(ant, 0, 0)
         board.addToken(bee, 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(1, targets.size.toLong())
-        Assert.assertEquals(board.getHex(2, 0), targets.get(0))
+        Assert.assertEquals(board.getHex(2, 0), targets[0])
     }
 
     /**
@@ -72,7 +72,7 @@ class SpiderTest {
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 1)
         board.addToken(p2.getFromSupply(BugType.BEETLE), 0, 2)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(2, targets.size.toLong())
         Assert.assertTrue(targets.contains(board.getHex(-1, 1)))
         Assert.assertTrue(targets.contains(board.getHex(3, 1)))

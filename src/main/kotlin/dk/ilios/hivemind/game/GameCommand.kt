@@ -3,25 +3,16 @@ package dk.ilios.hivemind.game
 import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.Token
 
-class GameCommand(fromQ: Int, fromR: Int, toQ: Int, toR: Int, token: Token?, movedByPillbug: Boolean) {
-    val fromQ: Int
-    val fromR: Int
-    val toQ: Int
-    val toR: Int
-    val token: Token?
-    val isMovedByPillbug: Boolean
-
-    init {
-        this.fromQ = fromQ
-        this.fromR = fromR
-        this.toQ = toQ
-        this.toR = toR
-        this.token = token
-        this.isMovedByPillbug = movedByPillbug
-    }
-
+class GameCommand(
+    val fromQ: Int,
+    val fromR: Int,
+    val toQ: Int,
+    val toR: Int,
+    val token: Token?,
+    val isMovedByPillbug: Boolean,
+) {
     fun execute(game: Game) {
-        val board = game.getBoard()
+        val board = game.board
 
         if (PASS == this) {
             // Do nothing;
@@ -37,7 +28,7 @@ class GameCommand(fromQ: Int, fromR: Int, toQ: Int, toR: Int, token: Token?, mov
     }
 
     fun undo(game: Game) {
-        val board = game.getBoard()
+        val board = game.board
 
         if (PASS == this) {
             // Do nothing;
@@ -95,19 +86,16 @@ class GameCommand(fromQ: Int, fromR: Int, toQ: Int, toR: Int, token: Token?, mov
         /**
          * Helper constructor: Move a token
          */
-        fun move(token: Token, toQ: Int, toR: Int): GameCommand {
-            return GameCommand(token.hex!!.q, token.hex!!.r, toQ, toR, token, false)
-        }
+        fun move(token: Token, toQ: Int, toR: Int): GameCommand =
+            GameCommand(token.hex!!.q, token.hex!!.r, toQ, toR, token, false)
 
         /**
          * Helper constructor: Add to board from supply
          */
-        fun addFromSupply(token: Token?, toQ: Int, toR: Int): GameCommand {
-            return GameCommand(Hex.SUPPLY, Hex.SUPPLY, toQ, toR, token, false)
-        }
+        fun addFromSupply(token: Token?, toQ: Int, toR: Int): GameCommand =
+            GameCommand(Hex.SUPPLY, Hex.SUPPLY, toQ, toR, token, false)
 
-        fun moveByPillbug(token: Token, toQ: Int, toR: Int): GameCommand {
-            return GameCommand(token.hex!!.q, token.hex!!.r, toQ, toR, token, true)
-        }
+        fun moveByPillbug(token: Token, toQ: Int, toR: Int): GameCommand =
+            GameCommand(token.hex!!.q, token.hex!!.r, toQ, toR, token, true)
     }
 }

@@ -10,36 +10,36 @@ class GameTest {
     @Test
     fun testReplayModeForward() {
         val game = recordedGame()
-        val white = game.getWhitePlayer()
-        val black = game.getBlackPlayer()
+        val white = game.whitePlayer
+        val black = game.blackPlayer
 
         game.setReplayMode(true)
-        assertTrue(game.getBoard().filledHexes.isEmpty())
+        assertTrue(game.board.filledHexes.isEmpty())
         assertEquals(11, white.supply.size)
         assertEquals(0, white.turns)
-        assertSame(white, game.getActivePlayer())
+        assertSame(white, game.activePlayer)
 
         val whiteMove = game.forward()
         assertSame(white.queen, whiteMove.token)
-        assertSame(white.queen, game.getBoard().getHex(0, 0).topToken)
+        assertSame(white.queen, game.board.getHex(0, 0).topToken)
         assertEquals(10, white.supply.size)
         assertEquals(1, white.turns)
-        assertSame(black, game.getActivePlayer())
+        assertSame(black, game.activePlayer)
 
         val blackMove = game.forward()
         assertSame(black.queen, blackMove.token)
-        assertSame(black.queen, game.getBoard().getHex(1, 0).topToken)
+        assertSame(black.queen, game.board.getHex(1, 0).topToken)
         assertEquals(10, black.supply.size)
         assertEquals(1, black.turns)
-        assertSame(white, game.getActivePlayer())
+        assertSame(white, game.activePlayer)
         assertThrows(IllegalStateException::class.java) { game.forward() }
     }
 
     @Test
     fun testReplayModeBackwards() {
         val game = recordedGame()
-        val white = game.getWhitePlayer()
-        val black = game.getBlackPlayer()
+        val white = game.whitePlayer
+        val black = game.blackPlayer
 
         game.setReplayMode(true)
         val whiteMove = game.forward()
@@ -49,24 +49,24 @@ class GameTest {
         assertNull(black.queen!!.hex)
         assertEquals(11, black.supply.size)
         assertEquals(0, black.turns)
-        assertSame(black, game.getActivePlayer())
-        assertEquals(1, game.getBoard().filledHexes.size)
+        assertSame(black, game.activePlayer)
+        assertEquals(1, game.board.filledHexes.size)
 
         assertSame(whiteMove, game.backwards())
         assertNull(white.queen!!.hex)
         assertEquals(11, white.supply.size)
         assertEquals(0, white.turns)
-        assertSame(white, game.getActivePlayer())
-        assertTrue(game.getBoard().filledHexes.isEmpty())
+        assertSame(white, game.activePlayer)
+        assertTrue(game.board.filledHexes.isEmpty())
         assertThrows(IllegalStateException::class.java) { game.backwards() }
 
         // Leaving replay restores the recorded position and permits further moves.
         game.setReplayMode(false)
-        assertEquals(2, game.getBoard().filledHexes.size)
+        assertEquals(2, game.board.filledHexes.size)
         assertEquals(1, white.turns)
         assertEquals(1, black.turns)
         game.continueGame(GameCommand.addFromSupply(white.getFromSupply(BugType.SPIDER), -1, 0))
-        assertEquals(3, game.getBoard().filledHexes.size)
+        assertEquals(3, game.board.filledHexes.size)
         assertEquals(2, white.turns)
     }
 

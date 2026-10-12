@@ -7,7 +7,7 @@ import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.Player
 import dk.ilios.hivemind.model.StandardPositionMode
 import dk.ilios.hivemind.model.rules.Rules
-import java.util.*
+import kotlin.random.Random
 
 /**
  * General game state class for a game of Hive.
@@ -23,13 +23,14 @@ class Game {
     var name: String? = "HiveX"
 
     // Players
-    private var whitePlayer: Player? = null
-    private var blackPlayer: Player? = null
+    private var whitePlayerState: Player? = null
+    private var blackPlayerState: Player? = null
 
     // Board properties
-    private var board: Board? = null // Reference to game board
+    private var boardState: Board? = null // Reference to game board
 
-    private var useZobristKey = false // If true, a Zobrist key is maintained for the board position and game state.
+    private var useZobristKey =
+        false // If true, a Zobrist key is maintained for the board position and game state.
     var zobristKey: Long = 0 // Zobrist key for board + game state
         private set
     private val playerHash = LongArray(2)
@@ -47,9 +48,9 @@ class Game {
             field = status
             this.statistics.setStatus(status)
         }
-    private var activePlayer: Player? = null
+    private var activePlayerState: Player? = null
 
-    private val moves: MutableList<GameCommand> = ArrayList<GameCommand>()
+    private val moves: MutableList<GameCommand> = mutableListOf<GameCommand>()
 
     // Keeping track of draws
     private val enforceForcedDraw =
@@ -66,11 +67,11 @@ class Game {
 
 
     fun addPlayers(white: Player, black: Player) {
-        this.whitePlayer = white
-        this.blackPlayer = black
-        statistics.setWhiteName(whitePlayer!!.name)
-        statistics.setBlackName(blackPlayer!!.name)
-        board = Board(white, black)
+        this.whitePlayerState = white
+        this.blackPlayerState = black
+        statistics.setWhiteName(whitePlayerState!!.name)
+        statistics.setBlackName(blackPlayerState!!.name)
+        boardState = Board(white, black)
     }
 
     /**
@@ -78,9 +79,9 @@ class Game {
      */
     fun start() {
         if (isRunning) return
-        board!!.clear()
+        boardState!!.clear()
         moves.clear()
-        activePlayer = whitePlayer
+        activePlayerState = whitePlayerState
 
         // Start the game loop
         statistics.startGame()
@@ -120,7 +121,7 @@ class Game {
     fun forward(): GameCommand {
         check(replayMode) { "Replay mode not enabled" }
         check(replayIndex != moves.size) { "Cannot go forward any further, at end of game." }
-        val command = moves.get(replayIndex)
+        val command = moves[replayIndex]
         command.execute(this)
         replayIndex++
         return command
@@ -133,7 +134,7 @@ class Game {
         check(replayMode) { "Replay mode not enabled" }
         check(replayIndex != 0) { "Cannot go back any further, at beginning of game." }
         replayIndex--
-        val command = moves.get(replayIndex)
+        val command = moves[replayIndex]
         command.undo(this)
         return command
     }
@@ -155,7 +156,7 @@ class Game {
         // Use CommandProvider if command is not provided
         val command = command ?: checkNotNull(requireActivePlayer().commandProvider) {
             "Active player has no command provider"
-        }.getCommand(this, getBoard())
+        }.getCommand(this, board)
         checkNotNull(command) { "Command must not be null" }
 
         if (isLegalCommand(command)) {
@@ -170,7 +171,7 @@ class Game {
                 statistics.stopGame()
             }
         } else {
-            throw IllegalStateException("Illegal command: " + activePlayer!!.name + " trying to execute " + command.toString())
+            throw IllegalStateException("Illegal command: " + activePlayerState!!.name + " trying to execute " + command.toString())
         }
     }
 
@@ -181,7 +182,7 @@ class Game {
         println(this.otherPlayer!!.name + ": Turn " + this.otherPlayer!!.turns)
         println("DuplicateMoves: " + whiteDuplicateMoves + " vs. " + blackDuplicateMoves)
         println(command.toString())
-        mapPrinter.print(getBoard())
+        mapPrinter.print(board)
     }
 
     private fun executeCommand(command: GameCommand) {
@@ -196,9 +197,7 @@ class Game {
         moves.add(command)
     }
 
-    private fun getColorIndex(player: Player): Int {
-        return if (player.isWhitePlayer) 0 else 1
-    }
+    private fun getColorIndex(player: Player): Int = if (player.isWhitePlayer) 0 else 1
 
 
     /**
@@ -207,15 +206,15 @@ class Game {
      */
     private fun keepTrackOfDuplicateMoves(command: GameCommand) {
         if (moves.size >= 4) {
-            val lastMove = moves.get(moves.size - 4).targetSquareDesc
+            val lastMove = moves[moves.size - 4].targetSquareDesc
             if (command.targetSquareDesc == lastMove) {
-                if (activePlayer!!.isWhitePlayer) {
+                if (activePlayerState!!.isWhitePlayer) {
                     whiteDuplicateMoves++
                 } else {
                     blackDuplicateMoves++
                 }
             } else {
-                if (activePlayer!!.isWhitePlayer) {
+                if (activePlayerState!!.isWhitePlayer) {
                     whiteDuplicateMoves = 0
                 } else {
                     blackDuplicateMoves = 0
@@ -228,10 +227,10 @@ class Game {
         checkNotNull(command) { "Command must not be null" }
 
         // Queen must be played at the 4 turn at the latest
-        if (activePlayer!!.moves == 3) {
-            val queenOnBoard = activePlayer!!.hasPlacedQueen()
+        if (activePlayerState!!.moves == 3) {
+            val queenOnBoard = activePlayerState!!.hasPlacedQueen()
             if (!queenOnBoard) {
-                val ok = activePlayer!!.queen == command.token
+                val ok = activePlayerState!!.queen == command.token
                 if (!ok) {
                     if (DEBUG) println("Queen must be moved now, was: " + command)
                 }
@@ -240,7 +239,7 @@ class Game {
         }
 
         // Hive must not move before queen has been placed
-        if (!activePlayer!!.hasPlacedQueen()) {
+        if (!activePlayerState!!.hasPlacedQueen()) {
             if (command != GameCommand.PASS && command.fromQ != Hex.SUPPLY) {
                 if (DEBUG) println("Queen must be moved before placing queen: " + command)
                 return false
@@ -253,13 +252,13 @@ class Game {
     val isEndOfGame: Boolean
         get() {
             val whiteQueenSurronded: Boolean =
-                Rules.instance.isQueenSurrounded(getWhitePlayer(), getBoard())
+                Rules.instance.isQueenSurrounded(whitePlayer, board)
             val blackQueenSurronded: Boolean =
-                Rules.instance.isQueenSurrounded(getBlackPlayer(), getBoard())
+                Rules.instance.isQueenSurrounded(blackPlayer, board)
             val forcedDraw = this.isForcedDraw
 
             // End game conditions
-            if (whitePlayer!!.turns + blackPlayer!!.turns == 2 * turnLimit && turnLimit > 0) {
+            if (whitePlayerState!!.turns + blackPlayerState!!.turns == 2 * turnLimit && turnLimit > 0) {
                 this.status = GameStatus.RESULT_TURN_LIMIT_REACHED
                 if (DEBUG) println("Move limit reached: " + turnLimit)
                 return true
@@ -285,40 +284,35 @@ class Game {
             return false
         }
 
-    fun getActivePlayer(): Player? {
-        return activePlayer
-    }
+    val activePlayer: Player?
+        get() = activePlayerState
 
     fun requireActivePlayer(): Player = checkNotNull(activePlayer) { "No active player" }
 
-    fun getWhitePlayer(): Player {
-        return whitePlayer!!
-    }
+    val whitePlayer: Player
+        get() = checkNotNull(whitePlayerState) { "Add players before accessing white player" }
 
-    fun getBlackPlayer(): Player {
-        return blackPlayer!!
-    }
+    val blackPlayer: Player
+        get() = checkNotNull(blackPlayerState) { "Add players before accessing black player" }
 
-    fun getBoard(): Board {
-        checkNotNull(board) { "Add players before board is available" }
-        return board!!
-    }
+    val board: Board
+        get() = checkNotNull(boardState) { "Add players before board is available" }
 
     fun togglePlayer() {
-        if (activePlayer == null) {
-            activePlayer = whitePlayer
+        if (activePlayerState == null) {
+            activePlayerState = whitePlayerState
         } else {
-            activePlayer = if (activePlayer === whitePlayer) blackPlayer else whitePlayer
+            activePlayerState = if (activePlayerState === whitePlayerState) blackPlayerState else whitePlayerState
         }
     }
 
     fun setActivePlayer(player: Player) {
-        check(!(player != whitePlayer && player != blackPlayer)) { "Active player must eiter be white or black: " + player.name }
-        activePlayer = player
+        check(!(player != whitePlayerState && player != blackPlayerState)) { "Active player must eiter be white or black: " + player.name }
+        activePlayerState = player
     }
 
     val otherPlayer: Player?
-        get() = if (activePlayer === whitePlayer) blackPlayer else whitePlayer
+        get() = if (activePlayerState === whitePlayerState) blackPlayerState else whitePlayerState
 
     fun setManualStepping(manualStepping: Boolean) {
         this.manualStepping = manualStepping
@@ -337,7 +331,7 @@ class Game {
     fun getMove(player: Player, turn: Int): GameCommand? {
         if (turn <= 0) return null
         val turnIndex = (turn - 1) * 2 + (if (player.isBlack) 1 else 0)
-        return if (moves.size > turnIndex) moves.get(turnIndex) else null
+        return if (moves.size > turnIndex) moves[turnIndex] else null
     }
 
     private val isForcedDraw: Boolean
@@ -351,18 +345,18 @@ class Game {
      * Enable the calculation of Zobrist keys for the board. Enabling Zobrist key also enabled Standard Position.
      */
     fun setStandardPositionMode(mode: StandardPositionMode?) {
-        board!!.setStandardPositionMode(mode)
+        boardState!!.setStandardPositionMode(mode)
         useZobristKey = (mode != StandardPositionMode.DISABLED)
 
         // Initialize Game state hashes
-        val random = Random()
+        val random = Random.Default
         playerHash[0] = random.nextLong()
         playerHash[1] = random.nextLong()
     }
 
     fun updateZobristKey() {
         if (useZobristKey) {
-            zobristKey = board!!.zobristKey xor playerHash[getColorIndex(getActivePlayer()!!)]
+            zobristKey = boardState!!.zobristKey xor playerHash[getColorIndex(activePlayer!!)]
         }
     }
 

@@ -6,20 +6,20 @@ import dk.ilios.hivemind.ai.heuristics.SimpleHeuristicV3
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 
 /**
  * Reports game result, ie. which color won or draw.
  */
 class GameResultPrColorMetric(predictLastMoves: Boolean) : Metric() {
-    private val results: MutableMap<String?, Result> = HashMap<String?, Result>()
+    private val results: MutableMap<String, Result> = hashMapOf<String, Result>()
 
     private val ai: HiveAI = IDDFSAlphaBetaMiniMaxAI("WinnerAI", SimpleHeuristicV3(), 2, 20)
     private var predictMoves = false // If true, the next two moves are predicted if the game has not ended
 
     init {
         predictMoves = predictLastMoves
-        results.put("all", Result())
+        results["all"] = Result()
     }
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
@@ -27,16 +27,16 @@ class GameResultPrColorMetric(predictLastMoves: Boolean) : Metric() {
         val groupKey = type.prefix + "-" + variant
 
         if (!results.containsKey(variantKey)) {
-            results.put(variantKey, Result())
+            results[variantKey] = Result()
         }
 
         if (!results.containsKey(groupKey)) {
-            results.put(groupKey, Result())
+            results[groupKey] = Result()
         }
 
-        val allResults: Result = results.get("all")!!
-        val variantResults: Result = results.get(variantKey)!!
-        val groupResults: Result = results.get(groupKey)!!
+        val allResults: Result = results["all"]!!
+        val variantResults: Result = results[variantKey]!!
+        val groupResults: Result = results[groupKey]!!
 
         val status = game.status
         when (status) {
@@ -61,8 +61,8 @@ class GameResultPrColorMetric(predictLastMoves: Boolean) : Metric() {
             else -> {
                 // Try to play two more turns to determine if the game was ended because a win was "sure"
                 if (predictMoves) {
-                    game.continueGame(ai.nextMove(game, game.getBoard()))
-                    game.continueGame(ai.nextMove(game, game.getBoard()))
+                    game.continueGame(ai.nextMove(game, game.board))
+                    game.continueGame(ai.nextMove(game, game.board))
                 }
 
                 if (game.status == GameStatus.RESULT_WHITE_WINS) {
@@ -90,11 +90,10 @@ class GameResultPrColorMetric(predictLastMoves: Boolean) : Metric() {
         val draw = StringBuilder("draw")
         val other = StringBuilder("other")
 
-        val keys = ArrayList<String?>(results.keys).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.keys.sorted()
 
         for (key in keys) {
-            val r: Result = results.get(key)!!
+            val r: Result = results[key]!!
             labels.append('\t').append(key)
             white.append('\t').append(r.whiteWin * 100 / r.total)
             black.append('\t').append(r.blackWin * 100 / r.total)

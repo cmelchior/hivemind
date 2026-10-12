@@ -3,22 +3,22 @@ package dk.ilios.hivemind.parser.metric
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 
 class WinnerOpeningMetric : Metric() {
-    private val whiteResults: MutableMap<String?, Result> = HashMap<String?, Result>()
-    private val blackResults: MutableMap<String?, Result> = HashMap<String?, Result>()
+    private val whiteResults: MutableMap<String, Result> = hashMapOf<String, Result>()
+    private val blackResults: MutableMap<String, Result> = hashMapOf<String, Result>()
 
     private var whiteTotal = 0
     private var blackTotal = 0
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
-        if (game.getWhitePlayer().moves < 4 || game.getBlackPlayer().moves < 4) return
+        if (game.whitePlayer.moves < 4 || game.blackPlayer.moves < 4) return
         if (game.status != GameStatus.RESULT_WHITE_WINS && game.status != GameStatus.RESULT_BLACK_WINS) return
         val sb = StringBuilder()
 
         val isWhite = (game.status == GameStatus.RESULT_WHITE_WINS)
-        val p = if (isWhite) game.getWhitePlayer() else game.getBlackPlayer()
+        val p = if (isWhite) game.whitePlayer else game.blackPlayer
 
         // Collect first 4 moves from player
         for (i in 1..4) {
@@ -33,11 +33,11 @@ class WinnerOpeningMetric : Metric() {
         val map = if (isWhite) whiteResults else blackResults
 
         if (!map.containsKey(opening)) {
-            map.put(opening, Result(opening, 1))
+            map[opening] = Result(opening, 1)
         } else {
-            val r: Result = map.get(opening)!!
+            val r: Result = map[opening]!!
             r.count += 1
-            map.put(opening, r)
+            map[opening] = r
         }
 
         if (isWhite) {
@@ -52,16 +52,15 @@ class WinnerOpeningMetric : Metric() {
         save(BLACK_FILE_NAME, blackResults, blackTotal)
     }
 
-    private fun save(fileName: String?, results: MutableMap<String?, Result>, total: Int) {
-        val file = Array<Array<String?>>(results.size + 2) { arrayOfNulls<String>(3) }
+    private fun save(fileName: String?, results: Map<String, Result>, total: Int) {
+        val file = Array(results.size + 2) { arrayOfNulls<String>(3) }
         file[0] = arrayOf<String?>("Opening", "Count", "%")
 
-        val keys = ArrayList<Result?>(results.values).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.values.sorted()
 
         var row = 1
         for (i in keys.indices.reversed()) {
-            val r = keys[i] as Result
+            val r = keys[i]
             file[row][0] = r.key
             file[row][1] = r.count.toString()
             file[row][2] = (r.count * 100 / total.toFloat()).toString()

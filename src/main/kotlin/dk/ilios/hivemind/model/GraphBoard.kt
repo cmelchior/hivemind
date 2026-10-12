@@ -28,8 +28,8 @@ package dk.ilios.hivemind.model
  */
 class GraphBoard {
     //    Map<String, Hex> border = new HashMap<String, Hex>(); // List of hexes that make up the border of the hive.
-    var hexes: MutableMap<String?, Hex?> =
-        HashMap<String?, Hex?>() // Key := (q,r), Value: hex. List of hexes visited in the game
+    private val hexes: MutableMap<String, Hex> =
+        hashMapOf<String, Hex>() // Key := (q,r), Value: hex. List of hexes visited in the game
 
     var neighbors: Array<IntArray?> = arrayOf(
         intArrayOf(0, -1),
@@ -41,8 +41,8 @@ class GraphBoard {
     )
 
     //    Map<Token, Node> hexes = new HashMap<Token, Node>(); // Maps a token to its graph node
-    private var border: MutableSet<Node?> = HashSet<Node?>() // Maps a hex to its graph node.
-    private var nodes: MutableMap<Hex?, Node?> = HashMap<Hex?, Node?>() // Maps a hex to its graph node.
+    private val border: MutableSet<Node?> = hashSetOf<Node?>() // Maps a hex to its graph node.
+    private val nodes: MutableMap<Hex?, Node?> = hashMapOf<Hex?, Node?>() // Maps a hex to its graph node.
 
 
     init {
@@ -159,20 +159,18 @@ class GraphBoard {
 
         // Create new hex if needed
         hex = Hex(q, r)
-        hexes.put(getKey(q, r), hex)
+        hexes[getKey(q, r)] = hex
         return hex
     }
 
     //
-    private fun getKey(q: Int, r: Int): String {
-        return "" + q + r
-    }
+    private fun getKey(q: Int, r: Int): String = "" + q + r
     //
     /**
      * Returns the hex for the given position or null if it doesn't exist or is a border hex.
      */
     fun findHex(q: Int, r: Int): Hex? {
-        val hex = hexes.get(getKey(q, r))
+        val hex = hexes[getKey(q, r)]
         if (hex == null) {
             return null
         } else {

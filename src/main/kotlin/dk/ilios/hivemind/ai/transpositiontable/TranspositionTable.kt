@@ -14,19 +14,17 @@ import dk.ilios.hivemind.game.GameCommand
  * @see https://groups.google.com/forum/.!topic/rec.games.chess.computer/p8GbiiLjp0o
  */
 class TranspositionTable {
-    private val table: MutableMap<Long?, TranspositionTableEntry?> = HashMap<Long?, TranspositionTableEntry?>()
+    private val table: MutableMap<Long, TranspositionTableEntry> = hashMapOf<Long, TranspositionTableEntry>()
 
     fun addResult(zobristKey: Long, value: Int, depth: Int, valueType: Int, bestMove: GameCommand?) {
-        val existingEntry = table.get(zobristKey)
+        val existingEntry = table[zobristKey]
         if (existingEntry == null || depth >= existingEntry.depth) {
-            table.put(zobristKey, TranspositionTableEntry(value, depth, valueType, bestMove))
+            table[zobristKey] = TranspositionTableEntry(value, depth, valueType, bestMove)
         }
     }
 
     /**
      * Return the already calculated value for a zobrist key or null if no key exists.
      */
-    fun getResult(zobristKey: Long): TranspositionTableEntry? {
-        return table.get(zobristKey)
-    }
+    fun getResult(zobristKey: Long): TranspositionTableEntry? = table[zobristKey]
 }

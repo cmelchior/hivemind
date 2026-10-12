@@ -3,7 +3,7 @@ package dk.ilios.hivemind.parser.metric
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
+
 import kotlin.math.max
 import kotlin.math.min
 
@@ -13,10 +13,10 @@ import kotlin.math.min
 class GameDurationTurnsMetric : Metric() {
     private var maxTurn = Int.MIN_VALUE
     private var minTurn = Int.MAX_VALUE
-    private val results: MutableMap<String?, ArrayList<Int?>> = HashMap<String?, ArrayList<Int?>>()
+    private val results: MutableMap<String, MutableList<Int>> = hashMapOf<String, MutableList<Int>>()
 
     init {
-        results.put(ALL_KEY, ArrayList<Int?>())
+        results[ALL_KEY] = mutableListOf<Int>()
     }
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
@@ -24,11 +24,11 @@ class GameDurationTurnsMetric : Metric() {
         val groupKey = type.prefix + "-" + variant
 
         if (!results.containsKey(variantKey)) {
-            results.put(variantKey, ArrayList<Int?>())
+            results[variantKey] = mutableListOf<Int>()
         }
 
         if (!results.containsKey(groupKey)) {
-            results.put(groupKey, ArrayList<Int?>())
+            results[groupKey] = mutableListOf<Int>()
         }
 
         // Only consider games we know has ended
@@ -42,18 +42,18 @@ class GameDurationTurnsMetric : Metric() {
             ensureSize(results.getValue(variantKey), lastPlayerTurns + 1)
             ensureSize(results.getValue(groupKey), lastPlayerTurns + 1)
 
-            val currentAllCounter = results.get(ALL_KEY)!!.get(lastPlayerTurns)!!
-            val currentVariantCounter = results.get(variantKey)!!.get(lastPlayerTurns)!!
-            val currentGroupCounter = results.get(groupKey)!!.get(lastPlayerTurns)!!
+            val currentAllCounter = results.getValue(ALL_KEY)[lastPlayerTurns]
+            val currentVariantCounter = results.getValue(variantKey)[lastPlayerTurns]
+            val currentGroupCounter = results.getValue(groupKey)[lastPlayerTurns]
 
-            results.get(ALL_KEY)!!.set(lastPlayerTurns, currentAllCounter + 1)
-            results.get(variantKey)!!.set(lastPlayerTurns, currentVariantCounter + 1)
-            results.get(groupKey)!!.set(lastPlayerTurns, currentGroupCounter + 1)
+            results[ALL_KEY]!![lastPlayerTurns] = currentAllCounter + 1
+            results[variantKey]!![lastPlayerTurns] = currentVariantCounter + 1
+            results[groupKey]!![lastPlayerTurns] = currentGroupCounter + 1
         }
     }
 
     override fun save() {
-        val file = Array<Array<String?>>(maxTurn - minTurn + 2) { arrayOfNulls<String>(results.size + 1) }  // [y][x]
+        val file = Array(maxTurn - minTurn + 2) { arrayOfNulls<String>(results.size + 1) }  // [y][x]
 
         // Set labels
         file[0][0] = "turn"
@@ -62,15 +62,14 @@ class GameDurationTurnsMetric : Metric() {
         }
 
         // Fill in values
-        val keys = ArrayList<String?>(results.keys).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.keys.sorted()
 
         var col = 1
         for (key in keys) {
-            val gameEndList: MutableList<Int?> = results.get(key)!!
+            val gameEndList: List<Int> = results[key]!!
             file[0][col] = key
             for (turn in minTurn..maxTurn) {
-                file[turn - minTurn + 1][col] = if (gameEndList.size > turn) gameEndList.get(turn).toString() else "0"
+                file[turn - minTurn + 1][col] = if (gameEndList.size > turn) gameEndList[turn].toString() else "0"
             }
             col++
         }

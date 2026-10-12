@@ -10,15 +10,12 @@ class Grasshopper : Bug() {
         return true
     }
 
-    override fun getTargetHexes(token: Token, board: Board): MutableList<Hex> {
+    override fun getTargetHexes(token: Token, board: Board): List<Hex> {
         // Find neighbor tokens and travel in their direction until we hit a empty space
-        val targets: MutableList<Hex> = ArrayList<Hex>()
         val neighbors = board.getNeighborTokens(token.hex)
-        for (direction in neighbors) {
-            targets.add(getFirstEmptyHexInDirection(checkNotNull(token.hex), checkNotNull(direction.hex), board))
+        return neighbors.map { direction ->
+            getFirstEmptyHexInDirection(checkNotNull(token.hex), checkNotNull(direction.hex), board)
         }
-
-        return targets
     }
 
     private fun getFirstEmptyHexInDirection(from: Hex, to: Hex, board: Board): Hex {
@@ -36,11 +33,7 @@ class Grasshopper : Bug() {
         return board.getHex(startQ + distance * directionQ, startR + distance * directionR)
     }
 
-    override fun canMimic(): Boolean {
-        return false
-    }
+    override fun canMimic(): Boolean = false
 
-    override fun canMoveOthers(): Boolean {
-        return false
-    }
+    override fun canMoveOthers(): Boolean = false
 }

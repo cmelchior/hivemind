@@ -31,9 +31,7 @@ object HexagonUtils {
         return rotation
     }
 
-    fun convertToAxialCoordinates(x: Int, y: Int, z: Int): IntArray {
-        return intArrayOf(x, z)
-    }
+    fun convertToAxialCoordinates(x: Int, y: Int, z: Int): IntArray = intArrayOf(x, z)
 
     /**
      * Cube coordinates fulfill x + y + z = 0

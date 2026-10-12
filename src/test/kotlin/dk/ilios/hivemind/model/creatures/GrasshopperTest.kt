@@ -33,9 +33,9 @@ class GrasshopperTest {
         board.addToken(grasshopper, 0, 0)
         board.addToken(bee, 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(grasshopper, board))
+        val targets = Rules.instance.getTargetHexes(grasshopper, board)
         Assert.assertEquals(1, targets.size.toLong())
-        Assert.assertEquals(board.getHex(2, 0), targets.get(0))
+        Assert.assertEquals(board.getHex(2, 0), targets[0])
     }
 
     /**
@@ -66,7 +66,7 @@ class GrasshopperTest {
         board.addToken(p2.getFromSupply(BugType.GRASSHOPPER), 2, 1)
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 1)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(1, targets.size.toLong())
         Assert.assertTrue(targets.contains(board.getHex(0, 0)))
     }

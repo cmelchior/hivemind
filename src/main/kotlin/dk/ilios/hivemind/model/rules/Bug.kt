@@ -20,7 +20,7 @@ abstract class Bug {
      *
      * @return Legal hexes the token can move to
      */
-    abstract fun getTargetHexes(token: Token, board: Board): MutableList<Hex>?
+    abstract fun getTargetHexes(token: Token, board: Board): List<Hex>
 
 
     /**
@@ -50,7 +50,7 @@ abstract class Bug {
         // Go a full round + 1 to check for empty spaces across list start/end.
         var free = 0
         for (i in 0..<hexes.size + 1) {
-            val hex = hexes.get(i % hexes.size)
+            val hex = hexes[i % hexes.size]
             if (hex.isEmpty) {
                 free++
                 if (free == 2) {

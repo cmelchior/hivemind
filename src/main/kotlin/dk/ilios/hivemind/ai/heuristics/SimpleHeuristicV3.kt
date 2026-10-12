@@ -15,11 +15,11 @@ class SimpleHeuristicV3 : BoardValueHeuristic {
          * - Different bugs have different values
          * -
          */
-        val whitePlayer = state.getWhitePlayer()
-        val blackPlayer = state.getBlackPlayer()
+        val whitePlayer = state.whitePlayer
+        val blackPlayer = state.blackPlayer
 
-        val blackWon: Boolean = Rules.instance.isQueenSurrounded(whitePlayer, state.getBoard())
-        val whiteWon: Boolean = Rules.instance.isQueenSurrounded(blackPlayer, state.getBoard())
+        val blackWon: Boolean = Rules.instance.isQueenSurrounded(whitePlayer, state.board)
+        val whiteWon: Boolean = Rules.instance.isQueenSurrounded(blackPlayer, state.board)
 
         if (blackWon && whiteWon) {
             // A draw is considered almost as bad as a LOSS (no one wants an AI that tries to DRAW)
@@ -37,7 +37,7 @@ class SimpleHeuristicV3 : BoardValueHeuristic {
         var whiteAntsInPlay = 0
         var blackAntsInPlay = 0
 
-        val hexes = state.getBoard().filledHexes
+        val hexes = state.board.filledHexes
         for (hex in hexes) {
             val t = hex.topToken
             if (t!!.originalType == BugType.SOLDIER_ANT) {
@@ -49,15 +49,15 @@ class SimpleHeuristicV3 : BoardValueHeuristic {
             }
         }
 
-        val whiteFreeTokens: Int = Rules.instance.getFreeTokens(whitePlayer, state.getBoard()).size
+        val whiteFreeTokens: Int = Rules.instance.getFreeTokens(whitePlayer, state.board).size
         val whiteTokensOnBoard = whitePlayer.noStartingBugs - whitePlayer.supply.size
         val whiteHexesFilledAroundOpposingQueen =
-            state.getBoard().getNeighborTokens(blackPlayer.queen!!.hex).size
+            state.board.getNeighborTokens(blackPlayer.queen!!.hex).size
 
-        val blackFreeTokens: Int = Rules.instance.getFreeTokens(blackPlayer, state.getBoard()).size
+        val blackFreeTokens: Int = Rules.instance.getFreeTokens(blackPlayer, state.board).size
         val blackTokensOnBoard = blackPlayer.noStartingBugs - blackPlayer.supply.size
         val blackHexesFilledAroundOpposingQueen =
-            state.getBoard().getNeighborTokens(whitePlayer.queen!!.hex).size
+            state.board.getNeighborTokens(whitePlayer.queen!!.hex).size
 
         return (100 * (whiteHexesFilledAroundOpposingQueen - blackHexesFilledAroundOpposingQueen) + 20 * (whiteAntsInPlay - blackAntsInPlay) + 10 * (whiteFreeTokens - blackFreeTokens))
 

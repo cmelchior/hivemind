@@ -43,8 +43,8 @@ class SimpleHeuristicTests {
         TestSetups.sureWinInTwoTurns(g1)
         TestSetups.sureWinInTwoTurns(g2)
 
-        g1.getBoard().moveToken(-1, 4, 2, 1) // Move A1 to T1
-        g2.getBoard().addToken(g2.getBlackPlayer().getFromSupply(BugType.GRASSHOPPER), -1, 2)
+        g1.board.moveToken(-1, 4, 2, 1) // Move A1 to T1
+        g2.board.addToken(g2.blackPlayer.getFromSupply(BugType.GRASSHOPPER), -1, 2)
 
         val score1 = heuristic.calculateBoardValue(g1)
         val score2 = heuristic.calculateBoardValue(g2)
@@ -60,8 +60,8 @@ class SimpleHeuristicTests {
         TestSetups.sureWinInTwoTurns(g1)
         TestSetups.sureWinInTwoTurns(g2)
 
-        g1.getBoard().moveToken(-1, 4, 2, 1) // Move A1 to T1
-        g2.getBoard().moveToken(-1, 4, 2, 3) // WTF?
+        g1.board.moveToken(-1, 4, 2, 1) // Move A1 to T1
+        g2.board.moveToken(-1, 4, 2, 3) // WTF?
 
         val score1 = heuristic.calculateBoardValue(g1)
         val score2 = heuristic.calculateBoardValue(g2)
@@ -77,14 +77,14 @@ class SimpleHeuristicTests {
         TestSetups.sureWinInTwoTurns(g1)
         TestSetups.sureWinInTwoTurns(g2)
 
-        g1.getBoard().moveToken(-1, 4, 0, 2) // Ant moved
-        g2.getBoard().moveToken(-1, 3, 0, 2) // Beetle moved
+        g1.board.moveToken(-1, 4, 0, 2) // Ant moved
+        g2.board.moveToken(-1, 3, 0, 2) // Beetle moved
 
         val score1 = heuristic.calculateBoardValue(g1)
         val score2 = heuristic.calculateBoardValue(g2)
 
-        val free: MutableSet<Token>? = Rules.instance.getFreeTokens(g1.getBlackPlayer(), g1.getBoard())
-        val free2: MutableSet<Token>? = Rules.instance.getFreeTokens(g2.getBlackPlayer(), g2.getBoard())
+        val free: Set<Token>? = Rules.instance.getFreeTokens(g1.blackPlayer, g1.board)
+        val free2: Set<Token>? = Rules.instance.getFreeTokens(g2.blackPlayer, g2.board)
 
         Assert.assertTrue(score1 == score2) // Black is scored negative
     }

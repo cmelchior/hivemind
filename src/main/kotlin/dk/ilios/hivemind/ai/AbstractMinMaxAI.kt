@@ -55,9 +55,9 @@ abstract class AbstractMinMaxAI(
 
     protected fun isGameOver(state: Game, depth: Int): Boolean {
         val whiteDead: Boolean =
-            Rules.instance.isQueenSurrounded(state.getWhitePlayer(), state.getBoard())
+            Rules.instance.isQueenSurrounded(state.whitePlayer, state.board)
         val blackDead: Boolean =
-            Rules.instance.isQueenSurrounded(state.getBlackPlayer(), state.getBoard())
+            Rules.instance.isQueenSurrounded(state.blackPlayer, state.board)
         var turnLimit = false
         if (state.turnLimit > 0) {
             val lookAhead = (depth - searchDepth) * -1
@@ -69,15 +69,17 @@ abstract class AbstractMinMaxAI(
     /**
      * Standard move generation
      */
-    protected fun generateMoves(state: Game, vararg priorityMoves: GameCommand?): MutableList<GameCommand> {
-        val initialList = ArrayList<GameCommand>()
-        val result = moveGenerator.generateMoves(initialList, state)
-
-        for (i in priorityMoves.size downTo 1) {
-            val priorityMove: GameCommand? = priorityMoves[i - 1]
-            if (priorityMove != null && result.contains(priorityMove)) {
-                result.remove(priorityMove)
-                result.add(0, priorityMove)
+    protected fun generateMoves(state: Game, vararg priorityMoves: GameCommand?): List<GameCommand> {
+        val moves = moveGenerator.generateMoves(emptyList(), state)
+        val result = if (priorityMoves.isEmpty()) {
+            moves
+        } else {
+            moves.toMutableList().apply {
+                for (priorityMove in priorityMoves.reversed()) {
+                    if (priorityMove != null && remove(priorityMove)) {
+                        add(0, priorityMove)
+                    }
+                }
             }
         }
 
@@ -85,7 +87,5 @@ abstract class AbstractMinMaxAI(
         return result
     }
 
-    override fun maintainsStandardPosition(): Boolean {
-        return true
-    }
+    override fun maintainsStandardPosition(): Boolean = true
 }

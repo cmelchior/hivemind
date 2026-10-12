@@ -9,7 +9,7 @@ import dk.ilios.hivemind.model.Board
 import dk.ilios.hivemind.model.Player
 import dk.ilios.hivemind.model.Player.PlayerType
 import dk.ilios.hivemind.model.StandardPositionMode
-import java.util.*
+import java.util.Collections
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -23,9 +23,9 @@ class AIGameController {
     private var numberOfMatches = 0
 
     private var duration: Long = 0
-    private val opponents: MutableSet<HiveAI> = HashSet<HiveAI>()
+    private val opponents: MutableSet<HiveAI> = hashSetOf<HiveAI>()
     private val gameResults: MutableList<GameStatistics> =
-        Collections.synchronizedList<GameStatistics>(ArrayList<GameStatistics>())
+        Collections.synchronizedList(mutableListOf<GameStatistics>())
 
     fun addOpponent(opponent: HiveAI?) {
         opponents.add(opponent!!)
@@ -48,14 +48,12 @@ class AIGameController {
         for (oppA in opponents) {
             for (oppB in opponents) {
                 if (oppA == oppB) continue
-                for (i in 0..<numberOfMatches) {
+                repeat(numberOfMatches) {
                     val a = oppA.copy()
                     val b = oppB.copy()
-                    executor.execute(object : Runnable {
-                        override fun run() {
-                            runGame(a, b, false)
-                        }
-                    })
+                    executor.execute {
+                        runGame(a, b, false)
+                    }
                 }
             }
         }
@@ -64,7 +62,7 @@ class AIGameController {
         executor.shutdown()
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             /* Ignore */
         }
 

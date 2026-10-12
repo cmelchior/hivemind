@@ -36,7 +36,7 @@ class LadyBugTest {
         board.addToken(ant, 0, 0)
         board.addToken(bee, 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(0, targets.size.toLong())
     }
 
@@ -76,7 +76,7 @@ class LadyBugTest {
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 1)
         board.addToken(p2.getFromSupply(BugType.BEETLE), 0, 2)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(9, targets.size.toLong())
         Assert.assertFalse(targets.contains(board.getHex(0, 4)))
         Assert.assertFalse(targets.contains(board.getHex(1, 3)))
@@ -117,7 +117,7 @@ class LadyBugTest {
         board.addToken(p2.getFromSupply(BugType.BEETLE), 0, 2)
         board.addToken(p2.getFromSupply(BugType.BEETLE), 0, 2)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(9, targets.size.toLong())
         Assert.assertFalse(targets.contains(board.getHex(0, 4)))
         Assert.assertFalse(targets.contains(board.getHex(1, 3)))

@@ -9,7 +9,7 @@ import dk.ilios.hivemind.model.Token
  * Interface for move generators used by HiveAI's.
  */
 abstract class MoveGenerator {
-    abstract fun generateMoves(initialList: MutableList<GameCommand>, state: Game): MutableList<GameCommand>
+    abstract fun generateMoves(initialList: List<GameCommand>, state: Game): List<GameCommand>
 
     protected fun createGameCommand(token: Token, hex: Hex): GameCommand {
         val fromHex = token.hex

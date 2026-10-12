@@ -23,12 +23,12 @@ class TokensAroundQueenMetric(winnerTurns: Int) : Metric() {
         val status = game.status
         val winner: Player
         val looser: Player
-        if (status == GameStatus.RESULT_BLACK_WINS && game.getBlackPlayer().turns == gamesWithWinnerTurns) {
-            winner = game.getBlackPlayer()
-            looser = game.getWhitePlayer()
-        } else if (status == GameStatus.RESULT_WHITE_WINS && game.getWhitePlayer().turns == gamesWithWinnerTurns) {
-            winner = game.getWhitePlayer()
-            looser = game.getBlackPlayer()
+        if (status == GameStatus.RESULT_BLACK_WINS && game.blackPlayer.turns == gamesWithWinnerTurns) {
+            winner = game.blackPlayer
+            looser = game.whitePlayer
+        } else if (status == GameStatus.RESULT_WHITE_WINS && game.whitePlayer.turns == gamesWithWinnerTurns) {
+            winner = game.whitePlayer
+            looser = game.blackPlayer
         } else {
             return
         }
@@ -43,10 +43,10 @@ class TokensAroundQueenMetric(winnerTurns: Int) : Metric() {
             }
 
             if (game.requireActivePlayer() === looser) {
-                val winnerTokensAroundQueen = game.getBoard().getNeighborTokens(looser.queen!!.hex).size
+                val winnerTokensAroundQueen = game.board.getNeighborTokens(looser.queen!!.hex).size
                 winnerData[turn]!![winnerTokensAroundQueen] += 1
             } else if (game.requireActivePlayer() === winner) {
-                val looserTokensAroundQueen = game.getBoard().getNeighborTokens(winner.queen!!.hex).size
+                val looserTokensAroundQueen = game.board.getNeighborTokens(winner.queen!!.hex).size
                 looserData[turn]!![looserTokensAroundQueen] += 1
             }
             lastActive = game.requireActivePlayer()
@@ -60,7 +60,7 @@ class TokensAroundQueenMetric(winnerTurns: Int) : Metric() {
     }
 
     private fun saveAverages() {
-        val file: Array<Array<String?>>? = Array<Array<String?>>(winnerData.size + 1) { arrayOfNulls<String>(3) }
+        val file: Array<Array<String?>>? = Array(winnerData.size + 1) { arrayOfNulls<String>(3) }
         file!![0] = arrayOf<String?>("Turns", "Winner", "Looser")
 
         for (row in winnerData.indices) {
@@ -87,7 +87,7 @@ class TokensAroundQueenMetric(winnerTurns: Int) : Metric() {
     }
 
     private fun save(fileName: String, data: Array<IntArray?>) {
-        val file: Array<Array<String?>>? = Array<Array<String?>>(data.size + 1) { arrayOfNulls<String>(8) }
+        val file: Array<Array<String?>>? = Array(data.size + 1) { arrayOfNulls<String>(8) }
 
         // Labels
         file!![0][0] = "Turns"

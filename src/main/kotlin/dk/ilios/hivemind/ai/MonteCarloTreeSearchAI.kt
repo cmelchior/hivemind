@@ -6,7 +6,7 @@ import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameCommand
 import dk.ilios.hivemind.model.Board
 import dk.ilios.hivemind.model.Player
-import java.util.*
+import kotlin.random.Random
 
 /**
  * Basic Monte Carlo Tree Search with standard UCT (Upper confidence bound)
@@ -15,16 +15,14 @@ import java.util.*
  */
 class MonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxTimeMillis: Int) :
     AbstractMonteCarloTreeSearchAI(name, maxDepth, maxTimeMillis) {
-    var random: Random = Random()
+    var random: Random = Random.Default
     var evaluationFunction: BoardValueHeuristic = SimpleHeuristicV3()
 
     private var startPlayer: Player? = null
 
     protected var simulationsMade: Int = 0
 
-    override fun copy(): HiveAI {
-        return MonteCarloTreeSearchAI(name, maxDepth, timeLimit)
-    }
+    override fun copy(): HiveAI = MonteCarloTreeSearchAI(name, maxDepth, timeLimit)
 
 
     override fun nextMove(state: Game, board: Board): GameCommand? {
@@ -55,14 +53,14 @@ class MonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxTimeMillis: Int) :
 
         // If partial expanded. Chance of expanding from here is equal to chance of hitting "empty" node if
         // selecting child at random.
-        if (node.getChildren().isEmpty() || (!node.isCompletelyVisited && node.getChildren().size < random.nextInt(
+        if (node.childNodes.isEmpty() || (!node.isCompletelyVisited && node.childNodes.size < random.nextInt(
                 node.getMaxChildren() + 1
             ))
         ) {
             return node // Either node is completly visited or we randomly chose a leaf node from here.
         } else {
             // Select random child node and continue down tree
-            val result = selection(node.getChildren().get(random.nextInt(node.getChildren().size)))
+            val result = selection(node.childNodes[random.nextInt(node.childNodes.size)])
             return result
         }
     }
@@ -77,7 +75,7 @@ class MonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxTimeMillis: Int) :
         leaf.setMaxChildren(moves.size)
 
         // Terminal node check
-        if (moves.size == 0) {
+        if (moves.isEmpty()) {
             return leaf
         }
 
@@ -87,13 +85,13 @@ class MonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxTimeMillis: Int) :
         // 3) Add move to tree as a node
         var moveCount = moves.size
         var moveIndex = random.nextInt(moves.size)
-        while (leaf.hasChild(moves.get(moveIndex))) {
+        while (leaf.hasChild(moves[moveIndex])) {
             moveIndex = (moveIndex + 1) % moves.size
             check(--moveCount >= 0) { "Expand cannot find a new child node" + leaf }
         }
 
         // Update tree with new node
-        val command = moves.get(moveIndex)
+        val command = moves[moveIndex]
         val node = GameNode(command, leaf)
         leaf.addChild(node)
         node.forwardGameState(state)
@@ -114,7 +112,7 @@ class MonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxTimeMillis: Int) :
         if (isGameOver(state) || depth == 0) {
             return evaluate(state)
         } else {
-            val command = moveGenerator.nextMove(state, state.getBoard())
+            val command = moveGenerator.nextMove(state, state.board)
             command!!.execute(state)
             val result = runSimulation(state, moveGenerator, depth - 1)
             command.undo(state)
@@ -161,7 +159,7 @@ class MonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxTimeMillis: Int) :
         var command: GameCommand? = GameCommand.PASS
         var maxValue = Double.MIN_VALUE
 
-        val children = root.getChildren()
+        val children = root.childNodes
         for (node in children) {
             if (node.value > maxValue || (node.value == maxValue && random.nextBoolean())) {
                 maxValue = node.value

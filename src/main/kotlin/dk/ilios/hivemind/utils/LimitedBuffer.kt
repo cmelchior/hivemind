@@ -1,18 +1,19 @@
 package dk.ilios.hivemind.utils
 
-import java.util.*
+class LimitedBuffer<E>(private val limit: Int) : AbstractList<E>() {
+    private val entries = ArrayDeque<E>()
 
-class LimitedBuffer<E>(limit: Int) : LinkedList<E?>() {
-    private val limit: Int
+    override val size: Int
+        get() = entries.size
 
-    init {
-        this.limit = limit
-    }
+    override fun get(index: Int): E = entries[index]
 
-    override fun add(e: E?): Boolean {
-        super.addFirst(e)
+    fun clear() = entries.clear()
+
+    fun add(element: E): Boolean {
+        entries.addFirst(element)
         if (size > limit) {
-            super.removeLast()
+            entries.removeLast()
         }
         return true
     }

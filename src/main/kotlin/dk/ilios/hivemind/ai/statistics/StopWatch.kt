@@ -4,23 +4,21 @@ package dk.ilios.hivemind.ai.statistics
  * StopWatch class used for various statistics across classes
  */
 class StopWatch private constructor() {
-    private val watches: MutableMap<String?, Watch?> = HashMap<String?, Watch?>()
+    private val watches: MutableMap<String?, Watch> = hashMapOf<String?, Watch>()
 
-    fun start(): Watch {
-        return start(SINGLE_WATCH_ID)
-    }
+    fun start(): Watch = start(SINGLE_WATCH_ID)
 
     @Synchronized
     fun start(name: String?): Watch {
         val watch = Watch()
-        watches.put(name, watch)
+        watches[name] = watch
         watch.start()
         return watch
     }
 
     @Synchronized
     fun stop(name: String?): Watch {
-        val watch = watches.get(name)
+        val watch = watches[name]
         if (watch != null) {
             watch.stop()
         } else {
@@ -30,13 +28,9 @@ class StopWatch private constructor() {
         return watch
     }
 
-    fun stop(): Watch {
-        return stop(SINGLE_WATCH_ID)
-    }
+    fun stop(): Watch = stop(SINGLE_WATCH_ID)
 
-    fun get(name: String?): Watch? {
-        return watches.get(name)
-    }
+    operator fun get(name: String?): Watch? = watches[name]
 
     class Watch {
         var name: String? = null
@@ -88,15 +82,6 @@ class StopWatch private constructor() {
     companion object {
         private const val SINGLE_WATCH_ID = "StopWatch.class#1"
 
-        @get:Synchronized
-        var instance: StopWatch? = null
-            get() {
-                if (field == null) {
-                    field = StopWatch()
-                }
-
-                return field
-            }
-            private set
+        val instance: StopWatch by lazy { StopWatch() }
     }
 }

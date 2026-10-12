@@ -26,27 +26,18 @@ class QueenBee : Bug() {
         return false
     }
 
-    override fun getTargetHexes(token: Token, board: Board): MutableList<Hex> {
+    override fun getTargetHexes(token: Token, board: Board): List<Hex> {
         val neighbors = board.getNeighborHexes(token.hex)
-        val result: MutableList<Hex> = ArrayList<Hex>()
 
         val startingHex = checkNotNull(token.hex)
-        for (targetHex in neighbors) {
+        return neighbors.filter { targetHex ->
             val canSlide: Boolean = Rules.instance.canSlideTo(startingHex, targetHex, board)
             val stillOneHive: Boolean = Rules.instance.isOneHiveIntact(startingHex, targetHex, board)
-            if (canSlide && stillOneHive) {
-                result.add(targetHex)
-            }
+            canSlide && stillOneHive
         }
-
-        return result
     }
 
-    override fun canMimic(): Boolean {
-        return false
-    }
+    override fun canMimic(): Boolean = false
 
-    override fun canMoveOthers(): Boolean {
-        return false
-    }
+    override fun canMoveOthers(): Boolean = false
 }

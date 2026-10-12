@@ -4,7 +4,7 @@ import dk.ilios.hivemind.ai.heuristics.BoardValueHeuristic
 import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameCommand
 import dk.ilios.hivemind.model.Board
-import java.util.*
+import kotlin.random.Random
 
 /**
  * AI that implements standard MinMax tree search.
@@ -12,11 +12,9 @@ import java.util.*
  */
 class SimpleMinMaxAI(name: String?, heuristic: BoardValueHeuristic, depth: Int, maxTimeInMillis: Int) :
     AbstractMinMaxAI(name, heuristic, depth, maxTimeInMillis) {
-    private val random = Random()
+    private val random = Random.Default
 
-    override fun copy(): HiveAI {
-        return SimpleMinMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
-    }
+    override fun copy(): HiveAI = SimpleMinMaxAI(name, heuristic, searchDepth, maxTimeInMillis)
 
     override fun nextMove(state: Game, board: Board): GameCommand {
         maximizingPlayer = state.requireActivePlayer()

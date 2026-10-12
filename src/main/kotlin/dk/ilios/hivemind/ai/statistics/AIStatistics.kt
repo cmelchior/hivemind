@@ -1,22 +1,27 @@
 package dk.ilios.hivemind.ai.statistics
 
 import dk.ilios.hivemind.ai.HiveAI
-import java.util.*
+import java.util.UUID
 
 /**
  * Utility class for keeping track of AI performance
  */
-class AIStatistics(ai: HiveAI) {
+class AIStatistics(private val ai: HiveAI) {
     private val DEBUG = true
 
-    private val ai: HiveAI
+    private val moveTimes = mutableListOf<Long>()
+    private val evaluationRates = mutableListOf<Int>()
+    private val evaluations = mutableListOf<Int>()
+    private val hits = mutableListOf<Int>()
 
-    // Result arrays
-    var millisecondsPrMove: ArrayList<Long?> = ArrayList<Long?>() // Time in milliseconds pr. move of the game
-    var gameStatesEvaluatedPrSecond: ArrayList<Int?> = ArrayList<Int?>() // Normalized "performance" value
-    var positionsEvaluatedPrMove: ArrayList<Int?> =
-        ArrayList<Int?>() // Number of positions looked at when finding a move.
-    var cacheHits: ArrayList<Int?> = ArrayList<Int?>() // Number of cachehits
+    val millisecondsPrMove: List<Long>
+        get() = moveTimes
+    val gameStatesEvaluatedPrSecond: List<Int>
+        get() = evaluationRates
+    val positionsEvaluatedPrMove: List<Int>
+        get() = evaluations
+    val cacheHits: List<Int>
+        get() = hits
 
     var numberOfCutoffs: Int = 0
     var totalCutoffTurns: Int = 0 // Average number of moves before cutoffs is totalCutoffTurns/numberOfCutoffs
@@ -30,16 +35,12 @@ class AIStatistics(ai: HiveAI) {
     var aiDepth: Int = 3
     var positionsEvaluated: Int = 0 // How many moves has been considered when getting the next move.
 
-    init {
-        this.ai = ai
-    }
-
     /**
      * A new move request has been made.
      */
     fun startCalculatingNextMove() {
         currentKey = UUID.randomUUID().toString()
-        StopWatch.instance!!.start(currentKey)
+        StopWatch.instance.start(currentKey)
         positionsEvaluated = 0
     }
 
@@ -47,13 +48,13 @@ class AIStatistics(ai: HiveAI) {
      * The AI has returned a move
      */
     fun moveCalculated() {
-        val time: Long = StopWatch.instance!!.stop(currentKey).elapsedTimeInMillis
+        val time: Long = StopWatch.instance.stop(currentKey).elapsedTimeInMillis
         val movesPrSecond = (positionsEvaluated / (time / 1000.0)).toInt()
 
-        millisecondsPrMove.add(time)
-        gameStatesEvaluatedPrSecond.add(movesPrSecond)
-        positionsEvaluatedPrMove.add(positionsEvaluated)
-        cacheHits.add(cacheHit)
+        moveTimes.add(time)
+        evaluationRates.add(movesPrSecond)
+        evaluations.add(positionsEvaluated)
+        hits.add(cacheHit)
 
         if (DEBUG) {
             println("(" + millisecondsPrMove.size + ") " + ai.name + " : " + (time / 1000.0) + " s.")
@@ -68,84 +69,25 @@ class AIStatistics(ai: HiveAI) {
     }
 
     val averageTimePrMove: Double
-        get() {
-            var result = 0
-            for (i in millisecondsPrMove) {
-                result += i!!.toInt()
-            }
-
-            return result / millisecondsPrMove.size.toDouble()
-        }
+        get() = moveTimes.sumOf { it.toInt() } / moveTimes.size.toDouble()
 
     val meanTimePrMove: Long
-        get() {
-            if (millisecondsPrMove.size == 0) return 0
-            val list = arrayOfNulls<Long>(millisecondsPrMove.size)
-            millisecondsPrMove.toArray<Long?>(list)
-            Arrays.sort(list)
-            return list[list.size / 2]!!
-        }
+        get() = if (moveTimes.isEmpty()) 0 else moveTimes.sorted()[moveTimes.size / 2]
 
     val maxTimePrMove: Long
-        get() {
-            var result: Long = 0
-            for (i in millisecondsPrMove) {
-                if (i!! > result) {
-                    result = i
-                }
-            }
-            return result
-        }
+        get() = (moveTimes.maxOrNull() ?: 0).coerceAtLeast(0)
 
     val averagePositionsEvaluatedPrMove: Double
-        get() {
-            var result = 0
-            for (i in positionsEvaluatedPrMove) {
-                result += i!!
-            }
-
-            return result / positionsEvaluatedPrMove.size.toDouble()
-        }
+        get() = evaluations.sum() / evaluations.size.toDouble()
 
     val meanPositionsEvaluatedPrMove: Int
-        get() {
-            if (positionsEvaluatedPrMove.size == 0) return 0
-            val list = arrayOfNulls<Int>(positionsEvaluatedPrMove.size)
-            positionsEvaluatedPrMove.toArray<Int?>(list)
-            Arrays.sort(list)
-            return list[list.size / 2]!!
-        }
+        get() = if (evaluations.isEmpty()) 0 else evaluations.sorted()[evaluations.size / 2]
 
     val maxPositionsEvaluatedPrMove: Int
-        get() {
-            var result = 0
-            for (i in positionsEvaluatedPrMove) {
-                if (i!! > result) {
-                    result = i
-                }
-            }
-
-            return result
-        }
-
-    fun getMillisecondsPrMove(): MutableList<Long?> {
-        return millisecondsPrMove
-    }
-
-    fun getGameStatesEvaluatedPrSecond(): MutableList<Int?> {
-        return gameStatesEvaluatedPrSecond
-    }
-
-    fun getPositionsEvaluatedPrMove(): MutableList<Int?> {
-        return positionsEvaluatedPrMove
-    }
+        get() = (evaluations.maxOrNull() ?: 0).coerceAtLeast(0)
 
     val averageBranchFactor: Int
-        get() = if (nodes > 0) Math.round((branches / nodes).toFloat()) else 0
-
-    fun getCacheHits(): MutableList<Int?> {
-        return cacheHits
-    }
+        get() = if (nodes > 0) branches / nodes else 0
 
     fun nodeBranched(size: Int) {
         nodes++

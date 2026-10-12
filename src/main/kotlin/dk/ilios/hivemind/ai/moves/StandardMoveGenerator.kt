@@ -12,50 +12,47 @@ import dk.ilios.hivemind.model.rules.Rules
  * No ordering of moves is assumed.
  */
 class StandardMoveGenerator : MoveGenerator() {
-    override fun generateMoves(initialList: MutableList<GameCommand>, state: Game): MutableList<GameCommand> {
-        val result = initialList
+    override fun generateMoves(initialList: List<GameCommand>, state: Game): List<GameCommand> = buildList {
+        addAll(initialList)
         val player = state.requireActivePlayer()
-        val board = state.getBoard()
+        val board = state.board
 
         // If in game ending position, no moves are possible
         if (Rules.instance.isQueenSurrounded(player, board) || Rules.instance
                 .isQueenSurrounded(checkNotNull(state.otherPlayer), board)
         ) {
-            return result
+            return@buildList
         }
 
         // If turn 4 and not placed queen, it must be placed now
-        val availableTokensFromSupply: MutableSet<Token>
+        val availableTokensFromSupply: Set<Token>
         if (player.moves == 3 && !player.hasPlacedQueen()) {
-            availableTokensFromSupply = HashSet<Token>()
-            availableTokensFromSupply.add(player.getFromSupply(BugType.QUEEN_BEE))
+            availableTokensFromSupply = setOf(player.getFromSupply(BugType.QUEEN_BEE))
         } else {
             availableTokensFromSupply = player.supply
         }
 
         // Get all moves adding tokens from supply
         for (token in availableTokensFromSupply) {
-            val hexes: MutableList<Hex> = Rules.instance.getStartHexes(player, board)
+            val hexes: List<Hex> = Rules.instance.getStartHexes(player, board)
             for (hex in hexes) {
-                result.add(createGameCommand(token, hex))
+                add(createGameCommand(token, hex))
             }
         }
 
         // Get moves for all tokens on the board (only allowed if player has placed queen)
         if (player.hasPlacedQueen()) {
-            val inPlayTokens: MutableSet<Token> = Rules.instance.getFreeTokens(player, board)
+            val inPlayTokens: Set<Token> = Rules.instance.getFreeTokens(player, board)
             for (token in inPlayTokens) {
-                val hexes = checkNotNull(Rules.instance.getTargetHexes(token, board))
+                val hexes = Rules.instance.getTargetHexes(token, board)
                 for (hex in hexes) {
-                    result.add(createGameCommand(token, hex))
+                    add(createGameCommand(token, hex))
                 }
             }
         }
 
-        if (result.isEmpty()) {
-            result.add(GameCommand.PASS)
+        if (isEmpty()) {
+            add(GameCommand.PASS)
         }
-
-        return result
     }
 }

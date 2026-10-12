@@ -33,11 +33,11 @@ class BeetleTest {
         board.addToken(bee, 0, 0)
         board.addToken(ant, 1, -1)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(bee, board))
+        val targets = Rules.instance.getTargetHexes(bee, board)
         Assert.assertEquals(3, targets.size.toLong())
-        Assert.assertEquals(board.getHex(0, -1), targets.get(0))
-        Assert.assertEquals(board.getHex(1, -1), targets.get(1))
-        Assert.assertEquals(board.getHex(1, 0), targets.get(2))
+        Assert.assertEquals(board.getHex(0, -1), targets[0])
+        Assert.assertEquals(board.getHex(1, -1), targets[1])
+        Assert.assertEquals(board.getHex(1, 0), targets[2])
     }
 
     /**
@@ -55,7 +55,7 @@ class BeetleTest {
         board.addToken(p2.getFromSupply(BugType.SPIDER), 1, 0)
         board.addToken(p2.getFromSupply(BugType.SPIDER), 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(beetle, board))
+        val targets = Rules.instance.getTargetHexes(beetle, board)
         Assert.assertEquals(4, targets.size.toLong())
         Assert.assertFalse(targets.contains(board.getHex(1, -1)))
     }
@@ -74,7 +74,7 @@ class BeetleTest {
         board.addToken(p2.getFromSupply(BugType.GRASSHOPPER), 1, -1)
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(bee, board))
+        val targets = Rules.instance.getTargetHexes(bee, board)
         Assert.assertEquals(5, targets.size.toLong())
         Assert.assertTrue(targets.contains(board.getHex(1, -1)))
     }

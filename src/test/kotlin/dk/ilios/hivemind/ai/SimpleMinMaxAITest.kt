@@ -77,7 +77,7 @@ class SimpleMinMaxAITest {
         game.turnLimit = 1
         game.start()
         game.continueGame() // Turn 1 (White)
-        val command = checkNotNull(ai.nextMove(game, game.getBoard())) // Turn 1 (Black)
+        val command = checkNotNull(ai.nextMove(game, game.board)) // Turn 1 (Black)
 
         Assert.assertEquals(p2.queen, command.token)
         Assert.assertEquals(0, command.toQ.toLong())
@@ -90,7 +90,7 @@ class SimpleMinMaxAITest {
             override fun calculateBoardValue(state: Game): Int {
                 // Black really wants token at (0,1).
                 if (state.requireActivePlayer().isBlack) {
-                    val hex = state.getBoard().getHex(0, 1)
+                    val hex = state.board.getHex(0, 1)
                     val t = hex.topToken
                     return if (t != null && t.player.isBlack) -100 else -25
                 } else {
@@ -131,7 +131,7 @@ class SimpleMinMaxAITest {
         game.start()
         game.continueGame() // Turn 1 (White)
 
-        val command = checkNotNull(ai.nextMove(game, game.getBoard())) // Turn 1 (Black)
+        val command = checkNotNull(ai.nextMove(game, game.board)) // Turn 1 (Black)
 
         Assert.assertEquals(0, command.toQ.toLong())
         Assert.assertEquals(1, command.toR.toLong())
@@ -151,7 +151,7 @@ class SimpleMinMaxAITest {
         game.turnLimit = 10
         game = TestSetups.sureWinInOneTurn(game)
 
-        val command = checkNotNull(ai.nextMove(game, game.getBoard()))
+        val command = checkNotNull(ai.nextMove(game, game.board))
         Assert.assertEquals(1, command.toQ.toLong())
         Assert.assertEquals(1, command.toR.toLong())
     }
@@ -170,7 +170,7 @@ class SimpleMinMaxAITest {
         game.turnLimit = 10
         game = TestSetups.sureWinInOneTurn(game)
 
-        val command = checkNotNull(ai.nextMove(game, game.getBoard()))
+        val command = checkNotNull(ai.nextMove(game, game.board))
 
         Assert.assertEquals(1, command.toQ.toLong())
         Assert.assertEquals(1, command.toR.toLong())
@@ -191,7 +191,7 @@ class SimpleMinMaxAITest {
         game.turnLimit = 10
         game = TestSetups.sureWinInTwoTurns(game)
 
-        val command = checkNotNull(ai.nextMove(game, game.getBoard()))
+        val command = checkNotNull(ai.nextMove(game, game.board))
         Assert.assertEquals(2, command.toQ.toLong())
         Assert.assertEquals(1, command.toR.toLong())
     }

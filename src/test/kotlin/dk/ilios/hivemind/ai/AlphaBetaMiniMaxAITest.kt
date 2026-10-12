@@ -24,7 +24,7 @@ class AlphaBetaMiniMaxAITest {
         game.turnLimit = 10
         game = TestSetups.sureWinInOneTurn(game)
 
-        val command = checkNotNull(ai.nextMove(game, game.getBoard()))
+        val command = checkNotNull(ai.nextMove(game, game.board))
 
         Assert.assertEquals(1, command.toQ.toLong())
         Assert.assertEquals(1, command.toR.toLong())
@@ -45,7 +45,7 @@ class AlphaBetaMiniMaxAITest {
         game.turnLimit = 10
         game.setStandardPositionMode(StandardPositionMode.DISABLED)
         game = TestSetups.sureWinInTwoTurns(game)
-        val command = checkNotNull(ai.nextMove(game, game.getBoard()))
+        val command = checkNotNull(ai.nextMove(game, game.board))
 
         Assert.assertEquals(2, command.toQ.toLong())
         Assert.assertEquals(1, command.toR.toLong())

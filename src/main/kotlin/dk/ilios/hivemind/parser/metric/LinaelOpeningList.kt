@@ -71,27 +71,27 @@ import dk.ilios.hivemind.parser.BoardspaceGameType
  *
  */
 class LinaelOpeningList : Metric() {
-    private val results: MutableMap<String?, ArrayList<String?>?> = HashMap<String?, ArrayList<String?>?>()
+    private val results: MutableMap<String, MutableList<String?>> = hashMapOf<String, MutableList<String?>>()
 
     init {
-        results.put(TYPE1, ArrayList<String?>())
-        results.put(TYPE2, ArrayList<String?>())
-        results.put(TYPE3, ArrayList<String?>())
-        results.put(TYPE_RELAXED, ArrayList<String?>())
+        results[TYPE1] = mutableListOf<String?>()
+        results[TYPE2] = mutableListOf<String?>()
+        results[TYPE3] = mutableListOf<String?>()
+        results[TYPE_RELAXED] = mutableListOf<String?>()
     }
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
         if (!variant.contains("l")) return  // We only care about games with the ladybug
 
-        if (game.getWhitePlayer().turns < 3 || game.getBlackPlayer()
+        if (game.whitePlayer.turns < 3 || game.blackPlayer
                 .turns < 3
         ) return  // Both players must have had 3 turns
 
         game.setReplayMode(true)
         val openingType = getOpeningType(game)
         if (openingType !== UNKNOWN) {
-            println(openingType + ": " + game.name + "\n" + printer.toString(game.getBoard()))
-            results.get(openingType)!!.add(game.name + "\n" + printer.toString(game.getBoard()))
+            println(openingType + ": " + game.name + "\n" + printer.toString(game.board))
+            results[openingType]!!.add(game.name + "\n" + printer.toString(game.board))
         }
     }
 
@@ -116,7 +116,7 @@ class LinaelOpeningList : Metric() {
     }
 
     private fun isType1(game: Game): Boolean {
-        val b = game.getBoard()
+        val b = game.board
 
         val w1 = b.getHexForStandardPosition(1, 0).topToken
         val w2 = b.getHexForStandardPosition(0, 0).topToken
@@ -136,7 +136,7 @@ class LinaelOpeningList : Metric() {
 
 
     private fun isType2(game: Game): Boolean {
-        val b = game.getBoard()
+        val b = game.board
 
         val w1 = b.getHexForStandardPosition(1, 0).topToken
         val w2 = b.getHexForStandardPosition(0, 0).topToken
@@ -155,7 +155,7 @@ class LinaelOpeningList : Metric() {
     }
 
     private fun isType3(game: Game): Boolean {
-        val b = game.getBoard()
+        val b = game.board
 
         val w1 = b.getHexForStandardPosition(1, 0).topToken
         val w2 = b.getHexForStandardPosition(0, 0).topToken
@@ -174,7 +174,7 @@ class LinaelOpeningList : Metric() {
     }
 
     private fun isTypeRelaxed(game: Game): Boolean {
-        val b = game.getBoard()
+        val b = game.board
 
         val w1 = b.getHexForStandardPosition(1, 0).topToken
         val w2 = b.getHexForStandardPosition(0, 0).topToken
@@ -194,7 +194,7 @@ class LinaelOpeningList : Metric() {
 
         for (key in results.keys) {
             sb.append(key + ":\n")
-            val results = ArrayList<String?>()
+            val results = mutableListOf<String?>()
             for (name in results) {
                 sb.append(name + "\n\n")
             }

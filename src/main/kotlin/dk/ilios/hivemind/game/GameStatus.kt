@@ -15,7 +15,5 @@ enum class GameStatus(value: Int) {
         this.value = value
     }
 
-    fun winnerFound(): Boolean {
-        return this == RESULT_BLACK_WINS || this == RESULT_WHITE_WINS
-    }
+    fun winnerFound(): Boolean = this == RESULT_BLACK_WINS || this == RESULT_WHITE_WINS
 }

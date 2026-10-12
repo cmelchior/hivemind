@@ -4,20 +4,19 @@ import dk.ilios.hivemind.game.Game
 import dk.ilios.hivemind.game.GameStatus
 import dk.ilios.hivemind.model.Player
 import dk.ilios.hivemind.parser.BoardspaceGameType
-import java.util.*
 
 
 /**
  * Show openings for both black and white and their respective win rates
  */
 class CompareOpeningsMetric : Metric() {
-    private val results: MutableMap<String?, Result> = HashMap<String?, Result>()
+    private val results: MutableMap<String, Result> = hashMapOf<String, Result>()
 
     override fun analyzeGame(type: BoardspaceGameType, variant: String, game: Game) {
-        if (game.getWhitePlayer().turns < 4 || game.getBlackPlayer().turns < 4) return
+        if (game.whitePlayer.turns < 4 || game.blackPlayer.turns < 4) return
 
-        val whiteOpening = getOpening(game.getWhitePlayer(), game)
-        val blackOpening = getOpening(game.getBlackPlayer(), game)
+        val whiteOpening = getOpening(game.whitePlayer, game)
+        val blackOpening = getOpening(game.blackPlayer, game)
 
         val key = whiteOpening + blackOpening
 
@@ -25,10 +24,10 @@ class CompareOpeningsMetric : Metric() {
             val result: Result = Result()
             result.whiteOpening = whiteOpening
             result.blackOpening = blackOpening
-            results.put(key, result)
+            results[key] = result
         }
 
-        val r: Result = results.get(key)!!
+        val r: Result = results[key]!!
 
         val status = game.status
         when (status) {
@@ -65,15 +64,14 @@ class CompareOpeningsMetric : Metric() {
     }
 
     private fun saveCount() {
-        val file = Array<Array<String?>>(results.size + 1) { arrayOfNulls<String>(5) }
+        val file = Array(results.size + 1) { arrayOfNulls<String>(5) }
         file[0] = arrayOf<String?>("White", "WhiteWin", "Draw", "BlackWin", "Black")
 
-        val keys = ArrayList<Result?>(results.values).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.values.sorted()
 
         var row = 1
         for (i in keys.indices.reversed()) {
-            val r = keys[i] as Result
+            val r = keys[i]
             file[row][0] = r.whiteOpening
             file[row][1] = r.whiteWins.toString()
             file[row][2] = r.draws.toString()
@@ -86,15 +84,14 @@ class CompareOpeningsMetric : Metric() {
     }
 
     private fun savePercentage() {
-        val file = Array<Array<String?>>(results.size + 1) { arrayOfNulls<String>(5) }
+        val file = Array(results.size + 1) { arrayOfNulls<String>(5) }
         file[0] = arrayOf<String?>("White", "WhiteWin", "Draw", "BlackWin", "Black")
 
-        val keys = ArrayList<Result?>(results.values).toTypedArray()
-        Arrays.sort(keys)
+        val keys = results.values.sorted()
 
         var row = 1
         for (i in keys.indices.reversed()) {
-            val r = keys[i] as Result
+            val r = keys[i]
             file[row][0] = r.whiteOpening
             file[row][1] = if (r.total() > 0) (100 * r.whiteWins / r.total().toFloat()).toString() else "0.0"
             file[row][2] = if (r.total() > 0) (100 * r.draws / r.total().toFloat()).toString() else "0.0"
@@ -114,13 +111,9 @@ class CompareOpeningsMetric : Metric() {
         var draws: Int = 0
         var others: Int = 0
 
-        fun total(): Int {
-            return whiteWins + blackWins + draws
-        }
+        fun total(): Int = whiteWins + blackWins + draws
 
-        fun key(): String {
-            return whiteOpening + blackOpening
-        }
+        fun key(): String = whiteOpening + blackOpening
 
         override fun compareTo(other: Any?): Int {
             if (other !is Result) return 1

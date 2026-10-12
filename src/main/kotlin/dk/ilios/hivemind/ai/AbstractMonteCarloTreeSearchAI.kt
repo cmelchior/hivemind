@@ -33,47 +33,44 @@ abstract class AbstractMonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxT
     /**
      * Generate all moves for the current game state.
      */
-    protected fun generateMoves(state: Game): MutableList<GameCommand> {
-        val result: MutableList<GameCommand> = ArrayList<GameCommand>()
+    protected fun generateMoves(state: Game): List<GameCommand> = buildList {
         val player = state.requireActivePlayer()
-        val board = state.getBoard()
+        val board = state.board
 
 
         // If turn 4 and not placed queen, it must be placed now
-        val supply: MutableSet<Token>
+        val supply: Set<Token>
         if (player.moves == 3 && !player.hasPlacedQueen()) {
-            supply = HashSet<Token>()
-            supply.add(player.getFromSupply(BugType.QUEEN_BEE))
+            supply = setOf(player.getFromSupply(BugType.QUEEN_BEE))
         } else {
             supply = player.supply
         }
 
         // Get all moves adding tokens from supply
         for (token in supply) {
-            val hexes: MutableList<Hex> = Rules.instance.getStartHexes(player, board)
+            val hexes: List<Hex> = Rules.instance.getStartHexes(player, board)
             for (hex in hexes) {
-                result.add(createGameCommand(token, hex))
+                add(createGameCommand(token, hex))
             }
         }
 
         // Get moves for all tokens on the board (only allowed if player has placed queen)
         if (player.hasPlacedQueen()) {
-            val inPlayTokens: MutableSet<Token> = Rules.instance.getFreeTokens(player, board)
+            val inPlayTokens: Set<Token> = Rules.instance.getFreeTokens(player, board)
             for (token in inPlayTokens) {
-                val hexes = checkNotNull(Rules.instance.getTargetHexes(token, board))
+                val hexes = Rules.instance.getTargetHexes(token, board)
                 for (hex in hexes) {
-                    result.add(createGameCommand(token, hex))
+                    add(createGameCommand(token, hex))
                 }
             }
         }
 
         // If no moves available / PASS
-        if (result.isEmpty()) {
-            result.add(GameCommand.PASS)
+        if (isEmpty()) {
+            add(GameCommand.PASS)
         }
 
-        aiStats.nodeBranched(result.size)
-        return result
+        aiStats.nodeBranched(size)
     }
 
     protected fun createGameCommand(token: Token, hex: Hex): GameCommand {
@@ -90,9 +87,9 @@ abstract class AbstractMonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxT
      */
     protected fun isGameOver(state: Game): Boolean {
         val whiteDead: Boolean =
-            Rules.instance.isQueenSurrounded(state.getWhitePlayer(), state.getBoard())
+            Rules.instance.isQueenSurrounded(state.whitePlayer, state.board)
         val blackDead: Boolean =
-            Rules.instance.isQueenSurrounded(state.getBlackPlayer(), state.getBoard())
+            Rules.instance.isQueenSurrounded(state.blackPlayer, state.board)
         return whiteDead || blackDead
     }
 
@@ -107,7 +104,7 @@ abstract class AbstractMonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxT
         private var maxChildren =
             -1 // How many children does the game node has. 0 Indicate game end result. -1 = Node has not been explored
         private val children: MutableMap<GameCommand?, GameNode> =
-            HashMap<GameCommand?, GameNode>() // Currently explored children
+            hashMapOf<GameCommand?, GameNode>() // Currently explored children
 
         // MCTS properties
         var visits: Int = 0 // Games played through this node
@@ -117,13 +114,10 @@ abstract class AbstractMonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxT
         val isTerminal: Boolean = false
 
 
-        fun getChildren(): MutableList<GameNode> {
-            return ArrayList<GameNode>(children.values)
-        }
+        val childNodes: List<GameNode>
+            get() = children.values.toList()
 
-        fun hasChild(child: GameCommand?): Boolean {
-            return children.keys.contains(child)
-        }
+        fun hasChild(child: GameCommand?): Boolean = children.keys.contains(child)
 
         fun setMaxChildren(maxChildren: Int) {
             // Only possible to set max children once
@@ -132,15 +126,13 @@ abstract class AbstractMonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxT
             }
         }
 
-        fun getMaxChildren(): Int {
-            return maxChildren
-        }
+        fun getMaxChildren(): Int = maxChildren
 
         val isCompletelyVisited: Boolean
             get() = children.size == maxChildren
 
         fun addChild(node: GameNode) {
-            children.put(node.command, node)
+            children[node.command] = node
         }
 
         fun addResult(result: Int) {
@@ -164,7 +156,5 @@ abstract class AbstractMonteCarloTreeSearchAI(name: String?, maxDepth: Int, maxT
         }
     }
 
-    override fun maintainsStandardPosition(): Boolean {
-        return false
-    }
+    override fun maintainsStandardPosition(): Boolean = false
 }

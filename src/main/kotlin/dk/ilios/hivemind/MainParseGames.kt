@@ -8,126 +8,87 @@ import dk.ilios.hivemind.parser.filters.QueenAsStartingPieceFilter
 import dk.ilios.hivemind.parser.metric.LinaelOpeningComparison
 import dk.ilios.hivemind.parser.metric.Metric
 import java.io.File
-import java.util.*
 
 class MainParseGames {
-    var metrics: MutableList<Metric> = ArrayList<Metric>()
-    var filters: MutableList<Filter> = ArrayList<Filter>()
-    var files: MutableMap<BoardspaceGameType, MutableList<File>> = HashMap<BoardspaceGameType, MutableList<File>>()
+    val metrics: List<Metric> = setupMetrics()
+    val filters: List<Filter> = setupFilters()
+    var files: Map<BoardspaceGameType, List<File>> = emptyMap()
+        private set
 
     fun start() {
-        setupMetrics()
-        setupFilters()
-        setupGameFiles()
+        files = setupGameFiles()
 
-        // Start parsing
-        // If a game breaks, quit parsing and report progress so far
-        val i = 0
-        for (type in files.keys) {
-            val fileList: MutableList<File> = files.get(type)!!
+        // Start parsing. Skip files that cannot be parsed.
+        for ((type, fileList) in files) {
             for (file in fileList) {
-                var parser: BoardspaceGameParser? = null
-                var game: Game? = null
-
+                val parser: BoardspaceGameParser
+                val game: Game
                 try {
                     parser = BoardspaceGameParser(file)
                     game = parser.parse()
                 } catch (e: RuntimeException) {
-                    println("Game could not be parsed: " + file.getName() + " -> " + e)
+                    println("Game could not be parsed: ${file.name} -> $e")
                     continue
                 }
 
-                var analyseGame = true
-                for (filter in filters) {
-                    if (!filter.analyseGame(parser.getGameType(), game)) {
-                        analyseGame = false
-                        break
-                    }
-                }
-
-                if (analyseGame) {
+                if (filters.all { it.analyseGame(parser.gameType, game) }) {
                     for (metric in metrics) {
                         game.setReplayMode(false)
-                        metric.analyzeGame(type, parser.getGameType(), game)
+                        metric.analyzeGame(type, parser.gameType, game)
                     }
                 }
             }
         }
 
-        saveMetrics()
+        metrics.forEach { it.save() }
     }
 
-    private fun setupGameFiles() {
-        // Test
-        // val testFiles = mutableListOf(File("./plays/test.sgf"))
-        // files[BoardspaceGameType.PLAYER] = testFiles
-
-        val tournamentFiles = Stack<File>()
-        tournamentFiles.add(File(TOURNAMENT_DIR))
-        files.put(BoardspaceGameType.TOURNAMENT, findAllFiles(tournamentFiles, ArrayList<File>()))
-
-        val playerFiles = Stack<File>()
-        playerFiles.add(File(PLAYER_DIR))
-        files.put(BoardspaceGameType.PLAYER, findAllFiles(playerFiles, ArrayList<File>()))
-
-        // val dumbotFiles = Stack<File>()
-        // dumbotFiles.add(File(DUMBOT_DIR))
-        // files[BoardspaceGameType.DUMBOT] = findAllFiles(dumbotFiles, ArrayList<File>())
-    }
-
+    private fun setupGameFiles(): Map<BoardspaceGameType, List<File>> = hashMapOf(
+        BoardspaceGameType.TOURNAMENT to findAllFiles(File(TOURNAMENT_DIR)),
+        BoardspaceGameType.PLAYER to findAllFiles(File(PLAYER_DIR)),
+        // BoardspaceGameType.DUMBOT to findAllFiles(File(DUMBOT_DIR)),
+        // BoardspaceGameType.PLAYER to listOf(File("./plays/test.sgf")),
+    )
 
     // Setup metrics to report on
-    private fun setupMetrics() {
-        // metrics.add(GamesAnalyzedMetric())
-        // metrics.add(GameResultPrColorMetric(true))
-        // metrics.add(GameDurationTurnsMetric())
-        // metrics.add(GameDurationTimeMetric())
-        // metrics.add(OpeningTokenMetric())
-        // metrics.add(LastTokenMetric())
-        // metrics.add(BugsInSupplyAtGameEndMetric())
-        // metrics.add(BugsOnBoardAtGameEndMetric())
-        // metrics.add(OpeningsMetric())
-        // metrics.add(WinnerOpeningMetric())
-        // metrics.add(FreeTokensPrTurnMetric(15))
-        // metrics.add(FreeTokensPrTurnMetric(25))
-        // metrics.add(TokensAroundQueenMetric(15))
-        // metrics.add(TokensAroundQueenMetric(25))
-        // metrics.add(HighRankedGamesMetric())
-        // metrics.add(CompareOpeningsMetric())
-        // metrics.add(LeastMovedTokenMetric())
-        // metrics.add(IngersollOpeningsMetric())
-        // metrics.add(LinaelOpeningList())
-        metrics.add(LinaelOpeningComparison())
-    }
+    private fun setupMetrics(): List<Metric> = listOf(
+        // GamesAnalyzedMetric(),
+        // GameResultPrColorMetric(true),
+        // GameDurationTurnsMetric(),
+        // GameDurationTimeMetric(),
+        // OpeningTokenMetric(),
+        // LastTokenMetric(),
+        // BugsInSupplyAtGameEndMetric(),
+        // BugsOnBoardAtGameEndMetric(),
+        // OpeningsMetric(),
+        // WinnerOpeningMetric(),
+        // FreeTokensPrTurnMetric(15),
+        // FreeTokensPrTurnMetric(25),
+        // TokensAroundQueenMetric(15),
+        // TokensAroundQueenMetric(25),
+        // HighRankedGamesMetric(),
+        // CompareOpeningsMetric(),
+        // LeastMovedTokenMetric(),
+        // IngersollOpeningsMetric(),
+        // LinaelOpeningList(),
+        LinaelOpeningComparison(),
+    )
 
-    private fun setupFilters() {
-        // filters.add(BoardspaceNetMasterPlayersFilter())
-        // filters.add(HivePLGamesOnlyFilter())
-        filters.add(QueenAsStartingPieceFilter())
-    }
+    private fun setupFilters(): List<Filter> = listOf(
+        // BoardspaceNetMasterPlayersFilter(),
+        // HivePLGamesOnlyFilter(),
+        QueenAsStartingPieceFilter(),
+    )
 
-
-    // Recursively find all files in the dirs then return result when done
-    private fun findAllFiles(dirs: Stack<File>, result: ArrayList<File>): MutableList<File> {
-        if (dirs.isEmpty()) {
-            return result
-        } else {
-            val files = dirs.pop()!!.listFiles()
-            for (file in files!!) {
-                if (file.isDirectory()) {
-                    dirs.push(file)
-                } else {
-                    result.add(file)
-                }
+    // Visit directories in the same depth-first order as the original stack traversal.
+    private fun findAllFiles(directory: File): List<File> = buildList {
+        val directories = ArrayDeque<File>()
+        directories.addLast(directory)
+        while (directories.isNotEmpty()) {
+            val children = checkNotNull(directories.removeLast().listFiles())
+            for (file in children) {
+                if (file.isDirectory) directories.addLast(file) else add(file)
             }
-
-            return findAllFiles(dirs, result)
-        }
-    }
-
-    private fun saveMetrics() {
-        for (metric in metrics) {
-            metric.save()
         }
     }
 

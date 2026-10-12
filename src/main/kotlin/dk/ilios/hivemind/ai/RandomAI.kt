@@ -8,7 +8,7 @@ import dk.ilios.hivemind.model.BugType
 import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.Token
 import dk.ilios.hivemind.model.rules.Rules
-import java.util.*
+import kotlin.random.Random
 
 /**
  * Test AI that randomly either places a bug or moves a existing bug.
@@ -16,14 +16,12 @@ import java.util.*
  * If queen has not been placed by turn 3 it will always happen on turn 4.
  */
 class RandomAI(override val name: String?) : HiveAI {
-    private val random = Random()
+    private val random = Random.Default
     private lateinit var state: Game
     private val stats = AIStatistics(this)
 
 
-    override fun copy(): HiveAI {
-        return RandomAI(name)
-    }
+    override fun copy(): HiveAI = RandomAI(name)
 
     @Synchronized
     override fun nextMove(state: Game, board: Board): GameCommand {
@@ -67,29 +65,27 @@ class RandomAI(override val name: String?) : HiveAI {
         return moveTokenFromSupplyToRandomBoardLocation(token)
     }
 
-    private fun haveTokensInSupply(): Boolean {
-        return state.requireActivePlayer().supply.size > 0
-    }
+    private fun haveTokensInSupply(): Boolean = state.requireActivePlayer().supply.isNotEmpty()
 
     private fun moveTokenToRandomLocation(token: Token): GameCommand {
-        val targets = checkNotNull(Rules.instance.getTargetHexes(token, state.getBoard()))
-        if (targets.size == 0) {
+        val targets = Rules.instance.getTargetHexes(token, state.board)
+        if (targets.isEmpty()) {
             return GameCommand.PASS
         } else {
             val fromHex = token.hex
-            val hex = targets.get(random.nextInt(targets.size))
+            val hex = targets[random.nextInt(targets.size)]
 
             return GameCommand(fromHex!!.q, fromHex.r, hex.q, hex.r, token, false)
         }
     }
 
     private fun moveTokenFromSupplyToRandomBoardLocation(token: Token): GameCommand {
-        val targets: MutableList<Hex> =
-            Rules.instance.getStartHexes(token.player, state.getBoard())
-        if (targets.size == 0) {
+        val targets: List<Hex> =
+            Rules.instance.getStartHexes(token.player, state.board)
+        if (targets.isEmpty()) {
             return GameCommand.PASS
         } else {
-            val hex = targets.get(random.nextInt(targets.size))
+            val hex = targets[random.nextInt(targets.size)]
             return GameCommand(Hex.SUPPLY, Hex.SUPPLY, hex.q, hex.r, token, false)
         }
     }
@@ -111,9 +107,9 @@ class RandomAI(override val name: String?) : HiveAI {
     val randomTokenFromBoard: Token?
         get() {
             val activePlayer = state.requireActivePlayer()
-            val tokens: MutableSet<Token> =
+            val tokens: Set<Token> =
                 Rules.instance
-                    .getFreeTokens(activePlayer, state.getBoard())
+                    .getFreeTokens(activePlayer, state.board)
             for (token in tokens) {
                 if (token.player == activePlayer) {
                     return token
@@ -124,7 +120,5 @@ class RandomAI(override val name: String?) : HiveAI {
         }
 
 
-    override fun maintainsStandardPosition(): Boolean {
-        return false
-    }
+    override fun maintainsStandardPosition(): Boolean = false
 }

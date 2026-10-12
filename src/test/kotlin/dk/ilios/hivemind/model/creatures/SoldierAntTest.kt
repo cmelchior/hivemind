@@ -34,10 +34,10 @@ class SoldierAntTest {
         board.addToken(ant, 0, 0)
         board.addToken(bee, 1, 0)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(5, targets.size.toLong())
-        Assert.assertEquals(board.getHex(1, -1), targets.get(0))
-        Assert.assertEquals(board.getHex(0, 1), targets.get(4))
+        Assert.assertEquals(board.getHex(1, -1), targets[0])
+        Assert.assertEquals(board.getHex(0, 1), targets[4])
     }
 
     /**
@@ -71,7 +71,7 @@ class SoldierAntTest {
         board.addToken(p2.getFromSupply(BugType.SOLDIER_ANT), 0, 1)
         board.addToken(p2.getFromSupply(BugType.BEETLE), 0, 2)
 
-        val targets = checkNotNull(Rules.instance.getTargetHexes(ant, board))
+        val targets = Rules.instance.getTargetHexes(ant, board)
         Assert.assertEquals(11, targets.size.toLong())
         Assert.assertFalse(targets.contains(board.getHex(1, 1)))
     }

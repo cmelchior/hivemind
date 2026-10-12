@@ -7,30 +7,29 @@ import dk.ilios.hivemind.model.Hex
 import dk.ilios.hivemind.model.HexagonUtils
 import dk.ilios.hivemind.model.Token
 import dk.ilios.hivemind.model.rules.Rules
-import java.util.*
+
 
 /**
  * Move generator that generate all possible moves, but puts moves that makes them neighbors to the opposing queen
  * first on the list.
  */
 class AggressiveMovesFirstGenerator : MoveGenerator() {
-    override fun generateMoves(initialList: MutableList<GameCommand>, state: Game): MutableList<GameCommand> {
-        val result = LinkedList<GameCommand>(initialList)
+    override fun generateMoves(initialList: List<GameCommand>, state: Game): List<GameCommand> {
+        val result = ArrayDeque(initialList)
         val player = state.requireActivePlayer()
-        val board = state.getBoard()
+        val board = state.board
 
         // If in game ending position, no moves are possible
         if (Rules.instance.isQueenSurrounded(player, board) || Rules.instance
                 .isQueenSurrounded(checkNotNull(state.otherPlayer), board)
         ) {
-            return result
+            return result.toList()
         }
 
         // If turn 4 and not placed queen, it must be placed now
-        val availableTokensFromSupply: MutableSet<Token>
+        val availableTokensFromSupply: Set<Token>
         if (player.moves == 3 && !player.hasPlacedQueen()) {
-            availableTokensFromSupply = HashSet<Token>()
-            availableTokensFromSupply.add(player.getFromSupply(BugType.QUEEN_BEE))
+            availableTokensFromSupply = setOf(player.getFromSupply(BugType.QUEEN_BEE))
         } else {
             availableTokensFromSupply = player.supply
         }
@@ -42,9 +41,9 @@ class AggressiveMovesFirstGenerator : MoveGenerator() {
 
         // 1) Get moves for all tokens on the board (only allowed if player has placed queen)
         if (player.hasPlacedQueen()) {
-            val inPlayTokens: MutableSet<Token> = Rules.instance.getFreeTokens(player, board)
+            val inPlayTokens: Set<Token> = Rules.instance.getFreeTokens(player, board)
             for (token in inPlayTokens) {
-                val hexes = checkNotNull(Rules.instance.getTargetHexes(token, board))
+                val hexes = Rules.instance.getTargetHexes(token, board)
                 for (hex in hexes) {
                     if (HexagonUtils.distance(queenQ, queenR, hex.q, hex.r) <= 1) {
                         result.addFirst(
@@ -62,7 +61,7 @@ class AggressiveMovesFirstGenerator : MoveGenerator() {
 
         // 2) Get all moves adding tokens from supply
         for (token in availableTokensFromSupply) {
-            val hexes: MutableList<Hex> = Rules.instance.getStartHexes(player, board)
+            val hexes: List<Hex> = Rules.instance.getStartHexes(player, board)
             for (hex in hexes) {
                 if (HexagonUtils.distance(queenQ, queenR, hex.q, hex.r) <= 1) {
                     result.addFirst(
@@ -81,6 +80,6 @@ class AggressiveMovesFirstGenerator : MoveGenerator() {
             result.add(GameCommand.PASS)
         }
 
-        return result
+        return result.toList()
     }
 }
